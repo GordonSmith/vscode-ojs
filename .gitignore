@@ -1,0 +1,10 @@
+/dist
+/grammar
+/lib*
+/node_modules
+/types
+.vscode-test
+*.vsix
+*.log
+*.interp
+*.tokens

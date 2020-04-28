@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "rootDir": "./src",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "target": "ES2019",
+        "outDir": "lib-cjs",
+        "sourceMap": true,
+        "noImplicitAny": false,
+        "noEmitOnError": false,
+        "noUnusedLocals": false,
+        "strictNullChecks": false,
+        "importHelpers": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "skipLibCheck": true,
+        "lib": [
+            "dom",
+            "ES2019"
+        ]
+    },
+    "include": [
+        "./src/**/*.ts",
+        "./node_modules/vscode/vscode.d.ts",
+        "./node_modules/vscode-debugadapter/lib/*",
+        "./node_modules/vscode/lib/*"
+    ]
+}

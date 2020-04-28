@@ -1,0 +1,17 @@
+# Ignore everything
+*
+*/**
+
+# Whitelist required files
+!dist/**/*
+!images/**/*
+!snippets/**/*
+!syntaxes/**/*
+
+!.vscodeignore
+!CHANGELOG.md
+!ecl.configuration.json
+!kel.configuration.json
+!LICENSE
+!package.json
+!README.md
