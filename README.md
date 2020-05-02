@@ -5,18 +5,31 @@ VS Code extension for "Observable JavaScript" by [ObservableHQ](https://observab
 * [ObservableHQ/runtime](https://github.com/observablehq/runtime)
 * [@hpcc-js/observable-md](https://github.com/hpcc-systems/Visualization/tree/master/packages/observable-md)
 
-## Quick Start
+## Getting Started
 
 1. Create a new file with the `.ojs` extension.
 2. Enter "Observable JavaScript" as you would with any language.
-3. Commands:
-  * `OJS: Check Syntax`
-  * `OJS: Preview WebPage`
-  * `OJS: Export WebPage (todo)`
+3. Press `Ctrl+K V` to preview notebook.
+
+## Commands
+_All commands are prefixed with "OJS" and are available via the command palette or by default shortcut key mappings_
+
+| Command                   | Shortcut | Description                                    |
+|---------------------------|:--------:|------------------------------------------------|
+|OJS: Check Syntax          |F7        | Syntax Check                                   |
+|OJS: Preview WebPage       |Ctrl+K V  | Preview notebook in an embedded Web Page       |
+|OJS: Import Notebook       |          | Import notebook from ObservableHQ              |
+|OJS: Export WebPage (todo) |          | Export notebook as a WebPage                   |
+
+## Settings
+_All settings are prefixed with "ojs." and are available via `file -> preferneces -> settings` menu_
+
+| Setting                   | Description                                               |
+|---------------------------|-----------------------------------------------------------|
+| ojs.refreshPreviewOnSave  | Refresh preview (if visible) when OJS document is saved   |
 
 ## Sample File (myfile.ojs)
-
-Som sample content to get started with
+_Sample content to get started with_
 
 ```javascript
 md`# Generator Test`;

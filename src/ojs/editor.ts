@@ -31,8 +31,9 @@ export class Editor {
     }
 
     onSaveWatcher() {
+        const ojsConfig = vscode.workspace.getConfiguration("ojs");
         vscode.workspace.onDidSaveTextDocument(doc => {
-            if (doc.languageId !== "ojs") {
+            if (doc.languageId !== "ojs" || ojsConfig.get<boolean>("refreshPreviewOnSave") === false) {
                 return;
             }
             if (vscode.window.activeTextEditor) {

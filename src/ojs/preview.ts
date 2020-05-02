@@ -1,8 +1,12 @@
 import type { ErrorArray } from "@hpcc-js/observable-md";
 import * as path from "path";
 import * as vscode from "vscode";
+import { Diagnostic } from "./diagnostic";
+import { diagnostics } from "./grammar";
 
 export class Preview {
+    protected _diagnostic: Diagnostic;
+
     static currentPanel: Preview | undefined;
 
     static readonly viewType = "OJSPreview";
@@ -11,7 +15,7 @@ export class Preview {
     private readonly _extensionPath: string;
     private _disposables: vscode.Disposable[] = [];
 
-    static async createOrShow(extensionPath: string) {
+    static async createOrShow(ctx: vscode.ExtensionContext, textDocument: vscode.TextDocument) {
 
         // If we already have a panel, show it.
         if (Preview.currentPanel) {
@@ -27,21 +31,22 @@ export class Preview {
             {
                 enableScripts: true,
                 retainContextWhenHidden: true,
-                localResourceRoots: [vscode.Uri.file(path.join(extensionPath, "dist"))]
+                localResourceRoots: [vscode.Uri.file(path.join(ctx.extensionPath, "dist"))]
             }
         );
 
-        Preview.currentPanel = new Preview(panel, extensionPath);
-        return Preview.currentPanel.init();
+        Preview.currentPanel = new Preview(panel, ctx);
+        return Preview.currentPanel.init(textDocument);
     }
 
-    static revive(panel: vscode.WebviewPanel, extensionPath: string) {
-        Preview.currentPanel = new Preview(panel, extensionPath);
+    static revive(panel: vscode.WebviewPanel, ctx: vscode.ExtensionContext) {
+        Preview.currentPanel = new Preview(panel, ctx);
     }
 
-    private constructor(panel: vscode.WebviewPanel, extensionPath: string) {
+    private constructor(panel: vscode.WebviewPanel, ctx: vscode.ExtensionContext) {
         this._panel = panel;
-        this._extensionPath = extensionPath;
+        this._diagnostic = Diagnostic.attach(ctx);
+        this._extensionPath = ctx.extensionPath;
 
         // Set the webview's initial html content
         this._panel.webview.html = this.getHtmlForWebview(this._panel.webview);
@@ -64,8 +69,18 @@ export class Preview {
 
     _callbackID = 0;
     _callbacks = {};
-    async init() {
+    async init(doc: vscode.TextDocument) {
         // Handle messages from the webview
+        this._diagnostic.setRuntime(doc.uri, []);
+        let runtimeErrors = [];
+        setInterval(() => {
+            if (runtimeErrors) {
+                runtimeErrors.forEach(e => {
+                    this._diagnostic.setRuntime(doc.uri, diagnostics(doc, e));
+                });
+                runtimeErrors = [];
+            }
+        }, 1000);
         return new Promise((resolve, reject) => {
             this._panel.webview.onDidReceiveMessage(message => {
                 const callback = this._callbacks[message.callbackID];
@@ -75,10 +90,14 @@ export class Preview {
                     switch (message.command) {
                         case "loaded":
                             resolve();
-                            return;
+                            break;
+                        case "errors":
+                            runtimeErrors.push(message.content);
+                            // this._diagnostic.setRuntime(doc.uri, diagnostics(doc, message.content));
+                            break;
                         case "alert":
                             vscode.window.showErrorMessage(message.content);
-                            return;
+                            break;
                     }
                 }
             }, null, this._disposables);
@@ -97,6 +116,17 @@ export class Preview {
                 resolve(...args);
             };
             this._panel.webview.postMessage({ command: "evaluate", content, callbackID });
+        });
+    }
+
+    pull(url): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const callbackID = ++this._callbackID;
+            this._callbacks[callbackID] = (...args: any[]) => {
+                delete this._callbacks[callbackID];
+                resolve(...args);
+            };
+            this._panel.webview.postMessage({ command: "pull", url, callbackID });
         });
     }
 

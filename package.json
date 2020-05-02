@@ -1,178 +1,186 @@
 {
-  "private": true,
-  "name": "observable-js",
-  "version": "0.0.0",
-  "publisher": "GordonSmith",
-  "displayName": "Observable JS",
-  "description": "Observable JS Compiler",
-  "icon": "images/ojsIcon.png",
-  "categories": [
-    "Programming Languages"
-  ],
-  "main": "./dist/extension.js",
-  "scripts": {
-    "clean": "rimraf out lib* dist types *.vsix",
-    "compile": "tsc",
-    "compile-watch": "npm run compile -- -watch",
-    "compile-es6": "tsc --module es6 --outDir ./lib-es6",
-    "compile-es6-watch": "npm run compile-es6 -- -w",
-    "bundle": "webpack --mode production",
-    "bundle-dev": "webpack --mode development",
-    "bundle-watch": "webpack --mode development --watch",
-    "build": "run-s compile-es6 bundle",
-    "watch": "npm-run-all compile-es6 --parallel compile-es6-watch bundle-watch",
-    "lint": "tslint --project . src/**/*.ts",
-    "test": "sh ./scripts/e2e.sh",
-    "standard-version": "standard-version",
-    "vscode:prepublish": "run-s clean build",
-    "git-push": "git push --follow-tags upstream master",
-    "vsce-publish": "vsce publish",
-    "vsce-package": "vsce package",
-    "tag": "run-s standard-version git-push"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "@observablehq/inspector": "^3.2.1",
-    "@observablehq/parser": "^4.0.1",
-    "@observablehq/runtime": "^4.7.0",
-    "@hpcc-js/common": "file:../hpcc-js/packages/common",
-    "@hpcc-js/observable-md": "file:../hpcc-js/packages/observable-md",
-    "@hpcc-js/util": "file:../hpcc-js/packages/util",
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^12.12.36",
-    "@types/vscode": "1.43.0",
-    "dynamic-import-polyfill": "^0.1.1",
-    "jsdom": "^16.2.2",
-    "mocha": "^6.2.2",
-    "node-fetch": "^2.6.0",
-    "npm-run-all": "^4.1.5",
-    "rimraf": "^3.0.2",
-    "source-map-loader": "^0.2.4",
-    "standard-version": "^7.1.0",
-    "tslib": "^1.11.1",
-    "tslint": "^5.17.0",
-    "typescript": "^3.8.3",
-    "vsce": "^1.75.0",
-    "vscode": "^1.1.36",
-    "vscode-languageclient": "^6.1.3",
-    "vscode-languageserver": "^6.1.1",
-    "vscode-languageserver-textdocument": "^1.0.1",
-    "vscode-test": "^1.3.0",
-    "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11"
-  },
-  "author": {
-    "name": "Gordon Smith"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/GordonSmith/vscode-ojs.git"
-  },
-  "engines": {
-    "vscode": "^1.43.0"
-  },
-  "extensionDependencies": [
-    "vscode.javascript"
-  ],
-  "activationEvents": [
-    "onLanguage:ojs"
-  ],
-  "contributes": {
-    "languages": [
-      {
-        "id": "ojs",
-        "extensions": [
-          "ojs"
-        ],
-        "aliases": [
-          "OJS",
-          "ojs"
-        ],
-        "configuration": "./ojs.configuration.json"
-      }
+    "private": true,
+    "name": "observable-js",
+    "version": "0.0.0",
+    "publisher": "GordonSmith",
+    "displayName": "Observable JS",
+    "description": "Observable JS Compiler",
+    "icon": "images/ojsIcon.png",
+    "categories": [
+        "Programming Languages"
     ],
-    "grammars": [
-      {
-        "language": "ojs",
-        "scopeName": "source.ojs",
-        "path": "./syntaxes/ojs.tmLanguage.json"
-      }
-    ],
-    "commands": [
-      {
-        "command": "ojs.checkSyntax",
-        "title": "OJS: Check Syntax.",
-        "description": "Syntax check OJS code."
-      },
-      {
-        "command": "ojs.preview",
-        "title": "OJS: Preview Web Page",
-        "description": "Preview Observable Page.",
-        "icon": {
-          "dark": "./images/preview-dark.svg",
-          "light": "./images/preview.svg"
-        }
-      }
-    ],
-    "menus": {
-      "explorer/context": [
-        {
-          "when": "resourceLangId == ojs && resourceExtname == .ojs",
-          "command": "ojs.preview",
-          "group": "navigation@998"
-        }
-      ],
-      "editor/context": [
-        {
-          "when": "resourceLangId == ojs && resourceExtname == .ojs",
-          "command": "ojs.preview",
-          "group": "navigation@998"
-        }
-      ],
-      "editor/title": [
-        {
-          "when": "resourceLangId == ojs && resourceExtname == .ojs",
-          "command": "ojs.preview",
-          "group": "navigation@998"
-        }
-      ]
+    "main": "./dist/extension.js",
+    "scripts": {
+        "clean": "rimraf out lib* dist types *.vsix",
+        "compile": "tsc",
+        "compile-watch": "npm run compile -- -watch",
+        "compile-es6": "tsc --module es6 --outDir ./lib-es6",
+        "compile-es6-watch": "npm run compile-es6 -- -w",
+        "bundle": "webpack --mode production",
+        "bundle-dev": "webpack --mode development",
+        "bundle-watch": "webpack --mode development --watch",
+        "build": "run-s compile-es6 bundle",
+        "watch": "npm-run-all compile-es6 --parallel compile-es6-watch bundle-watch",
+        "lint": "tslint --project . src/**/*.ts",
+        "test": "sh ./scripts/e2e.sh",
+        "standard-version": "standard-version",
+        "vscode:prepublish": "run-s clean build",
+        "git-push": "git push --follow-tags upstream master",
+        "vsce-publish": "vsce publish",
+        "vsce-package": "vsce package",
+        "tag": "run-s standard-version git-push"
     },
-    "keybindings": [
-      {
-        "command": "ojs.checkSyntax",
-        "key": "f7",
-        "mac": "f7",
-        "when": "editorTextFocus && editorLangId == ojs"
-      },
-      {
-        "command": "ojs.preview",
-        "key": "f5",
-        "mac": "f5",
-        "when": "editorTextFocus && editorLangId == ojs"
-      }
+    "dependencies": {},
+    "devDependencies": {
+        "@observablehq/inspector": "^3.2.1",
+        "@observablehq/parser": "^4.0.1",
+        "@observablehq/runtime": "^4.7.0",
+        "@hpcc-js/common": "file:../hpcc-js/packages/common",
+        "@hpcc-js/observable-md": "file:../hpcc-js/packages/observable-md",
+        "@hpcc-js/util": "file:../hpcc-js/packages/util",
+        "@types/mocha": "^5.2.7",
+        "@types/node": "^12.12.36",
+        "@types/vscode": "1.43.0",
+        "dynamic-import-polyfill": "^0.1.1",
+        "jsdom": "^16.2.2",
+        "mocha": "^6.2.2",
+        "node-fetch": "^2.6.0",
+        "npm-run-all": "^4.1.5",
+        "rimraf": "^3.0.2",
+        "source-map-loader": "^0.2.4",
+        "standard-version": "^7.1.0",
+        "tslib": "^1.11.1",
+        "tslint": "^5.17.0",
+        "typescript": "^3.8.3",
+        "vsce": "^1.75.0",
+        "vscode": "^1.1.36",
+        "vscode-languageclient": "^6.1.3",
+        "vscode-languageserver": "^6.1.1",
+        "vscode-languageserver-textdocument": "^1.0.1",
+        "vscode-test": "^1.3.0",
+        "webpack": "^4.42.1",
+        "webpack-cli": "^3.3.11"
+    },
+    "author": {
+        "name": "Gordon Smith"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/GordonSmith/vscode-ojs.git"
+    },
+    "engines": {
+        "vscode": "^1.43.0"
+    },
+    "extensionDependencies": [
+        "vscode.javascript"
     ],
-    "configuration": {
-      "type": "object",
-      "title": "Example configuration",
-      "properties": {
-        "languageServerExample.maxNumberOfProblems": {
-          "scope": "resource",
-          "type": "number",
-          "default": 100,
-          "description": "Controls the maximum number of problems produced by the server."
+    "activationEvents": [
+        "onLanguage:ojs",
+        "onLanguage:omd"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "ojs",
+                "extensions": [
+                    "ojs"
+                ],
+                "aliases": [
+                    "OJS",
+                    "ojs"
+                ],
+                "configuration": "./ojs.configuration.json"
+            },
+            {
+                "id": "omd",
+                "extensions": [
+                    "omd"
+                ],
+                "aliases": [
+                    "Observable Markdown"
+                ]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "ojs",
+                "scopeName": "source.ojs",
+                "path": "./syntaxes/ojs.tmLanguage.json"
+            },
+            {
+                "language": "omd",
+                "scopeName": "text.html.markdown",
+                "path": "./syntaxes/omd.tmLanguage"
+            }
+        ],
+        "commands": [
+            {
+                "command": "ojs.checkSyntax",
+                "title": "OJS: Check Syntax.",
+                "description": "Syntax check OJS code."
+            },
+            {
+                "command": "ojs.preview",
+                "title": "OJS: Preview Web Page",
+                "description": "Preview Observable Page.",
+                "icon": {
+                    "dark": "./images/preview-dark.svg",
+                    "light": "./images/preview.svg"
+                }
+            },
+            {
+                "command": "ojs.import",
+                "title": "OJS: Import notebook",
+                "description": "Import notebook as ojs."
+            }
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "when": "resourceLangId == ojs || resourceLangId == omd",
+                    "command": "ojs.preview",
+                    "group": "navigation@998"
+                }
+            ],
+            "editor/context": [
+                {
+                    "when": "resourceLangId == ojs || resourceLangId == omd",
+                    "command": "ojs.preview",
+                    "group": "navigation@998"
+                }
+            ],
+            "editor/title": [
+                {
+                    "when": "resourceLangId == ojs || resourceLangId == omd",
+                    "command": "ojs.preview",
+                    "group": "navigation@998"
+                }
+            ]
         },
-        "languageServerExample.trace.server": {
-          "scope": "window",
-          "type": "string",
-          "enum": [
-            "off",
-            "messages",
-            "verbose"
-          ],
-          "default": "off",
-          "description": "Traces the communication between VS Code and the language server."
+        "keybindings": [
+            {
+                "command": "ojs.checkSyntax",
+                "key": "f7",
+                "when": "resourceLangId == ojs || resourceLangId == omd"
+            },
+            {
+                "command": "ojs.preview",
+                "key": "ctrl+k v",
+                "mac": "cmd+k v",
+                "when": "resourceLangId == ojs || resourceLangId == omd"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "OJS (Observable JS)",
+            "properties": {
+                "ojs.refreshPreviewOnSave": {
+                    "type": "boolean",
+                    "scope": "resource",
+                    "default": true,
+                    "description": "Refresh preview on save."
+                }
+            }
         }
-      }
     }
-  }
 }

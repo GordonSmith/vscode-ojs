@@ -1,12 +1,8 @@
 import { ExtensionContext } from "vscode";
-import { Commands } from "./extension/command";
-import { Diagnostic } from "./extension/diagnostic";
-import { DocumentSymbolProvider } from "./extension/documentSymbolProvider";
-import { Editor } from "./extension/editor";
+import { activate as ojsActivate } from "./ojs/index";
+import { activate as omdActivate } from "./omd/index";
 
 export function activate(context: ExtensionContext) {
-    Diagnostic.attach(context);
-    DocumentSymbolProvider.attach(context);
-    Commands.attach(context);
-    Editor.attach(context);
+    ojsActivate(context);
+    omdActivate(context);
 }

@@ -10,20 +10,18 @@ if (window["__hpcc_test"]) {
     placeholder.text("");
     const compiler = new OJSRuntime("#placeholder");
     compiler.evaluate("", `\
-import {chart as treemap} with {treemap_data as data} from "@d3/treemap"
 
-mol = 42;
+    mutable test = 11;
+    mutable test2 = 22;
+    mutable t = 00;
 
-{
-    let idx = 0;
-    while(true) {
-        yield ++idx;
-        await Promises.delay(1000);
+    {
+        mutable t = 9999;
+        mutable test = 1111;
+        mutable test2 = 2222;
     }
-}
 
-treemap;
-    `).then(console.log);
+        `).then(console.log);
 
     setInterval(() => {
         compiler.refresh().then(console.log);
@@ -38,13 +36,26 @@ treemap;
 
     let hash;
     let compiler;
+    let watcher;
     function evaluate(content: string, callbackID: string) {
         const newHash = hashSum(content);
         if (hash !== newHash) {
             hash = newHash;
 
+            if (watcher) {
+                watcher.release();
+            }
+
             placeholder.text("");
             compiler = new OJSRuntime("#placeholder");
+
+            watcher = compiler.watch(notifcations => {
+                vscode.postMessage({
+                    command: "errors",
+                    content: notifcations.map(n => n.error)
+                });
+            });
+
             compiler.evaluate("", content).then(errors => {
                 vscode.postMessage({
                     command: "errors",
@@ -63,6 +74,19 @@ treemap;
         }
     }
 
+    function pull(url: string, callbackID: string) {
+        placeholder.text(`Importing notebook:  ${url}`);
+        compiler = new OJSRuntime("#placeholder");
+        compiler.pull(url).then(text => {
+            placeholder.text("");
+            vscode.postMessage({
+                command: "pullResponse",
+                content: text,
+                callbackID
+            });
+        });
+    }
+
     async function echo(content: string) {
         vscode.postMessage({
             command: "alert",
@@ -79,6 +103,9 @@ treemap;
         switch (message.command) {
             case "evaluate":
                 evaluate(message.content, message.callbackID);
+                break;
+            case "pull":
+                pull(message.url, message.callbackID);
                 break;
             case "echo":
                 echo(message.content);
