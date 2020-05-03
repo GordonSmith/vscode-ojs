@@ -18,7 +18,7 @@ _All commands are prefixed with "OJS" and are available via the command palette 
 |---------------------------|:--------:|------------------------------------------------|
 |OJS: Check Syntax          |F7        | Syntax Check                                   |
 |OJS: Preview WebPage       |Ctrl+K V  | Preview notebook in an embedded Web Page       |
-|OJS: Import Notebook       |          | Import notebook from ObservableHQ              |
+|OJS: Import Notebook       |          | Import notebook cells into current document    |
 |OJS: Export WebPage (todo) |          | Export notebook as a WebPage                   |
 
 ## Settings

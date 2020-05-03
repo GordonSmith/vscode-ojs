@@ -9,23 +9,17 @@ const placeholder = select("#placeholder");
 if (window["__hpcc_test"]) {
     placeholder.text("");
     const compiler = new OJSRuntime("#placeholder");
+
+    compiler.watch(notifcations => {
+        console.log(notifcations);
+    });
+
     compiler.evaluate("", `\
 
-    mutable test = 11;
-    mutable test2 = 22;
-    mutable t = 00;
+xxx = FileAttachment("test.json").json();
 
-    {
-        mutable t = 9999;
-        mutable test = 1111;
-        mutable test2 = 2222;
-    }
+        `);
 
-        `).then(console.log);
-
-    setInterval(() => {
-        compiler.refresh().then(console.log);
-    }, 1000);
 } else {
     const vscode = acquireVsCodeApi();
 
@@ -49,12 +43,12 @@ if (window["__hpcc_test"]) {
             placeholder.text("");
             compiler = new OJSRuntime("#placeholder");
 
-            watcher = compiler.watch(notifcations => {
-                vscode.postMessage({
-                    command: "errors",
-                    content: notifcations.map(n => n.error)
-                });
-            });
+            // watcher = compiler.watch(notifcations => {
+            //     vscode.postMessage({
+            //         command: "errors",
+            //         content: notifcations.map(n => n.error)
+            //     });
+            // });
 
             compiler.evaluate("", content).then(errors => {
                 vscode.postMessage({

@@ -69,7 +69,11 @@ export class Commands {
                         referer: impUrl
                     }
                 }).then(r => r.json());
-                InsertText(textEditor, () => nb.nodes.map(node => node.value + ";").join("\n\n"));
+                let text = nb.nodes.map(node => node.value).join("\n//  ---\n");
+                nb.files.forEach(f => {
+                    text = text.split(`"${f.name}"`).join(`/* "${f.name}" */"${f.url}"`);
+                });
+                InsertText(textEditor, () => text);
             }
         }
     }

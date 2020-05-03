@@ -8,7 +8,8 @@
 			"request": "launch",
 			"url": "file:///${workspaceRoot}/test.html",
 			"runtimeArgs": [
-				"--disable-web-security"
+				"--disable-web-security",
+				"--disable-features=IsolateOrigins,site-per-process"
 			],
 			"webRoot": "${workspaceRoot}"
 		},
