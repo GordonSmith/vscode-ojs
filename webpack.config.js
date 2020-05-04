@@ -26,8 +26,13 @@ const BaseConfig = {
                 test: /\.js$/,
                 use: ["source-map-loader"],
                 enforce: "pre"
+            },
+            {
+
+                "sideEffects": false
             }
-        ]
+
+        ],
     },
 
     resolve: {

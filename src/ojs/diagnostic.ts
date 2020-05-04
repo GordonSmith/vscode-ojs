@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
-let diagnosticCollection: vscode.DiagnosticCollection;
 let quickDiagnosticCollection: vscode.DiagnosticCollection;
+let runtimeDiagnosticCollection: vscode.DiagnosticCollection;
 
 export let diagnostic: Diagnostic;
 export class Diagnostic {
@@ -9,10 +9,10 @@ export class Diagnostic {
 
     private constructor(ctx: vscode.ExtensionContext) {
         this._ctx = ctx;
-        diagnosticCollection = vscode.languages.createDiagnosticCollection("ojs");
-        ctx.subscriptions.push(diagnosticCollection);
         quickDiagnosticCollection = vscode.languages.createDiagnosticCollection("ojsQuick");
         ctx.subscriptions.push(quickDiagnosticCollection);
+        runtimeDiagnosticCollection = vscode.languages.createDiagnosticCollection("ojsRuntime");
+        ctx.subscriptions.push(runtimeDiagnosticCollection);
     }
 
     static attach(ctx: vscode.ExtensionContext): Diagnostic {
@@ -34,22 +34,7 @@ export class Diagnostic {
         return `${this.posStr(r.start)}->${this.posStr(r.end)}`;
     }
 
-    _diagnostics: vscode.Diagnostic[] = [];
-    _diagnosticsMap: { [key: string]: number } = {};
-    set(uri: vscode.Uri, diagnostics: vscode.Diagnostic[]) {
-        diagnosticCollection.set(uri, diagnostics);
-        this._diagnostics = diagnostics;
-        this._diagnosticsMap = {};
-        diagnostics.forEach((d, i) => this._diagnosticsMap[this.rangeStr(d.range)] = i);
-    }
-
     setRuntime(uri: vscode.Uri, diagnostics: vscode.Diagnostic[]) {
-        diagnostics.forEach((d, i) => {
-            const idx = this._diagnosticsMap[this.rangeStr(d.range)];
-            if (idx >= 0) {
-                this._diagnostics[idx] = d;
-            }
-        });
-        diagnosticCollection.set(uri, this._diagnostics);
+        runtimeDiagnosticCollection.set(uri, diagnostics);
     }
 }

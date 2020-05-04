@@ -1,8 +1,39 @@
 import { select } from "@hpcc-js/common";
-import { OJSRuntime } from "@hpcc-js/observable-md";
-import { hashSum } from "@hpcc-js/util";
+import { OJSRuntime, VariableValue } from "@hpcc-js/observable-md";
+import { hashSum, IObserverHandle } from "@hpcc-js/util";
 
-declare const acquireVsCodeApi: () => any;
+export interface Message {
+    callbackID?: string;
+}
+
+export interface LoadedMessage extends Message {
+    command: "loaded";
+    content?: unknown;
+}
+
+export interface AlertMessage extends Message {
+    command: "alert";
+    content: string;
+}
+
+export interface Value {
+    uid: string;
+    error: boolean;
+    value: string;
+}
+
+export interface ValueMessage extends Message {
+    command: "values";
+    content: Value[];
+}
+
+interface VSCodeAPI {
+    postMessage: <T extends Message>(msg: T) => void;
+    setState: (newState) => void;
+    getState: () => any;
+}
+
+declare const acquireVsCodeApi: () => VSCodeAPI;
 
 const placeholder = select("#placeholder");
 
@@ -15,22 +46,57 @@ if (window["__hpcc_test"]) {
     });
 
     compiler.evaluate("", `\
-
-xxx = FileAttachment("test.json").json();
-
-        `);
+{
+    let i = 0;
+    while(true) {
+        yield Promises.tick(1000, ++i);
+    }
+}
+`);
 
 } else {
     const vscode = acquireVsCodeApi();
 
-    interface State {
+    let hash: string;
+    let compiler: OJSRuntime;
+    let watcher: IObserverHandle;
+
+    function stringify(value: any): string {
+        if (value instanceof Element) {
+            return value.outerHTML;
+        }
+        const type = typeof value;
+        switch (type) {
+            case "string":
+            case "number":
+            case "bigint":
+            case "boolean":
+            case "symbol":
+            case "undefined":
+                return value.toString();
+            case "function":
+                return "ƒ()";
+            case "object":
+                if (Array.isArray(value)) {
+                    return "[Array]";
+                }
+        }
+        if (value.toString) {
+            return value.toString();
+        }
+        return value;
     }
 
-    // const currState: State = vscode.getState() || {};
+    function valuesContent(variableValues: VariableValue[]): Value[] {
+        return variableValues.map(n => {
+            return {
+                uid: n.variable.uid(),
+                error: n.type === "rejected",
+                value: stringify(n.value)
+            };
+        });
+    }
 
-    let hash;
-    let compiler;
-    let watcher;
     function evaluate(content: string, callbackID: string) {
         const newHash = hashSum(content);
         if (hash !== newHash) {
@@ -43,25 +109,25 @@ xxx = FileAttachment("test.json").json();
             placeholder.text("");
             compiler = new OJSRuntime("#placeholder");
 
-            // watcher = compiler.watch(notifcations => {
-            //     vscode.postMessage({
-            //         command: "errors",
-            //         content: notifcations.map(n => n.error)
-            //     });
-            // });
+            watcher = compiler.watch(variableValues => {
+                vscode.postMessage<ValueMessage>({
+                    command: "values",
+                    content: valuesContent(variableValues)
+                });
+            });
 
-            compiler.evaluate("", content).then(errors => {
-                vscode.postMessage({
-                    command: "errors",
-                    content: errors,
+            compiler.evaluate("", content).then(variableValues => {
+                vscode.postMessage<ValueMessage>({
+                    command: "values",
+                    content: valuesContent(variableValues),
                     callbackID
                 });
             });
         } else {
-            compiler.refresh().then(errors => {
-                vscode.postMessage({
-                    command: "errors",
-                    content: errors,
+            compiler.refresh().then(variableValues => {
+                vscode.postMessage<ValueMessage>({
+                    command: "values",
+                    content: valuesContent(variableValues),
                     callbackID
                 });
             });
@@ -82,13 +148,13 @@ xxx = FileAttachment("test.json").json();
     }
 
     async function echo(content: string) {
-        vscode.postMessage({
+        vscode.postMessage<AlertMessage>({
             command: "alert",
             content: "echo:  " + content
         });
     }
 
-    vscode.postMessage({
+    vscode.postMessage<LoadedMessage>({
         command: "loaded"
     });
 

@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { Commands } from "./command";
 
-let kelEditor: Editor;
+let ojsEditor: Editor;
 export class Editor {
     _ctx: vscode.ExtensionContext;
     _commands: Commands;
@@ -15,10 +15,10 @@ export class Editor {
     }
 
     static attach(ctx: vscode.ExtensionContext): Editor {
-        if (!kelEditor) {
-            kelEditor = new Editor(ctx);
+        if (!ojsEditor) {
+            ojsEditor = new Editor(ctx);
         }
-        return kelEditor;
+        return ojsEditor;
     }
 
     onOpenWatcher() {

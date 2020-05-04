@@ -1,8 +1,11 @@
-import type { ErrorArray } from "@hpcc-js/observable-md";
+import type { OJSSyntaxError, VariableValue } from "@hpcc-js/observable-md";
 import * as path from "path";
 import * as vscode from "vscode";
+import type { AlertMessage, LoadedMessage, Value, ValueMessage } from "../webview";
 import { Diagnostic } from "./diagnostic";
-import { diagnostics } from "./grammar";
+import { Meta } from "./meta";
+
+type WebviewMessage = LoadedMessage | AlertMessage | ValueMessage;
 
 export class Preview {
     protected _diagnostic: Diagnostic;
@@ -36,7 +39,7 @@ export class Preview {
         );
 
         Preview.currentPanel = new Preview(panel, ctx);
-        return Preview.currentPanel.init(textDocument);
+        return Preview.currentPanel.init();
     }
 
     static revive(panel: vscode.WebviewPanel, ctx: vscode.ExtensionContext) {
@@ -68,32 +71,33 @@ export class Preview {
     }
 
     _callbackID = 0;
-    _callbacks = {};
-    async init(doc: vscode.TextDocument) {
+    _callbacks: { [key: number]: (msg: WebviewMessage) => void } = {};
+    _doc: vscode.TextDocument;
+    async init() {
         // Handle messages from the webview
-        this._diagnostic.setRuntime(doc.uri, []);
-        let runtimeErrors = [];
-        setInterval(() => {
-            if (runtimeErrors) {
-                runtimeErrors.forEach(e => {
-                    this._diagnostic.setRuntime(doc.uri, diagnostics(doc, e));
-                });
-                runtimeErrors = [];
-            }
-        }, 1000);
+        // this._diagnostic.setRuntime(doc.uri, []);
+        // let runtimeErrors = [];
+        // setInterval(() => {
+        //     if (runtimeErrors) {
+        //         runtimeErrors.forEach(e => {
+        //             this._diagnostic.setRuntime(doc.uri, diagnostics(doc, e));
+        //         });
+        //         runtimeErrors = [];
+        //     }
+        // }, 1000);
         return new Promise((resolve, reject) => {
-            this._panel.webview.onDidReceiveMessage(message => {
-                const callback = this._callbacks[message.callbackID];
+            this._panel.webview.onDidReceiveMessage((message: WebviewMessage) => {
+                const callback: (msg: WebviewMessage) => void = this._callbacks[message.callbackID];
                 if (callback) {
-                    callback(message.content);
+                    callback(message);
                 } else {
                     switch (message.command) {
                         case "loaded":
                             resolve();
                             break;
-                        case "errors":
-                            runtimeErrors.push(message.content);
-                            // this._diagnostic.setRuntime(doc.uri, diagnostics(doc, message.content));
+                        case "values":
+                            const meta = Meta.attach(this._doc);
+                            meta.update(message.content);
                             break;
                         case "alert":
                             vscode.window.showErrorMessage(message.content);
@@ -108,14 +112,17 @@ export class Preview {
         this._panel.webview.postMessage({ command: "echo", content });
     }
 
-    evaluate(content): Promise<ErrorArray> {
+    evaluate(doc: vscode.TextDocument): Promise<Value[]> {
+        this._doc = doc;
         return new Promise((resolve, reject) => {
             const callbackID = ++this._callbackID;
-            this._callbacks[callbackID] = (...args: any[]) => {
+            this._callbacks[callbackID] = (msg: ValueMessage) => {
                 delete this._callbacks[callbackID];
-                resolve(...args);
+                const meta = Meta.attach(doc);
+                meta.update(msg.content);
+                resolve(msg.content);
             };
-            this._panel.webview.postMessage({ command: "evaluate", content, callbackID });
+            this._panel.webview.postMessage({ command: "evaluate", content: doc.getText(), callbackID });
         });
     }
 

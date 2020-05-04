@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import * as vscode from "vscode";
 import { Diagnostic } from "./diagnostic";
-import { diagnostics, parse } from "./grammar";
+import { Meta } from "./meta";
 import { Preview } from "./preview";
 
 export let commands: Commands;
@@ -31,9 +31,8 @@ export class Commands {
 
     checkSyntax(doc?: vscode.TextDocument) {
         if (doc) {
-            this._diagnostic.set(doc.uri, []);
-            const text = doc.getText();
-            this._diagnostic.set(doc.uri, diagnostics(doc, parse(text).errors));
+            this._diagnostic.setQuick(doc.uri, []);
+            Meta.attach(doc);
         }
     }
 
@@ -47,11 +46,16 @@ export class Commands {
 
     async refreshPreview(doc?: vscode.TextDocument) {
         if (doc) {
-            this._diagnostic.set(doc.uri, []);
+            this._diagnostic.setQuick(doc.uri, []);
             const text = doc.getText();
             if (Preview.currentPanel) {
-                const errors = await Preview.currentPanel.evaluate(text);
-                this._diagnostic.set(doc.uri, diagnostics(doc, errors));
+                // const version = doc.version;
+                Preview.currentPanel.evaluate(doc);
+                // if (doc.version === version) {
+                //     const meta = Meta.attach(doc);
+                //     meta.update(errors);
+                // }
+                // this._diagnostic.set(doc.uri, diagnostics(doc, errors));
             }
         }
     }
@@ -69,7 +73,7 @@ export class Commands {
                         referer: impUrl
                     }
                 }).then(r => r.json());
-                let text = nb.nodes.map(node => node.value).join("\n//  ---\n");
+                let text = nb.nodes.map(node => node.value).join("\n\n");
                 nb.files.forEach(f => {
                     text = text.split(`"${f.name}"`).join(`/* "${f.name}" */"${f.url}"`);
                 });
