@@ -1,31 +1,26 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <title>Observable MD</title>
-    <link href="https://cdn.jsdelivr.net/npm/@hpcc-js/common/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <style>
-        body {
-            padding: 0px;
-            margin: 8px;
-            background: white;
-            color: black;
-            overflow-x: scroll !important;
-            overflow-y: scroll !important;
-            max-width: 800px
-        }
-    </style>
-    <script>
-        window["__hpcc_test"] = true;
-    </script>
+    <title>Observable JS</title>
+    <script src="./dist/runtime.js"></script>
 </head>
 
 <body>
     <div id="placeholder">
-        ...loading...
     </div>
-    <script src="./dist/webview.js"></script>
+    <script>
+        runtime.renderTo("#placeholder", `\
+{
+    let i = 0;
+    while(true) {
+        yield Promises.tick(1000, ++i);
+    }
+}
+`);
+
+    </script>
 </body>
 
 </html>

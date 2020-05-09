@@ -1,4 +1,6 @@
+import * as fs from "fs";
 import fetch from "node-fetch";
+import * as path from "path";
 import * as vscode from "vscode";
 import { Diagnostic } from "./diagnostic";
 import { Meta } from "./meta";
@@ -16,6 +18,7 @@ export class Commands {
         ctx.subscriptions.push(vscode.commands.registerCommand("ojs.preview", this.preview, this));
         ctx.subscriptions.push(vscode.commands.registerCommand("ojs.checkSyntax", this.activeCheckSyntax, this));
         ctx.subscriptions.push(vscode.commands.registerCommand("ojs.import", this.import, this));
+        ctx.subscriptions.push(vscode.commands.registerCommand("ojs.export", this.export, this));
     }
 
     static attach(ctx: vscode.ExtensionContext): Commands {
@@ -79,6 +82,70 @@ export class Commands {
                 });
                 InsertText(textEditor, () => text);
             }
+        }
+    }
+
+    private exportTpl(title, js: string, ojs: string): string {
+        function encode(str: string) {
+            return str
+                .split("\\").join("\\\\")
+                .split("`").join("\\`")
+                .split("$").join("\\$")
+                ;
+        }
+
+        return `\
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>${title}</title>
+    <style>
+        body {
+            margin: 0 16px;
+            font-family: Verdana, Apple Garamond;
+            font-size: 17px;
+            line-height: 1.5;
+            color: #1b1e22
+        }
+
+        body.fullscreen {
+            margin: 0px
+        }
+    </style>
+    <script>
+${js}
+    </script>
+</head>
+
+<body>
+    <div id="placeholder">
+    </div>
+    <script>
+        runtime.renderTo("#placeholder", \`${encode(ojs)}\`);
+    </script>
+</body>
+
+</html>
+`;
+    }
+
+    async export() {
+        if (vscode.window.activeTextEditor) {
+            const textDocument = vscode.window.activeTextEditor.document;
+            const htmlPath = textDocument.uri.path.replace(".ojs", ".html");
+            vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(htmlPath), saveLabel: "Export to HTML" }).then(resource => {
+                if (resource) {
+                    const resourceParts = path.parse(resource.path);
+                    const runtimePath = vscode.Uri.file(path.join(this._ctx.extensionPath, "dist", "runtime.min.js"));
+                    const runtime = fs.readFileSync(runtimePath.fsPath, "utf8");
+                    const ojs = textDocument.getText();
+                    const html = this.exportTpl("", runtime, ojs);
+                    fs.writeFile(resource.fsPath, html, "utf8", () => { });
+                    // fs.writeFile(resource.fsPath.replace(".html", ".js"), runtime, "utf8", () => { });
+                }
+            });
         }
     }
 }

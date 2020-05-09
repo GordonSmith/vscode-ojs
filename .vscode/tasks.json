@@ -24,10 +24,20 @@
             }
         },
         {
+            "type": "npm",
+            "label": "bundle-runtime watch",
+            "script": "bundle-runtime-watch",
+            "problemMatcher": [],
+            "presentation": {
+                "group": "group-build"
+            }
+        },
+        {
             "label": "build",
             "dependsOn": [
                 "compile watch",
                 "bundle watch",
+                "bundle-runtime watch"
             ],
             "group": "build",
             "problemMatcher": []

@@ -1,4 +1,4 @@
-import type { OJSSyntaxError, VariableValue } from "@hpcc-js/observable-md";
+// import type { OJSSyntaxError, VariableValue } from "@hpcc-js/observable-md";
 import * as path from "path";
 import * as vscode from "vscode";
 import type { AlertMessage, LoadedMessage, Value, ValueMessage } from "../webview";
@@ -46,10 +46,10 @@ export class Preview {
         Preview.currentPanel = new Preview(panel, ctx);
     }
 
-    private constructor(panel: vscode.WebviewPanel, ctx: vscode.ExtensionContext) {
+    private constructor(panel: vscode.WebviewPanel, protected _ctx: vscode.ExtensionContext) {
         this._panel = panel;
-        this._diagnostic = Diagnostic.attach(ctx);
-        this._extensionPath = ctx.extensionPath;
+        this._diagnostic = Diagnostic.attach(_ctx);
+        this._extensionPath = _ctx.extensionPath;
 
         // Set the webview's initial html content
         this._panel.webview.html = this.getHtmlForWebview(this._panel.webview);
@@ -194,6 +194,7 @@ export class Preview {
 </html>
 `;
     }
+
 }
 
 function getNonce() {

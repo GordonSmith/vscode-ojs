@@ -1,4 +1,4 @@
-import type { OJSSyntaxError } from "@hpcc-js/observable-md";
+// import type { OJSSyntaxError } from "@hpcc-js/observable-md";
 import { hashSum } from "@hpcc-js/util";
 import { parseModule } from "@observablehq/parser";
 import * as vscode from "vscode";

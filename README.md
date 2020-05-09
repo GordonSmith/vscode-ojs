@@ -17,9 +17,9 @@ _All commands are prefixed with "OJS" and are available via the command palette 
 | Command                   | Shortcut | Description                                    |
 |---------------------------|:--------:|------------------------------------------------|
 |OJS: Check Syntax          |F7        | Syntax Check                                   |
-|OJS: Preview WebPage       |Ctrl+K V  | Preview notebook in an embedded Web Page       |
+|OJS: Preview Web Page      |Ctrl+K V  | Preview notebook in an embedded Web Page       |
 |OJS: Import Notebook       |          | Import notebook cells into current document    |
-|OJS: Export WebPage (todo) |          | Export notebook as a WebPage                   |
+|OJS: Export to HTML        |          | Export as a self contained HTML file           |
 
 ## Settings
 _All settings are prefixed with "ojs." and are available via `file -> preferneces -> settings` menu_

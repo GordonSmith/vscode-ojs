@@ -1,4 +1,3 @@
-import { select } from "@hpcc-js/common";
 import { OJSRuntime, VariableValue } from "@hpcc-js/observable-md";
 import { hashSum, IObserverHandle } from "@hpcc-js/util";
 
@@ -35,10 +34,10 @@ interface VSCodeAPI {
 
 declare const acquireVsCodeApi: () => VSCodeAPI;
 
-const placeholder = select("#placeholder");
+const placeholder = document.getElementById("placeholder");
 
 if (window["__hpcc_test"]) {
-    placeholder.text("");
+    placeholder.innerText = "";
     const compiler = new OJSRuntime("#placeholder");
 
     compiler.watch(notifcations => {
@@ -106,7 +105,7 @@ if (window["__hpcc_test"]) {
                 watcher.release();
             }
 
-            placeholder.text("");
+            placeholder.innerText = "";
             compiler = new OJSRuntime("#placeholder");
 
             watcher = compiler.watch(variableValues => {
@@ -135,10 +134,10 @@ if (window["__hpcc_test"]) {
     }
 
     function pull(url: string, callbackID: string) {
-        placeholder.text(`Importing notebook:  ${url}`);
+        placeholder.innerText = `Importing notebook:  ${url}`;
         compiler = new OJSRuntime("#placeholder");
         compiler.pull(url).then(text => {
-            placeholder.text("");
+            placeholder.innerText = "";
             vscode.postMessage({
                 command: "pullResponse",
                 content: text,
