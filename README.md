@@ -5,6 +5,8 @@ VS Code extension for Observable "JavaScript" and "Markdown".  This extension wo
 * [ObservableHQ/runtime](https://github.com/observablehq/runtime)
 * [@hpcc-js/observable-md](https://github.com/hpcc-systems/Visualization/tree/master/packages/observable-md)
 
+![Demo GIF](./images/ojsDemo.gif)
+
 ## Quick Start with Observable JavaScript | Markdown
 
 1. Create a new file with either the `.ojs` or `.omd` extension.
@@ -90,7 +92,7 @@ viewof cars;
 
 ### Selection:
 
-```javascript 
+```json 
 ${JSON.stringify(cars, undefined, 2)}
 ```
  
