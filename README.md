@@ -1,15 +1,18 @@
-# Observable JS
+# Observable JavaScript | Markdown
 
-VS Code extension for "Observable JavaScript" by [ObservableHQ](https://observablehq.com/).  This extension would not have been possible without the following:
+VS Code extension for Observable "JavaScript" and "Markdown".  This extension would not have been possible without the following:
 * [ObservableHQ/parser](https://github.com/observablehq/parser)
 * [ObservableHQ/runtime](https://github.com/observablehq/runtime)
 * [@hpcc-js/observable-md](https://github.com/hpcc-systems/Visualization/tree/master/packages/observable-md)
 
-## Getting Started
+## Quick Start with Observable JavaScript | Markdown
 
-1. Create a new file with the `.ojs` extension.
-2. Enter "Observable JavaScript" as you would with any language.
-3. Press `Ctrl+K V` to preview notebook.
+1. Create a new file with either the `.ojs` or `.omd` extension.
+2. Select "OJS: Import Notebook" from command palette.
+3. Enter `https://observablehq.com/@observablehq/a-taste-of-observable` for the import URL.
+4. Press `Ctrl+K V` to preview notebook.
+5. Select "OJS: Export to HTML" from the command palette .
+6. Double click the exported HTML file to view in browser.
 
 ## Commands
 _All commands are prefixed with "OJS" and are available via the command palette or by default shortcut key mappings_
@@ -28,11 +31,11 @@ _All settings are prefixed with "ojs." and are available via `file -> prefernece
 |---------------------------|-----------------------------------------------------------|
 | ojs.refreshPreviewOnSave  | Refresh preview (if visible) when OJS document is saved   |
 
-## Sample File (myfile.ojs)
-_Sample content to get started with_
+## Sample OJS File (myfile.ojs)
 
 ```javascript
 md`# Generator Test`;
+
 function* range(n) {
   for (let i = 0; i < n; ++i) {
     yield i;
@@ -56,3 +59,39 @@ ${JSON.stringify(cars, undefined, 2)}
 ~~~
 `;
 ```
+
+## Sample OMD File (myfile.omd)
+
+``````markdown
+# Generator Test
+_Simple Generator test_
+
+```
+function* range(n) {
+  for (let i = 0; i < n; ++i) {
+    yield i;
+  }
+}
+
+{
+  for (const i of range(Infinity)) {
+    yield Promises.tick(1000, i + 1);
+  }
+}
+```
+
+# Import Test
+_Simple Import Test_
+
+```
+import {viewof selection as cars} from "@d3/brushable-scatterplot";
+viewof cars;
+```
+
+### Selection:
+
+```javascript 
+${JSON.stringify(cars, undefined, 2)}
+```
+ 
+``````

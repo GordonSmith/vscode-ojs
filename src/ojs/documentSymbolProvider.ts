@@ -14,6 +14,7 @@ export class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
     private constructor(ctx: vscode.ExtensionContext) {
         this._ctx = ctx;
         ctx.subscriptions.push(vscode.languages.registerDocumentSymbolProvider("ojs", this));
+        ctx.subscriptions.push(vscode.languages.registerDocumentSymbolProvider("omd", this));
         this._diagnostic = Diagnostic.attach(ctx);
     }
 

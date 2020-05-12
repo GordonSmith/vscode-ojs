@@ -21,21 +21,21 @@ const BaseConfig = {
     },
 
     module: {
-        rules: [
-            {
+        rules: [{
                 test: /\.js$/,
                 use: ["source-map-loader"],
                 enforce: "pre"
             },
             {
-
                 "sideEffects": false
             }
-
         ],
     },
 
     resolve: {
+        alias: {
+            "@hpcc-js/observable-md": path.resolve(__dirname, 'node_modules/@hpcc-js/observable-md/lib-es6/index.node.js')
+        }
     },
 
     plugins: []

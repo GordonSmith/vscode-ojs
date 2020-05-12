@@ -49,7 +49,7 @@ export class Commands {
 
     async refreshPreview(doc?: vscode.TextDocument) {
         if (doc) {
-            this._diagnostic.setQuick(doc.uri, []);
+            // this._diagnostic.setQuick(doc.uri, []);
             const text = doc.getText();
             if (Preview.currentPanel) {
                 // const version = doc.version;
@@ -61,6 +61,39 @@ export class Commands {
                 // this._diagnostic.set(doc.uri, diagnostics(doc, errors));
             }
         }
+    }
+
+    importOJS(textEditor, nb): string {
+        return nb.nodes.map(node => node.value).join("\n\n");
+    }
+
+    importOMD(textEditor, nb): string {
+        const retVal: string[] = [];
+        let inJS = false;
+        nb.nodes.forEach(node => {
+            const cell: string = node.value.trim();
+            if (cell.indexOf("md`") === 0) {
+                if (inJS) {
+                    retVal.push("```");
+                    inJS = false;
+                } else {
+                    retVal.push("");
+                }
+                retVal.push(cell.substring(3, cell.length - 1) + "");
+            } else {
+                if (!inJS) {
+                    retVal.push("```");
+                    inJS = true;
+                } else {
+                    retVal.push("");
+                }
+                retVal.push(node.value + "");
+            }
+        });
+        if (inJS) {
+            retVal.push("```");
+        }
+        return retVal.join("\n");
     }
 
     async import() {
@@ -76,7 +109,12 @@ export class Commands {
                         referer: impUrl
                     }
                 }).then(r => r.json());
-                let text = nb.nodes.map(node => node.value).join("\n\n");
+                let text = "";
+                if (textEditor.document.languageId === "omd") {
+                    text = this.importOMD(textEditor, nb);
+                } else {
+                    text = this.importOJS(textEditor, nb);
+                }
                 nb.files.forEach(f => {
                     text = text.split(`"${f.name}"`).join(`/* "${f.name}" */"${f.url}"`);
                 });
@@ -85,7 +123,7 @@ export class Commands {
         }
     }
 
-    private exportTpl(title, js: string, ojs: string): string {
+    private exportTpl(title, js: string, languageId: string, text: string): string {
         function encode(str: string) {
             return str
                 .split("\\").join("\\\\")
@@ -123,7 +161,7 @@ ${js}
     <div id="placeholder">
     </div>
     <script>
-        runtime.renderTo("#placeholder", \`${encode(ojs)}\`);
+        runtime.renderTo("#placeholder", \`${languageId}\`, \`${encode(text)}\`);
     </script>
 </body>
 
@@ -134,14 +172,14 @@ ${js}
     async export() {
         if (vscode.window.activeTextEditor) {
             const textDocument = vscode.window.activeTextEditor.document;
-            const htmlPath = textDocument.uri.path.replace(".ojs", ".html");
+            const htmlPath = textDocument.languageId === "omd" ? textDocument.uri.path.replace(".omd", ".html") : textDocument.uri.path.replace(".ojs", ".html");
             vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(htmlPath), saveLabel: "Export to HTML" }).then(resource => {
                 if (resource) {
                     const resourceParts = path.parse(resource.path);
                     const runtimePath = vscode.Uri.file(path.join(this._ctx.extensionPath, "dist", "runtime.min.js"));
                     const runtime = fs.readFileSync(runtimePath.fsPath, "utf8");
-                    const ojs = textDocument.getText();
-                    const html = this.exportTpl("", runtime, ojs);
+                    const text = textDocument.getText();
+                    const html = this.exportTpl("", runtime, textDocument.languageId, text);
                     fs.writeFile(resource.fsPath, html, "utf8", () => { });
                     // fs.writeFile(resource.fsPath.replace(".html", ".js"), runtime, "utf8", () => { });
                 }

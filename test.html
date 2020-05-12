@@ -11,15 +11,35 @@
     <div id="placeholder">
     </div>
     <script>
-        runtime.renderTo("#placeholder", `\
-{
-    let i = 0;
-    while(true) {
-        yield Promises.tick(1000, ++i);
-    }
-}
-`);
+        runtime.renderTo("#placeholder", `omd`, `\
+# OMD Generator Test
 
+\`\`\`
+function* range(n) {
+  for (let i = 0; i < n; ++i) {
+    yield i;
+  }
+}
+
+{
+  for (const i of range(Infinity)) {
+    yield Promises.tick(1000, i + 1);
+  }
+}
+\`\`\`
+
+# Import Test
+
+\`\`\`
+import {viewof selection as cars} from "@d3/brushable-scatterplot";
+viewof cars;
+\`\`\`
+
+### Selection:
+~~~json
+\${JSON.stringify(cars, undefined, 2)}
+~~~
+`);
     </script>
 </body>
 

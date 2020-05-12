@@ -29,7 +29,7 @@ export class Preview {
         // Otherwise, create a new panel.
         const panel = vscode.window.createWebviewPanel(
             Preview.viewType,
-            "OJS Preview",
+            "OJS / OMD Preview",
             vscode.ViewColumn.Beside,
             {
                 enableScripts: true,
@@ -122,7 +122,12 @@ export class Preview {
                 meta.update(msg.content);
                 resolve(msg.content);
             };
-            this._panel.webview.postMessage({ command: "evaluate", content: doc.getText(), callbackID });
+            this._panel.webview.postMessage({
+                command: "evaluate",
+                languageId: doc.languageId,
+                content: doc.getText(),
+                callbackID
+            });
         });
     }
 
@@ -173,15 +178,14 @@ export class Preview {
     <link href="https://cdn.jsdelivr.net/npm/@hpcc-js/common/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <style>
     body {
-        padding:0px;
-        margin:8px;
         background:white;
         color: black;
         overflow-x: scroll !important;
         overflow-y: scroll !important;
-        max-width: 800px
     }
-    </style>
+    :root{--syntax_diff:#24292e;--syntax_diff_bg:#fff;--selection:#d7d4f0;--hr:rgba(0,0,0,0.05);--sans-serif:-apple-system,BlinkMacSystemFont,\"avenir next\",avenir,helvetica,\"helvetica neue\",ubuntu,roboto,noto,\"segoe ui\",arial,sans-serif}h1,h2,h3,h4,h5,h6{color:#333;font-weight:700;line-height:1.15;margin-top:0;margin-bottom:.25em}h2~p,h3~p,h4~p{margin-top:0}a[href]{text-decoration:none}a[href]:hover{text-decoration:underline}h1 code,h2 code,h3 code,h4 code,h5 code,h6 code{font-size:90%}code,pre,tt{font:var(--mono_fonts)}img{max-width:calc(100vw - 28px)}.katex-display,figure,h1,h2,h3,h4,h5,h6,p,table{max-width:640px}blockquote,ol,ul{max-width:600px}blockquote{margin:1em 1.5em}ol,ul{padding-left:28px}hr{height:1px;margin:1em 0;padding:1em 0;border:none;background:no-repeat 50%/100% 1px linear-gradient(90deg,var(--hr),var(--hr))}pre{padding:2px 0}
+    :root{--syntax_normal:#1b1e23;--syntax_comment:#a9b0bc;--syntax_number:#20a5ba;--syntax_keyword:#c30771;--syntax_atom:#10a778;--syntax_string:#008ec4;--syntax_error:#ffbedc;--syntax_unknown_variable:#838383;--syntax_known_variable:#005f87;--syntax_matchbracket:#20bbfc;--syntax_key:#6636b4;--mono_fonts:82%/1.5 Menlo,Consolas,monospace}.observablehq--collapsed,.observablehq--expanded,.observablehq--function,.observablehq--gray,.observablehq--import,.observablehq--string:after,.observablehq--string:before{color:var(--syntax_normal)}.observablehq--collapsed,.observablehq--inspect a{cursor:pointer}.observablehq--field{text-indent:-1em;margin-left:1em}.observablehq--empty{color:var(--syntax_comment)}.observablehq--blue,.observablehq--keyword{color:#3182bd}.observablehq--forbidden,.observablehq--pink{color:#e377c2}.observablehq--orange{color:#e6550d}.observablehq--boolean,.observablehq--null,.observablehq--undefined{color:var(--syntax_atom)}.observablehq--bigint,.observablehq--date,.observablehq--green,.observablehq--number,.observablehq--regexp,.observablehq--symbol{color:var(--syntax_number)}.observablehq--index,.observablehq--key{color:var(--syntax_key)}.observablehq--prototype-key{color:#aaa}.observablehq--empty{font-style:oblique}.observablehq--purple,.observablehq--string{color:var(--syntax_string)}.observablehq--error,.observablehq--red{color:#e7040f}.observablehq--inspect{font:var(--mono_fonts);overflow-x:auto;display:block;white-space:pre}.observablehq--error .observablehq--inspect{word-break:break-all;white-space:pre-wrap}
+</style>
 </head>
 
 <body>

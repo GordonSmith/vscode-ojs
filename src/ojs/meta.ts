@@ -1,6 +1,5 @@
-// import type { OJSSyntaxError } from "@hpcc-js/observable-md";
+import { ojsParse, omdParse } from "@hpcc-js/observable-md";
 import { hashSum } from "@hpcc-js/util";
-import { parseModule } from "@observablehq/parser";
 import * as vscode from "vscode";
 import type { Value } from "../webview";
 import { diagnostic } from "./diagnostic";
@@ -30,6 +29,7 @@ export class Cell {
         error: false,
         value: ""
     };
+
     update(error: boolean, value: string) {
         this.value = {
             error,
@@ -97,7 +97,18 @@ export class Meta {
             this._cellMap = {};
             this._errors = [];
             try {
-                this._cells = parseModule(this._doc.getText()).cells.map(cell => new Cell(this._doc, cell));
+                let parsed;
+                switch (this._doc.languageId) {
+                    case "omd":
+                        parsed = omdParse(this._doc.getText());
+                        break;
+                    case "ojs":
+                    default:
+                        parsed = ojsParse(this._doc.getText());
+                        break;
+                }
+
+                this._cells = parsed.cells.map(cell => new Cell(this._doc, cell));
                 this._cells.forEach(cell => {
                     this._cellMap[cell.uid] = cell;
                 });

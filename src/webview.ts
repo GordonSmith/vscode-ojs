@@ -1,4 +1,4 @@
-import { OJSRuntime, VariableValue } from "@hpcc-js/observable-md";
+import { OJSRuntime, OMDRuntime, VariableValue } from "@hpcc-js/observable-md";
 import { hashSum, IObserverHandle } from "@hpcc-js/util";
 
 export interface Message {
@@ -38,21 +38,41 @@ const placeholder = document.getElementById("placeholder");
 
 if (window["__hpcc_test"]) {
     placeholder.innerText = "";
-    const compiler = new OJSRuntime("#placeholder");
+    const compiler = new OMDRuntime("#placeholder");
 
     compiler.watch(notifcations => {
         console.log(notifcations);
     });
 
     compiler.evaluate("", `\
-{
-    let i = 0;
-    while(true) {
-        yield Promises.tick(1000, ++i);
+# OMD Generator Test
+
+~~~
+function* range(n) {
+    for (let i = 0; i < n; ++i) {
+        yield i;
     }
 }
-`);
 
+{
+    for(const i of range (Infinity)); {
+        yield Promises.tick(1000, i + 1);
+    }
+}
+~~~
+# Import Test
+
+~~~;
+import { selection as cars viewof } from "@d3/brushable-scatterplot";
+viewof; cars;
+~~~
+
+### Selection:
+~~~json
+\${JSON.stringify(cars, undefined, 2)}
+~~~
+
+`);
 } else {
     const vscode = acquireVsCodeApi();
 
@@ -66,21 +86,22 @@ if (window["__hpcc_test"]) {
         }
         const type = typeof value;
         switch (type) {
-            case "string":
-            case "number":
-            case "bigint":
-            case "boolean":
-            case "symbol":
-            case "undefined":
-                return value.toString();
             case "function":
                 return "ƒ()";
             case "object":
                 if (Array.isArray(value)) {
                     return "[Array]";
                 }
+                break;
+            case "string":
+            case "number":
+            case "bigint":
+            case "boolean":
+            case "symbol":
+            case "undefined":
+                break;
         }
-        if (value.toString) {
+        if (value?.toString) {
             return value.toString();
         }
         return value;
@@ -96,7 +117,7 @@ if (window["__hpcc_test"]) {
         });
     }
 
-    function evaluate(content: string, callbackID: string) {
+    function evaluate(content: string, languageId: string, callbackID: string) {
         const newHash = hashSum(content);
         if (hash !== newHash) {
             hash = newHash;
@@ -106,7 +127,7 @@ if (window["__hpcc_test"]) {
             }
 
             placeholder.innerText = "";
-            compiler = new OJSRuntime("#placeholder");
+            compiler = languageId === "omd" ? new OMDRuntime("#placeholder") : new OJSRuntime("#placeholder");
 
             watcher = compiler.watch(variableValues => {
                 vscode.postMessage<ValueMessage>({
@@ -161,7 +182,7 @@ if (window["__hpcc_test"]) {
         const message = event.data; // The json data that the extension sent
         switch (message.command) {
             case "evaluate":
-                evaluate(message.content, message.callbackID);
+                evaluate(message.content, message.languageId, message.callbackID);
                 break;
             case "pull":
                 pull(message.url, message.callbackID);

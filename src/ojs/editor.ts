@@ -23,22 +23,29 @@ export class Editor {
 
     onOpenWatcher() {
         vscode.window.onDidChangeActiveTextEditor(te => {
-            if (te.document.languageId !== "ojs") {
-                return;
+            switch (te.document.languageId) {
+                case "ojs":
+                case "omd":
+                    this._commands.refreshPreview(te.document);
+                    break;
             }
-            this._commands.refreshPreview(te.document);
         });
     }
 
     onSaveWatcher() {
         const ojsConfig = vscode.workspace.getConfiguration("ojs");
         vscode.workspace.onDidSaveTextDocument(doc => {
-            if (doc.languageId !== "ojs" || ojsConfig.get<boolean>("refreshPreviewOnSave") === false) {
-                return;
+            switch (doc.languageId) {
+                case "ojs":
+                case "omd":
+                    if (ojsConfig.get<boolean>("refreshPreviewOnSave") === true) {
+                        if (vscode.window.activeTextEditor) {
+                            this._commands.refreshPreview(doc);
+                        }
+                    }
+                    break;
             }
-            if (vscode.window.activeTextEditor) {
-                this._commands.refreshPreview(doc);
-            }
+
         }, null, this._ctx.subscriptions);
     }
 }
