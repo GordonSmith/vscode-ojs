@@ -1,7 +1,7 @@
 {
     "private": true,
     "name": "observable-js",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "publisher": "GordonSmith",
     "displayName": "Observable JS",
     "description": "Observable JS Compiler",
@@ -88,7 +88,8 @@
         "onLanguage:omd"
     ],
     "contributes": {
-        "languages": [{
+        "languages": [
+            {
                 "id": "ojs",
                 "extensions": [
                     "ojs"
@@ -111,7 +112,8 @@
                 "configuration": "./omd.configuration.json"
             }
         ],
-        "grammars": [{
+        "grammars": [
+            {
                 "language": "ojs",
                 "scopeName": "source.ojs",
                 "path": "./syntaxes/ojs.tmLanguage.json"
@@ -167,7 +169,8 @@
                 }
             }
         ],
-        "commands": [{
+        "commands": [
+            {
                 "command": "ojs.checkSyntax",
                 "title": "OJS: Check Syntax.",
                 "description": "Syntax check OJS code."
@@ -197,12 +200,15 @@
             }
         ],
         "menus": {
-            "explorer/context": [{
-                "when": "resourceLangId == ojs || resourceLangId == omd",
-                "command": "ojs.preview",
-                "group": "navigation@998"
-            }],
-            "editor/context": [{
+            "explorer/context": [
+                {
+                    "when": "resourceLangId == ojs || resourceLangId == omd",
+                    "command": "ojs.preview",
+                    "group": "navigation@998"
+                }
+            ],
+            "editor/context": [
+                {
                     "when": "resourceLangId == ojs || resourceLangId == omd",
                     "command": "ojs.preview",
                     "group": "navigation@997"
@@ -218,7 +224,8 @@
                     "group": "navigation@999"
                 }
             ],
-            "editor/title": [{
+            "editor/title": [
+                {
                     "when": "resourceLangId == ojs || resourceLangId == omd",
                     "command": "ojs.export",
                     "group": "navigation@997"
@@ -230,7 +237,8 @@
                 }
             ]
         },
-        "keybindings": [{
+        "keybindings": [
+            {
                 "command": "ojs.checkSyntax",
                 "key": "f7",
                 "when": "resourceLangId == ojs || resourceLangId == omd"
