@@ -34,7 +34,8 @@ const BaseConfig = {
 
     resolve: {
         alias: {
-            "@hpcc-js/observable-md": path.resolve(__dirname, 'node_modules/@hpcc-js/observable-md/lib-es6/index.node.js')
+            "@hpcc-js/observable-md/lib-es6/ojsRuntime": path.resolve(__dirname, 'node_modules/@hpcc-js/observable-md/lib-es6/ojsRuntime.js'),
+            "@hpcc-js/observable-md/lib-es6/omdRuntime": path.resolve(__dirname, 'node_modules/@hpcc-js/observable-md/lib-es6/omdRuntime.js')
         }
     },
 

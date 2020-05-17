@@ -28,8 +28,7 @@ export default [{
         nodeResolve({
             preferBuiltins: true
         }),
-        commonjs({
-        }),
+        commonjs({}),
         sourcemaps(),
         postcss({
             extensions: [".css"],

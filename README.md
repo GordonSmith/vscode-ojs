@@ -1,4 +1,5 @@
 # Observable JavaScript | Markdown
+![Pull Build Test](https://img.shields.io/github/workflow/status/GordonSmith/vscode-ojs/Pull%20Build%20Test.svg?logo=github&label=Pull%20Build%20Test)
 
 VS Code extension for Observable "JavaScript" and "Markdown".  This extension would not have been possible without the following:
 * [ObservableHQ/parser](https://github.com/observablehq/parser)
@@ -19,19 +20,22 @@ VS Code extension for Observable "JavaScript" and "Markdown".  This extension wo
 ## Commands
 _All commands are prefixed with "OJS" and are available via the command palette or by default shortcut key mappings_
 
-| Command                   | Shortcut | Description                                    |
-|---------------------------|:--------:|------------------------------------------------|
-|OJS: Check Syntax          |F7        | Syntax Check                                   |
-|OJS: Preview Web Page      |Ctrl+K V  | Preview notebook in an embedded Web Page       |
-|OJS: Import Notebook       |          | Import notebook cells into current document    |
-|OJS: Export to HTML        |          | Export as a self contained HTML file           |
+| Command                   | Shortcut | Description                                                      |
+|---------------------------|:--------:|------------------------------------------------------------------|
+|OJS: Check Syntax          |F7        | Syntax Check                                                     |
+|OJS: Preview Web Page      |Ctrl+K V  | Preview notebook in an embedded Web Page                         |
+|OJS: Import Notebook       |          | Import published or shared notebook cells into current document  |
+|OJS: Export to HTML        |          | Export as a self contained HTML file                             |
+|                           |          |                                                                  |
 
 ## Settings
 _All settings are prefixed with "ojs." and are available via `file -> preferneces -> settings` menu_
 
-| Setting                   | Description                                               |
-|---------------------------|-----------------------------------------------------------|
-| ojs.refreshPreviewOnSave  | Refresh preview (if visible) when OJS document is saved   |
+| Setting                   | Default | Description                                               |
+|---------------------------|---------|-----------------------------------------------------------|
+| ojs.refreshPreviewOnSave  | true    | Refresh preview (if visible) when OJS document is saved   |
+| ojs.showRuntimeValues	    | false   | Show runtime values as diagnostic info                    |
+|                           |         |                                                           |
 
 ## Sample OJS File (myfile.ojs)
 

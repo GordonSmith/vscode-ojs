@@ -103,7 +103,8 @@ export class Commands {
                 prompt: "URL", placeHolder: "https://observablehq.com/@user/notebook"
             });
             if (impUrl) {
-                const nb = await fetch(impUrl.replace("https://observablehq.com/", "https://api.observablehq.com/document/"), {
+                const isShared = impUrl.indexOf("https://observablehq.com/d") === 0;
+                const nb = await fetch(impUrl.replace(`https://observablehq.com/${isShared ? "d/" : ""}`, "https://api.observablehq.com/document/"), {
                     headers: {
                         origin: "https://observablehq.com",
                         referer: impUrl
