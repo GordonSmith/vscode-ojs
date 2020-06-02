@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.3](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.2...v0.4.3) (2020-06-02)
+
+
+### Features
+
+* Consolidate with @hpcc-js/observable-md ([85fa59f](https://github.com/GordonSmith/vscode-ojs/commit/85fa59f6d13391a2b2c91ace90e914e7ca4e4e05))
+
 ### 0.4.2 (2020-05-17)
 
 
