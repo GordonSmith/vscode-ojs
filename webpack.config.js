@@ -12,7 +12,6 @@ const BaseConfig = {
         libraryTarget: "commonjs2",
         devtoolModuleFilenameTemplate: "../[resource-path]",
     },
-    devtool: 'source-map',
 
     externals: {
         canvas: "commonjs canvas", // Important (2)
@@ -22,14 +21,8 @@ const BaseConfig = {
 
     module: {
         rules: [{
-                test: /\.js$/,
-                use: ["source-map-loader"],
-                enforce: "pre"
-            },
-            {
-                "sideEffects": false
-            }
-        ],
+            "sideEffects": false
+        }],
     },
 
     resolve: {
@@ -63,4 +56,17 @@ const webview = {
     }
 };
 
-module.exports = [extension, webview];
+module.exports = (env, argv) => {
+    console.log(argv.mode);
+    if (argv.mode === 'development') {
+        extension.devtool = 'source-map';
+        extension.module.rules.push({
+            test: /\.js$/,
+            use: ["source-map-loader"],
+            enforce: "pre"
+        });
+        webview.devtool = 'source-map';
+    }
+
+    return [extension, webview];
+}

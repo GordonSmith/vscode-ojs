@@ -26,16 +26,14 @@ _All commands are prefixed with "OJS" and are available via the command palette 
 |OJS: Preview Web Page      |Ctrl+K V  | Preview notebook in an embedded Web Page                         |
 |OJS: Import Notebook       |          | Import published or shared notebook cells into current document  |
 |OJS: Export to HTML        |          | Export as a self contained HTML file                             |
-|                           |          |                                                                  |
 
 ## Settings
 _All settings are prefixed with "ojs." and are available via `file -> preferneces -> settings` menu_
 
 | Setting                   | Default | Description                                               |
-|---------------------------|---------|-----------------------------------------------------------|
+|---------------------------|:-------:|-----------------------------------------------------------|
 | ojs.refreshPreviewOnSave  | true    | Refresh preview (if visible) when OJS document is saved   |
 | ojs.showRuntimeValues	    | false   | Show runtime values as diagnostic info                    |
-|                           |         |                                                           |
 
 ## Sample OJS File (myfile.ojs)
 

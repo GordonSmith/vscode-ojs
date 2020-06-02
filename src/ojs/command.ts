@@ -124,7 +124,7 @@ export class Commands {
         }
     }
 
-    private exportTpl(title, js: string, languageId: string, text: string): string {
+    private exportTpl(title: string, languageId: string, text: string): string {
         function encode(str: string) {
             return str
                 .split("\\").join("\\\\")
@@ -135,34 +135,56 @@ export class Commands {
 
         return `\
 <!doctype html>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="utf-8">
     <title>${title}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@hpcc-js/common/font-awesome/css/font-awesome.min.css">
     <style>
-        body {
-            margin: 0 16px;
-            font-family: Verdana, Apple Garamond;
-            font-size: 17px;
-            line-height: 1.5;
-            color: #1b1e22
-        }
-
-        body.fullscreen {
-            margin: 0px
-        }
+    body {
+        padding: 0px;
+        margin: 8px;
+        background: white;
+        color: black;
+    }
+    #placeholder {
+        position: absolute;
+        left: 8px;
+        top: 8px;
+        right: 8px;
+        bottom: 8px;
+        max-width: 480px;
+    }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@hpcc-js/observable-md/dist/index.full.js" type="text/javascript" charset="utf-8"></script>
     <script>
-${js}
+        var omdMod = window["@hpcc-js/observable-md"]
     </script>
+
 </head>
 
-<body>
+<body onresize="doResize()">
     <div id="placeholder">
     </div>
     <script>
-        runtime.renderTo("#placeholder", \`${languageId}\`, \`${encode(text)}\`);
+        var app = new omdMod.Observable()
+            .target("placeholder")
+            .showValues(true)
+            .mode("${languageId}")
+            .text(\`${encode(text)}\`)
+            ;
+
+        doResize();
+
+        function doResize() {
+        if (app) {
+            app
+                .resize()
+                .lazyRender()
+                ;
+        }
+    }
     </script>
 </body>
 
@@ -176,13 +198,9 @@ ${js}
             const htmlPath = textDocument.languageId === "omd" ? textDocument.uri.path.replace(".omd", ".html") : textDocument.uri.path.replace(".ojs", ".html");
             vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(htmlPath), saveLabel: "Export to HTML" }).then(resource => {
                 if (resource) {
-                    const resourceParts = path.parse(resource.path);
-                    const runtimePath = vscode.Uri.file(path.join(this._ctx.extensionPath, "dist", "runtime.min.js"));
-                    const runtime = fs.readFileSync(runtimePath.fsPath, "utf8");
                     const text = textDocument.getText();
-                    const html = this.exportTpl("", runtime, textDocument.languageId, text);
+                    const html = this.exportTpl("", textDocument.languageId, text);
                     fs.writeFile(resource.fsPath, html, "utf8", () => { });
-                    // fs.writeFile(resource.fsPath.replace(".html", ".js"), runtime, "utf8", () => { });
                 }
             });
         }

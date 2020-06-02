@@ -1,45 +1,70 @@
 <!doctype html>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="utf-8">
-    <title>Observable JS</title>
-    <script src="./dist/runtime.js"></script>
+    <title>@hpcc-js/observable-md</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@hpcc-js/common/font-awesome/css/font-awesome.min.css">
+    <style>
+        body {
+            padding: 0px;
+            margin: 8px;
+            background: white;
+            color: black;
+        }
+        
+        #placeholder {
+            position: absolute;
+            left: 8px;
+            top: 8px;
+            right: 8px;
+            bottom: 8px;
+            max-width: 480px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@hpcc-js/observable-md/dist/index.full.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        var omdMod = window["@hpcc-js/observable-md"]
+    </script>
+
 </head>
 
-<body>
+<body onresize="doResize()">
     <div id="placeholder">
     </div>
     <script>
-        runtime.renderTo("#placeholder", `omd`, `\
-# OMD Generator Test
+        var app = new omdMod.Observable()
+            .target("placeholder")
+            .text(`md\`# Hello World - \${mol}!
 
-\`\`\`
-function* range(n) {
-  for (let i = 0; i < n; ++i) {
-    yield i;
-  }
-}
+_A [@hpcc-js/observable-md](https://github.com/hpcc-systems/Visualization/tree/master/packages/observable-md) demo - these demos are currently a work in progress and have dependencies which may or may not exist at any given time..._
 
-{
-  for (const i of range(Infinity)) {
-    yield Promises.tick(1000, i + 1);
-  }
-}
-\`\`\`
+* <i class="fa fa-arrow-right fa-lg" style="color:darkgray"></i> - Render Page (\\`
+                ctrl + s\\ `).
+* <i class="fa fa-download fa-lg" style="color:darkgray"></i> - Download as HTML.
+* <i class="fa fa-bug fa-lg" style="color:darkgray"></i> - Show Developer Info - _the live code values_.
+* Samples Drop Down - _expect frequent updates, while the plugins get updated with new functionality_
+* <i class="fa fa-github fa-lg" style="color:darkgray"></i> - Github Repository.
 
-# Import Test
+Very Quick Start:
+1. Edit the Markdown on the left
+2. Click the "Render" <i class="fa fa-arrow-right fa-lg" style="color:darkgray"></i> button (or press \\`
+                ctrl + s\\ `).
+3. Explore the samples in the drop down (top right).
+\`
 
-\`\`\`
-import {viewof selection as cars} from "@d3/brushable-scatterplot";
-viewof cars;
-\`\`\`
-
-### Selection:
-~~~json
-\${JSON.stringify(cars, undefined, 2)}
-~~~
+mol = 6 * 7;  // mol - get it?
 `);
+
+        doResize();
+
+        function doResize() {
+            if (app) {
+                app
+                    .resize()
+                    .lazyRender();
+            }
+        }
     </script>
 </body>
 
