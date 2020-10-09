@@ -99,3 +99,11 @@ ${JSON.stringify(cars, undefined, 2)}
 ```
  
 ``````
+
+# Recommended Extensions
+
+Other recommended extensions for working with Observable notebooks formats in [VSCode](https://code.visualstudio.com/):
+
+| Extension | Description |
+| --- | --- |
+| [Observable JS Notebook Inspector](https://marketplace.visualstudio.com/items?itemName=RandomFractalsInc.js-notebook-inspector)| VSCode extension for Interactive Preview of Observable JS Notebooks, Notebook Nodes, Cells and source code |
