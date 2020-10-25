@@ -39,9 +39,14 @@ export class Commands {
         }
     }
 
-    async preview() {
-        if (vscode.window.activeTextEditor) {
-            const textDocument = vscode.window.activeTextEditor.document;
+    async preview(fileUri?: vscode.Uri) {
+        let textDocument: vscode.TextDocument;
+        if (fileUri) {
+            textDocument = await vscode.workspace.openTextDocument(fileUri);
+        } else if (vscode.window.activeTextEditor) {
+            textDocument = vscode.window.activeTextEditor.document;
+        }
+        if (textDocument) {
             await Preview.createOrShow(this._ctx, textDocument);
             this.refreshPreview(textDocument);
         }

@@ -125,6 +125,7 @@ export class Preview {
             this._panel.webview.postMessage({
                 command: "evaluate",
                 languageId: doc.languageId,
+                path: doc.uri.path,
                 content: doc.getText(),
                 callbackID
             });
