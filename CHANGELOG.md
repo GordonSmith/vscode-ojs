@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.4](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.3...v0.4.4) (2020-10-27)
+
+
+### Bug Fixes
+
+* **preview:** Maintain preview state during VS Code restart ([49a3e4a](https://github.com/GordonSmith/vscode-ojs/commit/49a3e4aa8f4e84d0696749d808973b91c9df8f0a)), closes [#10](https://github.com/GordonSmith/vscode-ojs/issues/10)
+
 ### [0.4.3](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.2...v0.4.3) (2020-06-02)
 
 
