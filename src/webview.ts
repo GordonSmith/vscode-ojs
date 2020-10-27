@@ -174,15 +174,12 @@ viewof; cars;
         });
     }
 
-    vscode.postMessage<LoadedMessage>({
-        command: "loaded"
-    });
-
     window.addEventListener("message", event => {
         const message = event.data; // The json data that the extension sent
         switch (message.command) {
             case "evaluate":
                 evaluate(message.content, message.languageId, message.callbackID);
+                vscode.setState(message);
                 break;
             case "pull":
                 pull(message.url, message.callbackID);
@@ -193,5 +190,13 @@ viewof; cars;
         }
     });
 
-    // vscode.setState(currState);
+    vscode.postMessage<LoadedMessage>({
+        command: "loaded"
+    });
+
+    const prevState = vscode.getState();
+    if (prevState) {
+        evaluate(prevState.content, prevState.languageId, prevState.callbackID);
+    }
+
 }

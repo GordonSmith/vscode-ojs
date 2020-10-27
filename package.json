@@ -35,16 +35,16 @@
     },
     "dependencies": {},
     "devDependencies": {
-        "@hpcc-js/common": "^2.31.0",
-        "@hpcc-js/observable-md": "^2.9.0",
-        "@hpcc-js/util": "^2.19.0",
+        "@hpcc-js/common": "^2.40.0",
+        "@hpcc-js/observable-md": "^2.18.0",
+        "@hpcc-js/util": "^2.26.0",
         "@observablehq/inspector": "^3.2.1",
-        "@observablehq/parser": "^4.0.1",
-        "@observablehq/runtime": "^4.7.0",
+        "@observablehq/parser": "^4.2.0",
+        "@observablehq/runtime": "^4.8.0",
         "@types/mocha": "^5.2.7",
-        "@types/node": "^12.12.43",
+        "@types/node": "^12.19.1",
         "@types/vscode": "1.43.0",
-        "jsdom": "^16.2.2",
+        "jsdom": "^16.4.0",
         "mocha": "^6.2.2",
         "node-fetch": "^2.6.1",
         "npm-run-all": "^4.1.5",
@@ -52,13 +52,13 @@
         "source-map-loader": "^0.2.4",
         "standard-version": "^9.0.0",
         "terser": "4.6.13",
-        "tslib": "^1.11.1",
+        "tslib": "^1.14.1",
         "tslint": "^5.17.0",
-        "typescript": "^3.8.3",
-        "vsce": "^1.75.0",
+        "typescript": "^3.9.7",
+        "vsce": "^1.81.1",
         "vscode-test": "^1.4.0",
-        "webpack": "^4.42.1",
-        "webpack-cli": "^3.3.11"
+        "webpack": "^4.44.2",
+        "webpack-cli": "^3.3.12"
     },
     "author": {
         "name": "Gordon Smith"
@@ -75,7 +75,9 @@
     ],
     "activationEvents": [
         "onLanguage:ojs",
-        "onLanguage:omd"
+        "onLanguage:omd",
+        "onWebviewPanel:OJSPreview",
+        "onCommand:ojs.preview"
     ],
     "contributes": {
         "languages": [
@@ -161,13 +163,15 @@
         ],
         "commands": [
             {
+                "category": "OJS",
                 "command": "ojs.checkSyntax",
-                "title": "OJS: Check Syntax.",
+                "title": "Check Syntax.",
                 "description": "Syntax check OJS code."
             },
             {
+                "category": "OJS",
                 "command": "ojs.preview",
-                "title": "OJS: Preview Web Page",
+                "title": "Preview Web Page",
                 "description": "Preview Observable Page.",
                 "icon": {
                     "dark": "./images/preview-dark.svg",
@@ -175,13 +179,15 @@
                 }
             },
             {
+                "category": "OJS",
                 "command": "ojs.import",
-                "title": "OJS: Import notebook",
+                "title": "Import notebook",
                 "description": "Imports notebook cells from ObservableHQ."
             },
             {
+                "category": "OJS",
                 "command": "ojs.export",
-                "title": "OJS: Export to HTML",
+                "title": "Export to HTML",
                 "description": "Export as a self contained HTML file.",
                 "icon": {
                     "dark": "./images/export-dark.svg",
