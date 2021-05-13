@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.5](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.4...v0.4.5) (2021-05-13)
+
+
+### Bug Fixes
+
+* **security:**  Bump versions for latest security updates ([29fd13f](https://github.com/GordonSmith/vscode-ojs/commit/29fd13fefb27f1fe4e8cc44b544ee7188734b5bd))
+
 ### [0.4.4](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.3...v0.4.4) (2020-10-27)
 
 
