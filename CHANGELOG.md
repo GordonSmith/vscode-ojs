@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.8](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.7...v0.4.8) (2021-06-23)
+
+
+### Features
+
+*  Add support for HTML and TeX node types ([e7f5369](https://github.com/GordonSmith/vscode-ojs/commit/e7f536923461459e4b6f6fe4103c3249cf9a6d61))
+
 ### [0.4.7](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.6...v0.4.7) (2021-06-23)
 
 
