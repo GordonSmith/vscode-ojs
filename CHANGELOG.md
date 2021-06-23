@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.7](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.6...v0.4.7) (2021-06-23)
+
+
+### Features
+
+*  Add support for Observable notebooks ([d201bab](https://github.com/GordonSmith/vscode-ojs/commit/d201bab47ed7bd01ed55a89291a32dd54c011ca9))
+
 ### [0.4.6](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.5...v0.4.6) (2021-05-13)
 
 ### [0.4.5](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.4...v0.4.5) (2021-05-13)
