@@ -1,17 +1,17 @@
 # Ignore everything
 *
-*/**
 
 # Whitelist required files
-!dist/**/*
-!images/**/*
-!snippets/**/*
-!syntaxes/**/*
+!dist/
+!dist/*
+!images/
+!images/*
+!syntaxes/
+!syntaxes/*
 
 !.vscodeignore
 !CHANGELOG.md
-!ecl.configuration.json
-!kel.configuration.json
+!ojs.configuration.json
 !LICENSE
 !package.json
 !README.md
