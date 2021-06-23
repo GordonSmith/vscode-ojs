@@ -1,10 +1,17 @@
 import * as fs from "fs";
 import fetch from "node-fetch";
-import * as path from "path";
 import * as vscode from "vscode";
 import { Diagnostic } from "./diagnostic";
 import { Meta } from "./meta";
 import { Preview } from "./preview";
+
+function encode(str: string) {
+    return str
+        .split("\\").join("\\\\")
+        .split("`").join("\\`")
+        .split("$").join("\\$")
+        ;
+}
 
 export let commands: Commands;
 export class Commands {
@@ -69,30 +76,63 @@ export class Commands {
     }
 
     importOJS(textEditor, nb): string {
-        return nb.nodes.map(node => node.value).join("\n\n");
+        return nb.nodes.map(node => {
+            switch (node.mode) {
+                case "md":
+                    return `\
+md\`
+${encode(node.value)}
+\`;`;
+                case "js":
+                    return node.value;
+                default:
+                    console.warn(`"Unknown node type "${node.mode}"`);
+            }
+        }).join("\n\n");
     }
 
     importOMD(textEditor, nb): string {
         const retVal: string[] = [];
         let inJS = false;
         nb.nodes.forEach(node => {
-            const cell: string = node.value.trim();
-            if (cell.indexOf("md`") === 0) {
-                if (inJS) {
-                    retVal.push("```");
-                    inJS = false;
-                } else {
-                    retVal.push("");
-                }
-                retVal.push(cell.substring(3, cell.length - 1) + "");
-            } else {
-                if (!inJS) {
-                    retVal.push("```");
-                    inJS = true;
-                } else {
-                    retVal.push("");
-                }
-                retVal.push(node.value + "");
+            switch (node.mode) {
+                case "md":
+                    if (inJS) {
+                        retVal.push("```");
+                        inJS = false;
+                    } else {
+                        retVal.push("");
+                    }
+                    retVal.push(node.value);
+                    break;
+                case "js":
+                    const cell: string = node.value.trim();
+                    let prefixLen = 0;
+                    if (cell.indexOf("md`") === 0) {
+                        prefixLen = 3;
+                    } else if (cell.indexOf("md `") === 0) {
+                        prefixLen = 4;
+                    }
+                    if (prefixLen) {
+                        if (inJS) {
+                            retVal.push("```");
+                            inJS = false;
+                        } else {
+                            retVal.push("");
+                        }
+                        retVal.push(cell.substring(prefixLen, cell.length - 1) + "");
+                    } else {
+                        if (!inJS) {
+                            retVal.push("```");
+                            inJS = true;
+                        } else {
+                            retVal.push("");
+                        }
+                        retVal.push(node.value + "");
+                    }
+                    break;
+                default:
+                    console.warn(`"Unknown node type "${node.mode}"`);
             }
         });
         if (inJS) {
@@ -130,14 +170,6 @@ export class Commands {
     }
 
     private exportTpl(title: string, languageId: string, text: string): string {
-        function encode(str: string) {
-            return str
-                .split("\\").join("\\\\")
-                .split("`").join("\\`")
-                .split("$").join("\\$")
-                ;
-        }
-
         return `\
 <!doctype html>
 <html>

@@ -1,0 +1,5 @@
+# Hello and ${w}
+
+```
+w = "Welcome!";
+```
