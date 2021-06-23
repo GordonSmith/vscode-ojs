@@ -78,15 +78,13 @@ export class Commands {
     importOJS(textEditor, nb): string {
         return nb.nodes.map(node => {
             switch (node.mode) {
-                case "md":
-                    return `\
-md\`
-${encode(node.value)}
-\`;`;
                 case "js":
                     return node.value;
                 default:
-                    console.warn(`"Unknown node type "${node.mode}"`);
+                    return `\
+${node.mode}\`
+${encode(node.value)}
+\`;`;
             }
         }).join("\n\n");
     }
@@ -105,7 +103,7 @@ ${encode(node.value)}
                     }
                     retVal.push(node.value);
                     break;
-                case "js":
+                default:
                     const cell: string = node.value.trim();
                     let prefixLen = 0;
                     if (cell.indexOf("md`") === 0) {
@@ -128,11 +126,13 @@ ${encode(node.value)}
                         } else {
                             retVal.push("");
                         }
-                        retVal.push(node.value + "");
+                        if (node.mode !== "js") {
+                            retVal.push(`${node.mode}\`${encode(node.value)}\`;`);
+                        } else {
+                            retVal.push(node.value + "");
+                        }
                     }
                     break;
-                default:
-                    console.warn(`"Unknown node type "${node.mode}"`);
             }
         });
         if (inJS) {
