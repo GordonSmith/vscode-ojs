@@ -1,17 +1,14 @@
-# Ignore everything
-*
-*/**
-
-# Whitelist required files
-!dist/**/*
-!images/**/*
-!snippets/**/*
-!syntaxes/**/*
-
-!.vscodeignore
-!CHANGELOG.md
-!ecl.configuration.json
-!kel.configuration.json
-!LICENSE
-!package.json
-!README.md
+.github
+.vscode
+lib-es6
+node_modules
+samples
+src
+.gitignore
+.vscodeignore
+ojs.configuration.json
+package-lock.json
+test.html
+tsconfig.json
+tslint.json
+webpack.config.js
