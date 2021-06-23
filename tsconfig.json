@@ -22,7 +22,7 @@
         "paths": {
             "@hpcc-js/*": [
                 "./node_modules/@hpcc-js/*",
-                "../../../hpcc-js/packages/*"
+                "../hpcc-js/packages/*"
             ]
         }
     },

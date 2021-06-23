@@ -20,7 +20,8 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--disable-extensions",
-				"--extensionDevelopmentPath=${workspaceRoot}"
+				"--extensionDevelopmentPath=${workspaceRoot}",
+				"${workspaceRoot}\\samples"
 			],
 			"outFiles": [
 				"${workspaceRoot}/client/out/**/*.js"

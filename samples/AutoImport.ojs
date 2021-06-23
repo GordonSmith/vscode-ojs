@@ -1,0 +1,154 @@
+md`
+# Recommended Libraries
+
+To help you get work done quickly, the [Observable standard library](https://github.com/observablehq/stdlib) provides a handful of recommended open-source libraries by default in all notebooks. (Use [require](/@observablehq/introduction-to-require) to load any other library you desire.)
+
+| Symbol | Name | Version |
+|-|-|-|
+| _ | Lodash | 4.7.21 |
+| d3 | D3.js | 6.7.0 |
+| vl | Vega-Lite | 5.0.0 |
+| Inputs | Observable Inputs | 0.8.0 |
+| Plot | Observable Plot | 0.1.0 |
+| dot | Observable Graphviz | 0.2.1 |
+| htl | Observable Hypertext Literal | 0.2.5 |
+| SQLite | SQL.js | 1.5.0 |
+
+`;
+
+md`
+---
+
+### [Lodash](https://lodash.com/docs/4.17.21)
+
+Lodash takes the hassle out of working with data.
+`;
+
+_
+
+_.mean([25, 24, 26, 12])
+
+md`
+---
+
+### [D3.js](https://d3js.org)
+
+D3 is a low-level library for visualizing and analyzing data.
+`;
+
+d3
+
+d3.mean([25, 24, 26, 12])
+
+d3.create("svg")
+    .attr("width", 128)
+    .attr("height", 128)
+  .call(svg => svg.selectAll("circle")
+    .data(d3.range(128, 0, -8))
+    .join("circle")
+      .attr("fill", d3.scaleSequential(d3.interpolateViridis).domain([0, 128]))
+      .attr("r", d => d))
+  .node()
+
+md`
+---
+
+### [Vega-Lite](https://vega.github.io/vega-lite-api/)
+
+Vega-Lite is a high-level grammar for visual analysis.
+`;
+
+vl
+
+vl.markBar()
+  .data(movies)
+  .encode(vl.x().fieldQ('IMDB Rating').bin(true), vl.y().count())
+  .render()
+
+movies = FileAttachment(/* "movies.json" */"https://static.observableusercontent.com/files/ef1053b80e60ecf7aaeec165f1f2a1a512c0fa864e90aa0d6d8e8c80e307ebc921ed12eae87144f76f13764c683a7e2c818502f6a287a5cfff9a93a501eb27e3").json()
+
+md`
+---
+
+### [Observable Inputs](/@observablehq/inputs)
+
+These lightweight interface components — buttons, sliders, dropdowns, tables, and the like — help you explore data and build interactive displays.
+`;
+
+Inputs
+
+viewof gain = Inputs.range([0, 11], {value: 5, step: 0.1, label: "Gain"})
+
+gain
+
+md`
+---
+
+### [Observable Plot](/@observablehq/plot)
+
+Plot helps you quickly visualize tabular data.
+`;
+
+Plot
+
+Plot.rectY(movies, Plot.binX({y: "count"}, {x: "IMDB Rating"})).plot()
+
+md`
+---
+
+### [Observable Graphviz](https://github.com/observablehq/graphviz)
+
+[Graphviz](http://www.graphviz.org) visualizes abstract graphs and networks, such as flow charts.
+`;
+
+dot
+
+dot`digraph { rankdir = RL; x -> y -> z; }`
+
+md`
+---
+
+### [Observable Hypertext Literal](/@observablehq/htl)
+
+Hypertext Literal lets you safely generate dynamic HTML or SVG. (This is a more powerful substitute for the \`html\` tagged template literal which is also in the standard library; when Observable supports standard library versioning, this will be available as \`html\` instead of \`htl.html\`.)
+`;
+
+htl
+
+htl.html`Hello, <i>world</i>!`
+
+md`
+---
+
+### [SQL.js](https://sql.js.org/)
+
+SQL.js is an Emscripten port of SQLite. It’s typically used with a SQLite [file attachment](/@observablehq/file-attachments) to get a [SQLite database client](/@observablehq/sqlite).
+`;
+
+SQLite
+
+chinook = FileAttachment(/* "chinook.db" */"https://static.observableusercontent.com/files/b3711cfd9bdf50cbe4e74751164d28e907ce366cd4bf56a39a980a48fdc5f998c42a019716a8033e2b54defdd97e4a55ebe4f6464b4f0678ea0311532605a115").sqlite()
+
+Inputs.table(await chinook.query(`SELECT * FROM albums`))
+
+md`
+---
+
+## FAQ
+`;
+
+md`
+**What about performance?** Isn’t it slow to load all these libraries on every notebook? No! Thanks to static analysis and the magic of [Observable dataflow](/@observablehq/how-observable-runs), a library isn’t loaded unless you reference it. Your notebooks are as fast as ever (and possibly faster, since we can make some optimizations).
+`;
+
+md`
+**What about versioning?** When new patch or minor versions are released, we’ll upgrade the Observable standard library so that your notebook gets the latest version automatically. In the future, we plan to let you control when (and if) you want to upgrade; for now you can override the standard library in your notebook if you need to specify a different version.
+`;
+
+md`
+**What if I want to use something else?** Go right ahead! You can override anything in Observable’s standard library simply by defining a cell with the same name in your notebook. See our [introduction to require](/@observablehq/introduction-to-require) for more on loading libraries.
+`;
+
+md`
+**What about my favorite library?** Let us know what you’d like added! We’re tracking suggestions as [issues on GitHub](https://github.com/observablehq/stdlib/issues). For now we’re only including a few of the most popular open-source libraries and libraries of our own. Soon we plan to allow you to add (or change) what’s available by default in your notebooks. Stay tuned.
+`;

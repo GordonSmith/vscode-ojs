@@ -14,8 +14,8 @@ VS Code extension for Observable "JavaScript" and "Markdown".  This extension wo
 2. Select "OJS: Import Notebook" from command palette.
 3. Enter `https://observablehq.com/@observablehq/a-taste-of-observable` for the import URL.
 4. Press `Ctrl+K V` to preview notebook.
-5. Select "OJS: Export to HTML" from the command palette .
-6. Double click the exported HTML file to view in browser.
+5. Select "OJS: Export to HTML" from the command palette.
+6. Double click the exported HTML file to view in browser (Note:  You may need to host the file on a webserver if it is importing other libraries).
 
 ## Commands
 _All commands are prefixed with "OJS" and are available via the command palette or by default shortcut key mappings_
