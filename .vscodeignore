@@ -1,13 +1,12 @@
 # Ignore everything
 *
+*/**
 
 # Whitelist required files
-!dist/
-!dist/*
-!images/
-!images/*
-!syntaxes/
-!syntaxes/*
+!dist/**/*
+!images/**/*
+!snippets/**/*
+!syntaxes/**/*
 
 !.vscodeignore
 !CHANGELOG.md
