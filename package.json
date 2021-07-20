@@ -24,6 +24,7 @@
         "build": "run-s compile-es6 bundle",
         "watch": "npm-run-all compile-es6 --parallel compile-es6-watch bundle-watch",
         "lint": "tslint --project . src/**/*.ts",
+        "lint-fix": "tslint --fix --project . src/**/*.ts",
         "rm-hpcc": "rimraf ./node_modules/@hpcc-js",
         "test": "sh ./scripts/e2e.sh",
         "standard-version": "standard-version",
@@ -193,6 +194,16 @@
                     "dark": "./images/export-dark.svg",
                     "light": "./images/export.svg"
                 }
+            },
+            {
+                "category": "OJS",
+                "command": "ojs.exportECL",
+                "title": "Export to ECL",
+                "description": "Export as a self contained ECL file.",
+                "icon": {
+                    "dark": "./images/export-dark.svg",
+                    "light": "./images/export.svg"
+                }
             }
         ],
         "menus": {
@@ -207,17 +218,22 @@
                 {
                     "when": "resourceLangId == ojs || resourceLangId == omd",
                     "command": "ojs.preview",
-                    "group": "navigation@997"
+                    "group": "navigation@960"
                 },
                 {
                     "when": "resourceLangId == ojs || resourceLangId == omd",
                     "command": "ojs.import",
-                    "group": "navigation@998"
+                    "group": "navigation@970"
                 },
                 {
                     "when": "resourceLangId == ojs || resourceLangId == omd",
                     "command": "ojs.export",
-                    "group": "navigation@999"
+                    "group": "navigation@980"
+                },
+                {
+                    "when": "resourceLangId == ojs || resourceLangId == omd",
+                    "command": "ojs.exportECL",
+                    "group": "navigation@990"
                 }
             ],
             "editor/title": [

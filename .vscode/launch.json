@@ -4,7 +4,7 @@
 	"configurations": [
 		{
 			"name": "test.html",
-			"type": "chrome",
+			"type": "pwa-msedge",
 			"request": "launch",
 			"url": "file:///${workspaceRoot}/test.html",
 			"runtimeArgs": [

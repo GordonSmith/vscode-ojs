@@ -1,5 +1,5 @@
 # Hello and ${w}
 
 ```
-w = "Welcome!";
+w = 'Welcome!';
 ```
