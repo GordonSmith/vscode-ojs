@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.10](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.9...v0.4.10) (2021-07-20)
+
+
+### Features
+
+*  Add export to ECL option. ([96f66ef](https://github.com/GordonSmith/vscode-ojs/commit/96f66ef1a3056902780a2f7c53c1c1e4607f3b6d))
+
 ### [0.4.9](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.8...v0.4.9) (2021-06-27)
 
 ### [0.4.8](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.7...v0.4.8) (2021-06-23)
