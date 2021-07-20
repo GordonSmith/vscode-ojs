@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import fetch from "node-fetch";
+import * as path from "path";
 import * as vscode from "vscode";
 import { Diagnostic } from "./diagnostic";
 import { Meta } from "./meta";
@@ -26,6 +27,7 @@ export class Commands {
         ctx.subscriptions.push(vscode.commands.registerCommand("ojs.checkSyntax", this.activeCheckSyntax, this));
         ctx.subscriptions.push(vscode.commands.registerCommand("ojs.import", this.import, this));
         ctx.subscriptions.push(vscode.commands.registerCommand("ojs.export", this.export, this));
+        ctx.subscriptions.push(vscode.commands.registerCommand("ojs.exportECL", this.exportECL, this));
     }
 
     static attach(ctx: vscode.ExtensionContext): Commands {
@@ -238,6 +240,27 @@ ${encode(node.value)}
                     const text = textDocument.getText();
                     const html = this.exportTpl("", textDocument.languageId, text);
                     fs.writeFile(resource.fsPath, html, "utf8", () => { });
+                }
+            });
+        }
+    }
+
+    private exportECLTpl(attrID: string, text: string): string {
+        const escapedTextParts = text.split("'").join("\\'").split("\r\n").join("\n").split("\n");
+        return `\
+EXPORT ${attrID} := ${escapedTextParts.map(line => `'${line}`).join("\\n' + \n")}';
+`;
+    }
+
+    async exportECL() {
+        if (vscode.window.activeTextEditor) {
+            const textDocument = vscode.window.activeTextEditor.document;
+            const eclPath = textDocument.languageId === "omd" ? textDocument.uri.path.replace(".omd", ".ecl") : textDocument.uri.path.replace(".ojs", ".ecl");
+            vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(eclPath), saveLabel: "Export to ECL" }).then(resource => {
+                if (resource) {
+                    const text = textDocument.getText();
+                    const ecl = this.exportECLTpl(path.basename(textDocument.uri.path, path.extname(textDocument.uri.path)), text);
+                    fs.writeFile(resource.fsPath, ecl, "utf8", () => { });
                 }
             });
         }
