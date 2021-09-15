@@ -1,5 +1,4 @@
-import { ojsParse } from "@hpcc-js/observable-md/lib-es6/ojsRuntime";
-import { omdParse } from "@hpcc-js/observable-md/lib-es6/omdRuntime";
+import { ojsParse, omdParse } from "@hpcc-js/observable-md/lib-es6/parsers";
 import { hashSum } from "@hpcc-js/util";
 import * as vscode from "vscode";
 import type { Value } from "../webview";

@@ -1,0 +1,7 @@
+import { mol } from "./myLib.ojs";
+
+mol;
+
+42;
+
+md`# Hello and Welcome ${mol}`;

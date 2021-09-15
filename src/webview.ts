@@ -1,3 +1,4 @@
+/* eslint-disable no-inner-declarations */
 import { OJSRuntime, OMDRuntime, VariableValue } from "@hpcc-js/observable-md";
 import { hashSum, IObserverHandle } from "@hpcc-js/util";
 
@@ -72,12 +73,12 @@ viewof; cars;
 \${JSON.stringify(cars, undefined, 2)}
 ~~~
 
-`);
+`, ".");
 } else {
     const vscode = acquireVsCodeApi();
 
     let hash: string;
-    let compiler: OJSRuntime;
+    let compiler: OJSRuntime | OMDRuntime;
     let watcher: IObserverHandle;
 
     function stringify(value: any): string {
@@ -117,7 +118,7 @@ viewof; cars;
         });
     }
 
-    function evaluate(content: string, languageId: string, callbackID: string) {
+    function evaluate(content: string, languageId: string, folder: string, callbackID: string) {
         const newHash = hashSum(content);
         if (hash !== newHash) {
             hash = newHash;
@@ -136,7 +137,7 @@ viewof; cars;
                 });
             });
 
-            compiler.evaluate("", content).then(variableValues => {
+            compiler.evaluate("", content, folder).then(variableValues => {
                 vscode.postMessage<ValueMessage>({
                     command: "values",
                     content: valuesContent(variableValues),
@@ -178,7 +179,7 @@ viewof; cars;
         const message = event.data; // The json data that the extension sent
         switch (message.command) {
             case "evaluate":
-                evaluate(message.content, message.languageId, message.callbackID);
+                evaluate(message.content, message.languageId, message.folder, message.callbackID);
                 vscode.setState(message);
                 break;
             case "pull":
@@ -196,7 +197,7 @@ viewof; cars;
 
     const prevState = vscode.getState();
     if (prevState) {
-        evaluate(prevState.content, prevState.languageId, prevState.callbackID);
+        evaluate(prevState.content, prevState.languageId, prevState.callbackID, prevState.folder);
     }
 
 }

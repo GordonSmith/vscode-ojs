@@ -2,10 +2,10 @@
     "compilerOptions": {
         "baseUrl": ".",
         "rootDir": "./src",
-        "module": "commonjs",
+        "module": "es6",
         "moduleResolution": "node",
         "target": "ES2019",
-        "outDir": "lib-cjs",
+        "outDir": "lib-es6",
         "sourceMap": true,
         "noImplicitAny": false,
         "noEmitOnError": false,
@@ -27,9 +27,6 @@
         }
     },
     "include": [
-        "./src/**/*.ts",
-        "./node_modules/vscode/vscode.d.ts",
-        "./node_modules/vscode-debugadapter/lib/*",
-        "./node_modules/vscode/lib/*"
+        "./src/**/*.ts"
     ]
 }
