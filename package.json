@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "observable-js",
-  "version": "0.4.10",
+  "version": "0.4.11",
   "publisher": "GordonSmith",
   "displayName": "Observable JS",
   "description": "Observable JS Compiler",

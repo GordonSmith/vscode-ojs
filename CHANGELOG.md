@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.11](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.10...v0.4.11) (2021-10-03)
+
+
+### Features
+
+*  Add support for local file imports ([d4b9eac](https://github.com/GordonSmith/vscode-ojs/commit/d4b9eac6817551bdab00c649795e98dce27507d3))
+
 ### [0.4.10](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.9...v0.4.10) (2021-07-20)
 
 
