@@ -30,7 +30,7 @@
     "vscode:prepublish": "run-s clean build",
     "git-push": "git push --follow-tags upstream master",
     "vsce-publish": "vsce publish",
-    "vsce-package": "vsce package",
+    "vsce-package": "vsce package -o ./gordonsmith.observable-js.vsix",
     "rm-hpcc": "rimraf ./node_modules/@hpcc-js",
     "tag": "run-s standard-version git-push"
   },
