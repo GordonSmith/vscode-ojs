@@ -27,6 +27,10 @@ export class Preview {
         }
 
         // Otherwise, create a new panel.
+        const localResourceRoots = [
+            vscode.Uri.file(path.join(ctx.extensionPath, "dist")),
+            ...vscode.workspace.workspaceFolders.map(wf => wf.uri)
+        ];
         const panel = vscode.window.createWebviewPanel(
             Preview.viewType,
             "OJS / OMD Preview",
@@ -34,7 +38,7 @@ export class Preview {
             {
                 enableScripts: true,
                 retainContextWhenHidden: true,
-                localResourceRoots: [vscode.Uri.file(path.join(ctx.extensionPath, "dist"))]
+                localResourceRoots
             }
         );
 
@@ -93,7 +97,7 @@ export class Preview {
                 } else {
                     switch (message.command) {
                         case "loaded":
-                            resolve();
+                            resolve("");
                             break;
                         case "values":
                             const meta = Meta.attach(this._doc);
@@ -114,6 +118,7 @@ export class Preview {
 
     evaluate(doc: vscode.TextDocument): Promise<Value[]> {
         this._doc = doc;
+        const folder = this._panel.webview.asWebviewUri(vscode.Uri.file(path.dirname(doc.uri.fsPath))).toString();
         return new Promise((resolve, reject) => {
             const callbackID = ++this._callbackID;
             this._callbacks[callbackID] = (msg: ValueMessage) => {
@@ -125,23 +130,23 @@ export class Preview {
             this._panel.webview.postMessage({
                 command: "evaluate",
                 languageId: doc.languageId,
-                path: doc.uri.path,
+                folder,
                 content: doc.getText(),
                 callbackID
             });
         });
     }
 
-    pull(url): Promise<string> {
-        return new Promise((resolve, reject) => {
-            const callbackID = ++this._callbackID;
-            this._callbacks[callbackID] = (...args: any[]) => {
-                delete this._callbacks[callbackID];
-                resolve(...args);
-            };
-            this._panel.webview.postMessage({ command: "pull", url, callbackID });
-        });
-    }
+    // pull(url): Promise<string> {
+    //     return new Promise((resolve, reject) => {
+    //         const callbackID = ++this._callbackID;
+    //         this._callbacks[callbackID] = (...args: any[]) => {
+    //             delete this._callbacks[callbackID];
+    //             resolve(...args);
+    //         };
+    //         this._panel.webview.postMessage({ command: "pull", url, callbackID });
+    //     });
+    // }
 
     dispose() {
         Preview.currentPanel = undefined;

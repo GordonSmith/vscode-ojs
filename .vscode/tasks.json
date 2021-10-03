@@ -29,7 +29,10 @@
                 "compile watch",
                 "bundle watch"
             ],
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": []
         }
     ]

@@ -1,284 +1,287 @@
 {
-    "private": true,
-    "name": "observable-js",
-    "version": "0.4.10",
-    "publisher": "GordonSmith",
-    "displayName": "Observable JS",
-    "description": "Observable JS Compiler",
-    "icon": "images/ObservableJS.png",
-    "categories": [
-        "Data Science",
-        "Notebooks",
-        "Visualization"
+  "private": true,
+  "name": "observable-js",
+  "version": "0.4.10",
+  "publisher": "GordonSmith",
+  "displayName": "Observable JS",
+  "description": "Observable JS Compiler",
+  "icon": "images/ObservableJS.png",
+  "categories": [
+    "Data Science",
+    "Notebooks",
+    "Visualization"
+  ],
+  "main": "./dist/extension.js",
+  "scripts": {
+    "clean": "rimraf out lib* dist types *.vsix",
+    "compile": "tsc",
+    "compile-watch": "npm run compile -- -watch",
+    "compile-es6": "tsc --module es6 --outDir ./lib-es6",
+    "compile-es6-watch": "npm run compile-es6 -- -w",
+    "bundle": "webpack --mode production",
+    "bundle-dev": "webpack --mode development",
+    "bundle-watch": "webpack --mode development --watch",
+    "build": "run-s compile-es6 bundle",
+    "watch": "npm-run-all compile-es6 --parallel compile-es6-watch bundle-watch",
+    "lint": "eslint src/**/*.ts",
+    "lint-fix": "npm run lint -- --fix",
+    "test": "npm run compile",
+    "standard-version": "standard-version",
+    "vscode:prepublish": "run-s clean build",
+    "git-push": "git push --follow-tags upstream master",
+    "vsce-publish": "vsce publish",
+    "vsce-package": "vsce package",
+    "rm-hpcc": "rimraf ./node_modules/@hpcc-js",
+    "tag": "run-s standard-version git-push"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@hpcc-js/common": "^2.57.0",
+    "@hpcc-js/observable-md": "^2.42.0",
+    "@hpcc-js/util": "^2.38.0",
+    "@observablehq/inspector": "^3.2.4",
+    "@observablehq/parser": "^4.5.0",
+    "@observablehq/runtime": "^4.17.5",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.20.27",
+    "@types/vscode": "1.43.0",
+    "@typescript-eslint/eslint-plugin": "^4.31.1",
+    "@typescript-eslint/parser": "^4.31.1",
+    "css-loader": "^4.3.0",
+    "eslint": "^7.32.0",
+    "jsdom": "^16.7.0",
+    "mocha": "^7.2.0",
+    "node-fetch": "^2.6.5",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
+    "source-map-loader": "^0.2.4",
+    "standard-version": "^9.3.1",
+    "style-loader": "^1.3.0",
+    "tslib": "^2.3.1",
+    "typescript": "^4.4.3",
+    "vsce": "^1.100.1",
+    "vscode-test": "^1.6.1",
+    "webpack": "^5.56.0",
+    "webpack-cli": "^4.8.0"
+  },
+  "author": {
+    "name": "Gordon Smith"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GordonSmith/vscode-ojs.git"
+  },
+  "engines": {
+    "vscode": "^1.43.0"
+  },
+  "extensionDependencies": [
+    "vscode.javascript"
+  ],
+  "activationEvents": [
+    "onLanguage:ojs",
+    "onLanguage:omd",
+    "onWebviewPanel:OJSPreview",
+    "onCommand:ojs.preview"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "ojs",
+        "extensions": [
+          "ojs"
+        ],
+        "aliases": [
+          "OJS",
+          "ojs"
+        ],
+        "configuration": "./ojs.configuration.json"
+      },
+      {
+        "id": "omd",
+        "extensions": [
+          "omd"
+        ],
+        "aliases": [
+          "OMD",
+          "omd"
+        ],
+        "configuration": "./omd.configuration.json"
+      }
     ],
-    "main": "./dist/extension.js",
-    "scripts": {
-        "clean": "rimraf out lib* dist types *.vsix",
-        "compile": "tsc",
-        "compile-watch": "npm run compile -- -watch",
-        "compile-es6": "tsc --module es6 --outDir ./lib-es6",
-        "compile-es6-watch": "npm run compile-es6 -- -w",
-        "bundle": "webpack --mode production",
-        "bundle-dev": "webpack --mode development",
-        "bundle-watch": "webpack --mode development --watch",
-        "build": "run-s compile-es6 bundle",
-        "watch": "npm-run-all compile-es6 --parallel compile-es6-watch bundle-watch",
-        "lint": "tslint --project . src/**/*.ts",
-        "lint-fix": "tslint --fix --project . src/**/*.ts",
-        "rm-hpcc": "rimraf ./node_modules/@hpcc-js",
-        "test": "sh ./scripts/e2e.sh",
-        "standard-version": "standard-version",
-        "vscode:prepublish": "run-s clean build",
-        "git-push": "git push --follow-tags upstream master",
-        "vsce-publish": "vsce publish",
-        "vsce-package": "vsce package",
-        "tag": "run-s standard-version git-push"
-    },
-    "dependencies": {},
-    "devDependencies": {
-        "@hpcc-js/common": "^2.49.0",
-        "@hpcc-js/observable-md": "^2.31.0",
-        "@hpcc-js/util": "^2.30.0",
-        "@observablehq/inspector": "^3.2.2",
-        "@observablehq/parser": "^4.4.1",
-        "@observablehq/runtime": "^4.12.0",
-        "@types/mocha": "^5.2.7",
-        "@types/node": "^12.20.15",
-        "@types/vscode": "1.43.0",
-        "jsdom": "^16.6.0",
-        "mocha": "^6.2.2",
-        "node-fetch": "^2.6.1",
-        "npm-run-all": "^4.1.5",
-        "rimraf": "^3.0.2",
-        "source-map-loader": "^0.2.4",
-        "standard-version": "^9.3.0",
-        "terser": "4.6.13",
-        "tslib": "^1.14.1",
-        "tslint": "^5.17.0",
-        "typescript": "^3.9.10",
-        "vsce": "^1.95.0",
-        "vscode-test": "^1.5.2",
-        "webpack": "^4.46.0",
-        "webpack-cli": "^3.3.12"
-    },
-    "author": {
-        "name": "Gordon Smith"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/GordonSmith/vscode-ojs.git"
-    },
-    "engines": {
-        "vscode": "^1.43.0"
-    },
-    "extensionDependencies": [
-        "vscode.javascript"
-    ],
-    "activationEvents": [
-        "onLanguage:ojs",
-        "onLanguage:omd",
-        "onWebviewPanel:OJSPreview",
-        "onCommand:ojs.preview"
-    ],
-    "contributes": {
-        "languages": [
-            {
-                "id": "ojs",
-                "extensions": [
-                    "ojs"
-                ],
-                "aliases": [
-                    "OJS",
-                    "ojs"
-                ],
-                "configuration": "./ojs.configuration.json"
-            },
-            {
-                "id": "omd",
-                "extensions": [
-                    "omd"
-                ],
-                "aliases": [
-                    "OMD",
-                    "omd"
-                ],
-                "configuration": "./omd.configuration.json"
-            }
-        ],
-        "grammars": [
-            {
-                "language": "ojs",
-                "scopeName": "source.ojs",
-                "path": "./syntaxes/ojs.tmLanguage.json"
-            },
-            {
-                "language": "omd",
-                "scopeName": "text.html.markdown",
-                "path": "./syntaxes/omd.tmLanguage.json",
-                "embeddedLanguages": {
-                    "meta.embedded.block.html": "html",
-                    "source.js": "javascript",
-                    "source.css": "css",
-                    "meta.embedded.block.frontmatter": "yaml",
-                    "meta.embedded.block.css": "css",
-                    "meta.embedded.block.ini": "ini",
-                    "meta.embedded.block.java": "java",
-                    "meta.embedded.block.lua": "lua",
-                    "meta.embedded.block.makefile": "makefile",
-                    "meta.embedded.block.perl": "perl",
-                    "meta.embedded.block.r": "r",
-                    "meta.embedded.block.ruby": "ruby",
-                    "meta.embedded.block.php": "php",
-                    "meta.embedded.block.sql": "sql",
-                    "meta.embedded.block.vs_net": "vs_net",
-                    "meta.embedded.block.xml": "xml",
-                    "meta.embedded.block.xsl": "xsl",
-                    "meta.embedded.block.yaml": "yaml",
-                    "meta.embedded.block.dosbatch": "dosbatch",
-                    "meta.embedded.block.clojure": "clojure",
-                    "meta.embedded.block.coffee": "coffee",
-                    "meta.embedded.block.c": "c",
-                    "meta.embedded.block.cpp": "cpp",
-                    "meta.embedded.block.diff": "diff",
-                    "meta.embedded.block.dockerfile": "dockerfile",
-                    "meta.embedded.block.go": "go",
-                    "meta.embedded.block.groovy": "groovy",
-                    "meta.embedded.block.pug": "jade",
-                    "meta.embedded.block.javascript": "javascript",
-                    "meta.embedded.block.json": "json",
-                    "meta.embedded.block.less": "less",
-                    "meta.embedded.block.objc": "objc",
-                    "meta.embedded.block.scss": "scss",
-                    "meta.embedded.block.perl6": "perl6",
-                    "meta.embedded.block.powershell": "powershell",
-                    "meta.embedded.block.python": "python",
-                    "meta.embedded.block.rust": "rust",
-                    "meta.embedded.block.scala": "scala",
-                    "meta.embedded.block.shellscript": "shellscript",
-                    "meta.embedded.block.typescript": "typescript",
-                    "meta.embedded.block.typescriptreact": "typescriptreact",
-                    "meta.embedded.block.csharp": "csharp",
-                    "meta.embedded.block.fsharp": "fsharp"
-                }
-            }
-        ],
-        "commands": [
-            {
-                "category": "OJS",
-                "command": "ojs.checkSyntax",
-                "title": "Check Syntax.",
-                "description": "Syntax check OJS code."
-            },
-            {
-                "category": "OJS",
-                "command": "ojs.preview",
-                "title": "Preview Web Page",
-                "description": "Preview Observable Page.",
-                "icon": {
-                    "dark": "./images/preview-dark.svg",
-                    "light": "./images/preview.svg"
-                }
-            },
-            {
-                "category": "OJS",
-                "command": "ojs.import",
-                "title": "Import notebook",
-                "description": "Imports notebook cells from ObservableHQ."
-            },
-            {
-                "category": "OJS",
-                "command": "ojs.export",
-                "title": "Export to HTML",
-                "description": "Export as a self contained HTML file.",
-                "icon": {
-                    "dark": "./images/export-dark.svg",
-                    "light": "./images/export.svg"
-                }
-            },
-            {
-                "category": "OJS",
-                "command": "ojs.exportECL",
-                "title": "Export to ECL",
-                "description": "Export as a self contained ECL file.",
-                "icon": {
-                    "dark": "./images/export-dark.svg",
-                    "light": "./images/export.svg"
-                }
-            }
-        ],
-        "menus": {
-            "explorer/context": [
-                {
-                    "when": "resourceLangId == ojs || resourceLangId == omd",
-                    "command": "ojs.preview",
-                    "group": "navigation@998"
-                }
-            ],
-            "editor/context": [
-                {
-                    "when": "resourceLangId == ojs || resourceLangId == omd",
-                    "command": "ojs.preview",
-                    "group": "navigation@960"
-                },
-                {
-                    "when": "resourceLangId == ojs || resourceLangId == omd",
-                    "command": "ojs.import",
-                    "group": "navigation@970"
-                },
-                {
-                    "when": "resourceLangId == ojs || resourceLangId == omd",
-                    "command": "ojs.export",
-                    "group": "navigation@980"
-                },
-                {
-                    "when": "resourceLangId == ojs || resourceLangId == omd",
-                    "command": "ojs.exportECL",
-                    "group": "navigation@990"
-                }
-            ],
-            "editor/title": [
-                {
-                    "when": "resourceLangId == ojs || resourceLangId == omd",
-                    "command": "ojs.export",
-                    "group": "navigation@997"
-                },
-                {
-                    "when": "resourceLangId == ojs || resourceLangId == omd",
-                    "command": "ojs.preview",
-                    "group": "navigation@998"
-                }
-            ]
-        },
-        "keybindings": [
-            {
-                "command": "ojs.checkSyntax",
-                "key": "f7",
-                "when": "resourceLangId == ojs || resourceLangId == omd"
-            },
-            {
-                "command": "ojs.preview",
-                "key": "ctrl+k v",
-                "mac": "cmd+k v",
-                "when": "resourceLangId == ojs || resourceLangId == omd"
-            }
-        ],
-        "configuration": {
-            "type": "object",
-            "title": "OJS (Observable JS)",
-            "properties": {
-                "ojs.refreshPreviewOnSave": {
-                    "type": "boolean",
-                    "scope": "resource",
-                    "default": true,
-                    "description": "Refresh preview on save."
-                },
-                "ojs.showRuntimeValues": {
-                    "type": "boolean",
-                    "scope": "resource",
-                    "default": false,
-                    "description": "Show runtime values as diagnostic info."
-                }
-            }
+    "grammars": [
+      {
+        "language": "ojs",
+        "scopeName": "source.ojs",
+        "path": "./syntaxes/ojs.tmLanguage.json"
+      },
+      {
+        "language": "omd",
+        "scopeName": "text.html.markdown",
+        "path": "./syntaxes/omd.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.html": "html",
+          "source.js": "javascript",
+          "source.css": "css",
+          "meta.embedded.block.frontmatter": "yaml",
+          "meta.embedded.block.css": "css",
+          "meta.embedded.block.ini": "ini",
+          "meta.embedded.block.java": "java",
+          "meta.embedded.block.lua": "lua",
+          "meta.embedded.block.makefile": "makefile",
+          "meta.embedded.block.perl": "perl",
+          "meta.embedded.block.r": "r",
+          "meta.embedded.block.ruby": "ruby",
+          "meta.embedded.block.php": "php",
+          "meta.embedded.block.sql": "sql",
+          "meta.embedded.block.vs_net": "vs_net",
+          "meta.embedded.block.xml": "xml",
+          "meta.embedded.block.xsl": "xsl",
+          "meta.embedded.block.yaml": "yaml",
+          "meta.embedded.block.dosbatch": "dosbatch",
+          "meta.embedded.block.clojure": "clojure",
+          "meta.embedded.block.coffee": "coffee",
+          "meta.embedded.block.c": "c",
+          "meta.embedded.block.cpp": "cpp",
+          "meta.embedded.block.diff": "diff",
+          "meta.embedded.block.dockerfile": "dockerfile",
+          "meta.embedded.block.go": "go",
+          "meta.embedded.block.groovy": "groovy",
+          "meta.embedded.block.pug": "jade",
+          "meta.embedded.block.javascript": "javascript",
+          "meta.embedded.block.json": "json",
+          "meta.embedded.block.less": "less",
+          "meta.embedded.block.objc": "objc",
+          "meta.embedded.block.scss": "scss",
+          "meta.embedded.block.perl6": "perl6",
+          "meta.embedded.block.powershell": "powershell",
+          "meta.embedded.block.python": "python",
+          "meta.embedded.block.rust": "rust",
+          "meta.embedded.block.scala": "scala",
+          "meta.embedded.block.shellscript": "shellscript",
+          "meta.embedded.block.typescript": "typescript",
+          "meta.embedded.block.typescriptreact": "typescriptreact",
+          "meta.embedded.block.csharp": "csharp",
+          "meta.embedded.block.fsharp": "fsharp"
         }
+      }
+    ],
+    "commands": [
+      {
+        "category": "OJS",
+        "command": "ojs.checkSyntax",
+        "title": "Check Syntax.",
+        "description": "Syntax check OJS code."
+      },
+      {
+        "category": "OJS",
+        "command": "ojs.preview",
+        "title": "Preview Web Page",
+        "description": "Preview Observable Page.",
+        "icon": {
+          "dark": "./images/preview-dark.svg",
+          "light": "./images/preview.svg"
+        }
+      },
+      {
+        "category": "OJS",
+        "command": "ojs.import",
+        "title": "Import notebook",
+        "description": "Imports notebook cells from ObservableHQ."
+      },
+      {
+        "category": "OJS",
+        "command": "ojs.export",
+        "title": "Export to HTML",
+        "description": "Export as a self contained HTML file.",
+        "icon": {
+          "dark": "./images/export-dark.svg",
+          "light": "./images/export.svg"
+        }
+      },
+      {
+        "category": "OJS",
+        "command": "ojs.exportECL",
+        "title": "Export to ECL",
+        "description": "Export as a self contained ECL file.",
+        "icon": {
+          "dark": "./images/export-dark.svg",
+          "light": "./images/export.svg"
+        }
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "when": "resourceLangId == ojs || resourceLangId == omd",
+          "command": "ojs.preview",
+          "group": "navigation@998"
+        }
+      ],
+      "editor/context": [
+        {
+          "when": "resourceLangId == ojs || resourceLangId == omd",
+          "command": "ojs.preview",
+          "group": "navigation@960"
+        },
+        {
+          "when": "resourceLangId == ojs || resourceLangId == omd",
+          "command": "ojs.import",
+          "group": "navigation@970"
+        },
+        {
+          "when": "resourceLangId == ojs || resourceLangId == omd",
+          "command": "ojs.export",
+          "group": "navigation@980"
+        },
+        {
+          "when": "resourceLangId == ojs || resourceLangId == omd",
+          "command": "ojs.exportECL",
+          "group": "navigation@990"
+        }
+      ],
+      "editor/title": [
+        {
+          "when": "resourceLangId == ojs || resourceLangId == omd",
+          "command": "ojs.export",
+          "group": "navigation@997"
+        },
+        {
+          "when": "resourceLangId == ojs || resourceLangId == omd",
+          "command": "ojs.preview",
+          "group": "navigation@998"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "ojs.checkSyntax",
+        "key": "f7",
+        "when": "resourceLangId == ojs || resourceLangId == omd"
+      },
+      {
+        "command": "ojs.preview",
+        "key": "ctrl+k v",
+        "mac": "cmd+k v",
+        "when": "resourceLangId == ojs || resourceLangId == omd"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "OJS (Observable JS)",
+      "properties": {
+        "ojs.refreshPreviewOnSave": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "Refresh preview on save."
+        },
+        "ojs.showRuntimeValues": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": false,
+          "description": "Show runtime values as diagnostic info."
+        }
+      }
     }
+  }
 }
