@@ -1,5 +1,5 @@
 /* eslint-disable no-inner-declarations */
-import { OJSRuntime, OMDRuntime, VariableValue } from "@hpcc-js/observable-md";
+import { OJSRuntime, OJSRuntimeError, OJSSyntaxError, OMDRuntime, VariableValue } from "@hpcc-js/observable-md";
 import { hashSum, IObserverHandle } from "@hpcc-js/util";
 
 export interface Message {
@@ -118,6 +118,14 @@ viewof; cars;
         });
     }
 
+    function encode(str: string) {
+        return str
+            // .split("\\").join("\\\\")
+            // .split("`").join("\\`")
+            // .split("$").join("\\$")
+            ;
+    }
+
     function evaluate(content: string, languageId: string, folder: string, callbackID: string) {
         const newHash = hashSum(content);
         if (hash !== newHash) {
@@ -137,13 +145,18 @@ viewof; cars;
                 });
             });
 
-            compiler.evaluate("", content, folder).then(variableValues => {
-                vscode.postMessage<ValueMessage>({
-                    command: "values",
-                    content: valuesContent(variableValues),
-                    callbackID
+            compiler.evaluate("", encode(content), folder)
+                .then(variableValues => {
+                    vscode.postMessage<ValueMessage>({
+                        command: "values",
+                        content: valuesContent(variableValues),
+                        callbackID
+                    });
+                }).catch((e: OJSSyntaxError) => {
+                    debugger;
+                    // this._errors = [new OJSRuntimeError("error", e.start, e.end, e.message)];
+                    // this.runtimeUpdated();
                 });
-            });
         } else {
             compiler.refresh().then(variableValues => {
                 vscode.postMessage<ValueMessage>({

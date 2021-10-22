@@ -50,11 +50,11 @@ module.exports = (env, argv) => [
             extension: "./lib-es6/extension.js"
         }
     }),
-    makeConfig(argv, {
-        entry: {
-            webview: "./lib-es6/webview.js"
-        },
-        target: "web",
-        libraryTarget: "module"
-    })
+    // makeConfig(argv, {
+    //     entry: {
+    //         webview: "./lib-es6/webview.js"
+    //     },
+    //     target: "web",
+    //     libraryTarget: "module"
+    // })
 ];

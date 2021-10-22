@@ -6,13 +6,15 @@ import { Diagnostic } from "./diagnostic";
 import { Meta } from "./meta";
 import { Preview } from "./preview";
 
-function encode(str: string) {
+export function encode(str: string) {
     return str
         .split("\\").join("\\\\")
         .split("`").join("\\`")
         .split("$").join("\\$")
         ;
 }
+
+const isObservableFile = (languageId: string) => languageId === "omd" || languageId === "ojs";
 
 export let commands: Commands;
 export class Commands {
@@ -77,7 +79,7 @@ export class Commands {
         }
     }
 
-    importOJS(textEditor, nb): string {
+    importOJS(nb): string {
         return nb.nodes.map(node => {
             switch (node.mode) {
                 case "js":
@@ -91,7 +93,7 @@ ${encode(node.value)}
         }).join("\n\n");
     }
 
-    importOMD(textEditor, nb): string {
+    importOMD(nb): string {
         const retVal: string[] = [];
         let inJS = false;
         nb.nodes.forEach(node => {
@@ -144,29 +146,45 @@ ${encode(node.value)}
     }
 
     async import() {
-        if (vscode.window.activeTextEditor) {
-            const textEditor = vscode.window.activeTextEditor;
-            const impUrl = await vscode.window.showInputBox({
-                prompt: "URL", placeHolder: "https://observablehq.com/@user/notebook"
-            });
-            if (impUrl) {
+        const impUrl = await vscode.window.showInputBox({
+            prompt: "URL", placeHolder: "https://observablehq.com/@user/notebook"
+        });
+        if (impUrl) {
+            let textEditor = vscode.window.activeTextEditor;
+            let languageId = textEditor?.document?.languageId;
+            if (!isObservableFile(languageId)) {
+                textEditor = undefined;
+                languageId = await vscode.window.showQuickPick(["omd", "ojs"], { placeHolder: "File Type" });
+            }
+            if (isObservableFile(languageId)) {
                 const isShared = impUrl.indexOf("https://observablehq.com/d") === 0;
                 const nb = await fetch(impUrl.replace(`https://observablehq.com/${isShared ? "d/" : ""}`, "https://api.observablehq.com/document/"), {
                     headers: {
                         origin: "https://observablehq.com",
                         referer: impUrl
                     }
-                }).then(r => r.json());
-                let text = "";
-                if (textEditor.document.languageId === "omd") {
-                    text = this.importOMD(textEditor, nb);
-                } else {
-                    text = this.importOJS(textEditor, nb);
-                }
+                }).then(r => r.json() as any);
+                let text = languageId === "omd" ? this.importOMD(nb) : this.importOJS(nb);
                 nb.files.forEach(f => {
                     text = text.split(`"${f.name}"`).join(`/* "${f.name}" */"${f.url}"`);
                 });
-                InsertText(textEditor, () => text);
+                if (textEditor) {
+                    InsertText(textEditor, () => text);
+                } else {
+                    const folder = vscode.workspace.workspaceFolders[0]?.uri.path;
+                    const filePath = path.posix.join(folder, `Untitled-${Math.round(1000 + Math.random() * 1000)}.${languageId}`);
+                    const newFile = vscode.Uri.parse("untitled://" + filePath);
+                    const document = await vscode.workspace.openTextDocument(newFile);
+                    const edit = new vscode.WorkspaceEdit();
+                    edit.insert(newFile, new vscode.Position(0, 0), text);
+                    await vscode.workspace.applyEdit(edit).then(success => {
+                        if (success) {
+                            vscode.window.showTextDocument(document);
+                        } else {
+                            vscode.window.showInformationMessage("Error!");
+                        }
+                    });
+                }
             }
         }
     }

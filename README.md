@@ -10,12 +10,13 @@ VS Code extension for Observable "JavaScript" and "Markdown".  This extension wo
 
 ## Quick Start with Observable JavaScript | Markdown
 
-1. Create a new file with either the `.ojs` or `.omd` extension.
-2. Select "OJS: Import Notebook" from command palette.
-3. Enter `https://observablehq.com/@observablehq/a-taste-of-observable` for the import URL.
-4. Press `Ctrl+K V` to preview notebook.
-5. Select "OJS: Export to HTML" from the command palette.
-6. Double click the exported HTML file to view in browser (Note:  You may need to host the file on a webserver if it is importing other libraries).
+1. Create a new file with either the `.ojs` or `.omd` extension (optional).
+2. Open this file in a VSCode editor instance (optional).
+3. Select "OJS: Import Notebook" from command palette.
+4. Enter `https://observablehq.com/@observablehq/a-taste-of-observable` for the import URL.
+5. Press `Ctrl+K V` to preview notebook.
+6. Select "OJS: Export to HTML" from the command palette.
+7. Double click the exported HTML file to view in browser (Note:  You may need to host the file on a webserver if it is importing other libraries).
 
 ## Commands
 _All commands are prefixed with "OJS" and are available via the command palette or by default shortcut key mappings_
