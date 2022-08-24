@@ -1,0 +1,252 @@
+{
+    "id": "8f58e0bf4ecc8bee",
+    "slug": null,
+    "trashed": false,
+    "description": "",
+    "likes": 0,
+    "publish_level": "shared",
+    "forks": 0,
+    "fork_of": null,
+    "update_time": "2022-08-24T08:01:19.659Z",
+    "publish_time": "2022-08-24T08:01:19.659Z",
+    "publish_version": 26,
+    "latest_version": 26,
+    "thumbnail": "d30de97e8487edde807fb9fb326277a13495929d4a926c50968532f4b97d470c",
+    "default_thumbnail": "d30de97e8487edde807fb9fb326277a13495929d4a926c50968532f4b97d470c",
+    "roles": [],
+    "sharing": null,
+    "owner": {
+        "id": "ecffd59db269e2b5",
+        "github_login": "GordonSmith",
+        "avatar_url": "https://avatars.observableusercontent.com/avatar/78b1e9a8876f3e6bb69bf1b0cbe8833994e77a8bdd7893eef27fe59c995b0fe0",
+        "login": "gordonsmith",
+        "name": "Gordon Smith",
+        "bio": "",
+        "home_url": "http://hpccsystems.com",
+        "type": "individual",
+        "tier": "basic"
+    },
+    "creator": {
+        "id": "ecffd59db269e2b5",
+        "github_login": "GordonSmith",
+        "avatar_url": "https://avatars.observableusercontent.com/avatar/78b1e9a8876f3e6bb69bf1b0cbe8833994e77a8bdd7893eef27fe59c995b0fe0",
+        "login": "gordonsmith",
+        "name": "Gordon Smith",
+        "bio": "",
+        "home_url": "http://hpccsystems.com",
+        "tier": "basic"
+    },
+    "authors": [
+        {
+            "id": "ecffd59db269e2b5",
+            "avatar_url": "https://avatars.observableusercontent.com/avatar/78b1e9a8876f3e6bb69bf1b0cbe8833994e77a8bdd7893eef27fe59c995b0fe0",
+            "name": "Gordon Smith",
+            "login": "gordonsmith",
+            "bio": "",
+            "home_url": "http://hpccsystems.com",
+            "github_login": "GordonSmith",
+            "tier": "basic",
+            "approved": true,
+            "description": ""
+        }
+    ],
+    "collections": [],
+    "files": [],
+    "comments": [],
+    "commenting_lock": null,
+    "suggestion_from": null,
+    "suggestions_to": [],
+    "version": 26,
+    "title": "Serializer Test",
+    "license": null,
+    "copyright": "",
+    "nodes": [
+        {
+            "id": 0,
+            "value": "# Serializer Test 3",
+            "pinned": true,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 1,
+            "name": "",
+            "value": "1 + 2\r\n",
+            "mode": "js"
+        },
+        {
+            "id": 2,
+            "name": "",
+            "value": "{\r\n  return 1 + 2;\r\n}",
+            "mode": "js"
+        },
+        {
+            "id": 3,
+            "name": "",
+            "value": "",
+            "mode": "js"
+        },
+        {
+            "id": 4,
+            "name": "",
+            "value": "foo1 = 42",
+            "mode": "js"
+        },
+        {
+            "id": 5,
+            "name": "",
+            "value": "foo2 = {\r\n  return 42;\r\n}",
+            "mode": "js"
+        },
+        {
+            "id": 6,
+            "name": "",
+            "value": "value = Promise.resolve(42);",
+            "mode": "js"
+        },
+        {
+            "id": 7,
+            "name": "",
+            "value": "2 * await value",
+            "mode": "js"
+        },
+        {
+            "id": 8,
+            "name": "",
+            "value": "yield* [1, 2, 3]",
+            "mode": "js"
+        },
+        {
+            "id": 9,
+            "name": "",
+            "value": "viewof x = DOM.range()",
+            "mode": "js"
+        },
+        {
+            "id": 10,
+            "name": "",
+            "value": "viewof x",
+            "mode": "js"
+        },
+        {
+            "id": 11,
+            "name": "",
+            "value": "viewof x.tagName;",
+            "mode": "js"
+        },
+        {
+            "id": 12,
+            "name": "",
+            "value": "x;\r\n",
+            "mode": "js"
+        },
+        {
+            "id": 13,
+            "name": "",
+            "value": "\r\ny = viewof x;",
+            "mode": "js"
+        },
+        {
+            "id": 14,
+            "name": "",
+            "value": "x*100",
+            "mode": "js"
+        },
+        {
+            "id": 15,
+            "name": "",
+            "value": "import { graphviz } from \"@hpcc-js/hpcc-js-wasm\"",
+            "mode": "js"
+        },
+        {
+            "id": 16,
+            "name": "",
+            "value": "import {viewof foo} from \"module\"",
+            "mode": "js"
+        },
+        {
+            "id": 17,
+            "name": "",
+            "value": "sales=[]",
+            "mode": "js"
+        },
+        {
+            "id": 18,
+            "name": "",
+            "value": "import { chart } with {sales as data} from \"@mbostock/d3-bar-chart\"",
+            "mode": "js"
+        },
+        {
+            "id": 19,
+            "name": "",
+            "value": "viewof chart",
+            "mode": "js"
+        },
+        {
+            "id": 20,
+            "name": "",
+            "value": "//import { dot } from \"@gordonsmith/graphviz\";",
+            "mode": "js"
+        },
+        {
+            "id": 21,
+            "name": "",
+            "value": "dot`digraph D {\r\n\r\n  A [shape=diamond]\r\n  B [shape=box]\r\n  C [shape=circle]\r\n\r\n  A -> B [style=dashed, color=grey] \r\n  A -> C [color=\"black:invis:black\"]\r\n  A -> D [penwidth=5, arrowhead=none]\r\n\r\n}`;\r\n",
+            "mode": "js"
+        },
+        {
+            "id": 22,
+            "name": "",
+            "value": "dotx",
+            "mode": "js"
+        },
+        {
+            "id": 23,
+            "name": "",
+            "value": "\r\nxxx = JavaScript;\r\n",
+            "mode": "js"
+        },
+        {
+            "id": 24,
+            "value": "## Markdown",
+            "pinned": true,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 25,
+            "value": "<h1>HTML ${JavaScript}</h1>",
+            "pinned": true,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 26,
+            "value": "Inputs.table([{a:1}])",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 27,
+            "value": "| name   | quantity |\r\n| ------ | -------- |\r\n| apples | 12       |\r\n| pears  | 34       |",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 28,
+            "value": "\"cars\"",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        }
+    ],
+    "resolutions": []
+}

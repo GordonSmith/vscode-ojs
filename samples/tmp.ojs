@@ -1,0 +1,60 @@
+md`
+# 3D Sample
+`;
+
+{
+  const div = DOM.element('div');
+  
+  Plotly.newPlot(div, data, layout);
+  
+  return div;
+}
+
+md`
+---
+`;
+
+rawData = await d3.csv('https://raw.githubusercontent.com/plotly/datasets/master/api_docs/mt_bruno_elevation.csv');
+
+function unpack(rows, key) {
+  return rows.map(row => row[key]);
+}
+
+function zData(rows) {
+  let z_data=[ ]
+  for(let i=0;i<24;i++)
+  {
+   z_data.push(unpack(rows,i));
+  }
+  return z_data;
+}
+
+data = [{
+  z: zData(rawData),
+  type: 'surface',
+  contours: {
+    z: {
+      show:true,
+      usecolormap: true,
+      highlightcolor:"#42f462",
+      project:{z: true}
+    }
+  }
+}];
+
+
+layout = ({
+  title: 'Mt Bruno Elevation With Projected Contours',
+  scene: {camera: {eye: {x: 1.87, y: 0.88, z: -0.64}}},
+  autosize: false,
+  width,
+  height: 800,
+  margin: {
+    l: 65,
+    r: 50,
+    b: 65,
+    t: 90,
+  }
+})
+
+Plotly = require("https://cdn.plot.ly/plotly-latest.min.js")

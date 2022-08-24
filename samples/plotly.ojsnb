@@ -1,0 +1,40 @@
+{
+    "nodes": [
+        {
+            "id": 0,
+            "name": "",
+            "value": "zzz=42;",
+            "mode": "js"
+        },
+        {
+            "id": 1,
+            "name": "",
+            "value": "mutable x = zzz;",
+            "mode": "js"
+        },
+        {
+            "id": 2,
+            "name": "",
+            "value": "x",
+            "mode": "js"
+        },
+        {
+            "id": 3,
+            "name": "",
+            "value": "++x\r\n",
+            "mode": "js"
+        },
+        {
+            "id": 4,
+            "name": "",
+            "value": "mutable x",
+            "mode": "js"
+        },
+        {
+            "id": 5,
+            "name": "",
+            "value": "++mutable x",
+            "mode": "js"
+        }
+    ]
+}

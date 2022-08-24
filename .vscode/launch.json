@@ -4,7 +4,7 @@
 	"configurations": [
 		{
 			"name": "test.html",
-			"type": "pwa-msedge",
+			"type": "msedge",
 			"request": "launch",
 			"url": "file:///${workspaceRoot}/test.html",
 			"runtimeArgs": [
@@ -14,17 +14,18 @@
 			"webRoot": "${workspaceRoot}"
 		},
 		{
+			"name": "Launch Client",
 			"type": "extensionHost",
 			"request": "launch",
-			"name": "Launch Client",
 			"runtimeExecutable": "${execPath}",
+			"debugWebviews": true,
 			"args": [
 				"--disable-extensions",
 				"--extensionDevelopmentPath=${workspaceRoot}",
 				"${workspaceRoot}\\samples"
 			],
 			"outFiles": [
-				"${workspaceRoot}/client/out/**/*.js"
+				"${workspaceRoot}/src/**/*.js"
 			],
 		},
 		{
