@@ -23,10 +23,10 @@ export class Editor {
 
     onOpenWatcher() {
         vscode.window.onDidChangeActiveTextEditor(te => {
-            switch (te.document.languageId) {
+            switch (te?.document?.languageId) {
                 case "ojs":
                 case "omd":
-                    this._commands.refreshPreview(te.document);
+                    this._commands.refreshPreview(te?.document);
                     break;
             }
         });

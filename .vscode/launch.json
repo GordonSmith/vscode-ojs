@@ -25,7 +25,8 @@
 				"${workspaceRoot}\\samples"
 			],
 			"outFiles": [
-				"${workspaceRoot}/src/**/*.js"
+				"${workspaceRoot}/src/**/*.js",
+				"${workspaceRoot}/src/notebook/renderers/**/*.js"
 			],
 		},
 		{

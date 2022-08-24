@@ -40,7 +40,7 @@ export default [{
     },
     plugins: plugins
 }, {
-    input: "./lib-es6/notebook-renderers/ojsRenderer",
+    input: "./lib-es6/notebook/renderers/index",
     output: [{
         file: "dist/ojsRenderer.js",
         format: "es",
