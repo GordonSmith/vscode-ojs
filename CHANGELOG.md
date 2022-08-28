@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.15](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.14...v0.4.15) (2022-08-28)
+
+
+### Features
+
+*  Add support for VS Code Notebooks ([873935b](https://github.com/GordonSmith/vscode-ojs/commit/873935b4b8e800cd0757b4c8e9a067f5a3298f22)), closes [#32](https://github.com/GordonSmith/vscode-ojs/issues/32)
+
 ### [0.4.14](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.13...v0.4.14) (2021-10-28)
 
 
