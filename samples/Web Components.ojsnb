@@ -1,0 +1,130 @@
+{
+    "id": "68d7197d5e2f1406",
+    "slug": "web-components",
+    "trashed": false,
+    "description": "",
+    "likes": 16,
+    "publish_level": "public",
+    "forks": 0,
+    "fork_of": null,
+    "update_time": "2022-07-28T12:44:07.415Z",
+    "publish_time": "2022-01-29T19:12:09.225Z",
+    "publish_version": 463,
+    "latest_version": 463,
+    "thumbnail": "67cdeb7296c86a16151382da9a02756ff1e5d36f5972cc2e2c2a7cd7cbaa1588",
+    "default_thumbnail": "4474176f1fc42cd44637ce915d5e168c78e27a0bff5219f6fc2f7588aec424ca",
+    "roles": [],
+    "sharing": null,
+    "owner": {
+        "id": "ecffd59db269e2b5",
+        "github_login": "GordonSmith",
+        "avatar_url": "https://avatars.observableusercontent.com/avatar/78b1e9a8876f3e6bb69bf1b0cbe8833994e77a8bdd7893eef27fe59c995b0fe0",
+        "login": "gordonsmith",
+        "name": "Gordon Smith",
+        "bio": "",
+        "home_url": "http://hpccsystems.com",
+        "type": "individual",
+        "tier": "basic"
+    },
+    "creator": {
+        "id": "ecffd59db269e2b5",
+        "github_login": "GordonSmith",
+        "avatar_url": "https://avatars.observableusercontent.com/avatar/78b1e9a8876f3e6bb69bf1b0cbe8833994e77a8bdd7893eef27fe59c995b0fe0",
+        "login": "gordonsmith",
+        "name": "Gordon Smith",
+        "bio": "",
+        "home_url": "http://hpccsystems.com",
+        "tier": "basic"
+    },
+    "authors": [
+        {
+            "id": "ecffd59db269e2b5",
+            "avatar_url": "https://avatars.observableusercontent.com/avatar/78b1e9a8876f3e6bb69bf1b0cbe8833994e77a8bdd7893eef27fe59c995b0fe0",
+            "name": "Gordon Smith",
+            "login": "gordonsmith",
+            "bio": "",
+            "home_url": "http://hpccsystems.com",
+            "github_login": "GordonSmith",
+            "tier": "basic",
+            "approved": true,
+            "description": ""
+        }
+    ],
+    "collections": [],
+    "files": [],
+    "comments": [],
+    "commenting_lock": null,
+    "suggestion_from": null,
+    "suggestions_to": [],
+    "version": 463,
+    "title": "Web Components",
+    "license": null,
+    "copyright": "",
+    "nodes": [
+        {
+            "id": 0,
+            "value": "# Web Components\n\nQuick example using Web Components from [@hpcc-js/web-components](https://gordonsmith.github.io/hpcc-js-wc), some highlights:\n* The layout is a combination of split panels and tab panels, so drag some of those splitters!\n* The \"Liquid Fun\" visualization is inside a drag and zoom container so you can drag and zoom it!\n* The tab panel can be reordered, so swap them about!\n* The observable component will work anywhere, not just here! (but looks like I have some escaping work to do!).",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 1,
+            "value": "<hpcc-splitpanel orientation=\"vertical\" style=\"width:100%;height:1000px\">\r\n  <hpcc-zoom style=\"width:100%;height:100%;min-height:48px;overflow:hidden\">\r\n    <hpcc-observable style=\"overflow:hidden\">\r\n      canvas\r\n      \r\n      import { canvas } with { height } from \"@mbostock/liquidfun\"\r\n      \r\n      height=400\r\n  \r\n      md&#96;###### Credits:  [@mbostock](https://observablehq.com/@mbostock)&#96;\r\n    </hpcc-observable>\r\n  </hpcc-zoom>\r\n  <hpcc-tabpanel tabs_movable=1 style=\"width:100%;height:100%;border:0px;padding:0px;min-height:48px;overflow:hidden\">\r\n    <hpcc-observable data-label=\"Function Quadrature Plot\" style=\"width:100%;height:100%;margin-top:-4px;padding:0;min-height:48px;overflow:hidden\">\r\n      graph\r\n  \r\n      import { graph } from \"@laotzunami/numeric-integration-quadrature\"\r\n\r\n      md&#96;###### Credits:  [@laotzunami](https://observablehq.com/@laotzunami)&#96;\r\n    </hpcc-observable>\r\n    <hpcc-observable show_errors=1 data-label=\"Quadrature Percent Error\" style=\"width:100%;height:100%;margin-top:-4px;padding:0;min-height:48px;overflow:hidden\">\r\n      error\r\n  \r\n      import { error } from \"@laotzunami/numeric-integration-quadrature\"\r\n      md&#96;###### Credits:  [@laotzunami](https://observablehq.com/@laotzunami)&#96;\r\n    </hpcc-observable>\r\n  </hpcc-tabpanel>\r\n</hpcc-splitpanel>",
+            "pinned": true,
+            "mode": "html",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 2,
+            "value": "pies = {\r\n  wc;  // Need reference wc so edits are observed correctly  --\r\n  const elList = document.querySelectorAll(\"hpcc-pie\");\r\n  return Array.prototype.slice.call(elList, 0);\r\n}",
+            "pinned": false,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 3,
+            "value": "{\r\n  wc;  // Needs reference to wc so edits are observed correctly  --\r\n  yield \"loading pie data\";\r\n  for (const pie of pies) {\r\n    pie.columns = [\"Subject\", \"Score\"];\r\n    pie.data = [\r\n      [\"Math\", 188],\r\n      [\"English\", 72],\r\n      [\"Science\", 60],\r\n      [\"History\", 50],\r\n      [\"Geography\", 40],\r\n      [\"Biology\", 30], \r\n      [\"Physics\", 20],\r\n      [\"Chemistry\", 10]\r\n    ];\r\n  }\r\n  yield \"loaded pie data\";\r\n}",
+            "pinned": false,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 4,
+            "value": "tick = {\r\n  wc;  // Needs reference to wc so edits are observed correctly  --\r\n  let retVal = 0;\r\n  while (true) {\r\n    yield Promises.delay(150, retVal);\r\n    retVal += 2;\r\n    let i = 0;\r\n    for (const pie of pies) {\r\n      pie.setAttribute(\"start_angle\", i % 2 === 0 ? retVal :-retVal);\r\n      ++i;\r\n    }\r\n  }\r\n}",
+            "pinned": false,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 5,
+            "value": "## Dependencies",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 6,
+            "value": "wc = require(\"@hpcc-js/wc-layout\")",
+            "pinned": false,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 7,
+            "value": "wc2 = require(\"@hpcc-js/wc-observable\")",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        }
+    ],
+    "resolutions": []
+}

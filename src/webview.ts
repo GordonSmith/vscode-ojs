@@ -153,7 +153,6 @@ viewof; cars;
                         callbackID
                     });
                 }).catch((e: OJSSyntaxError) => {
-                    debugger;
                     // this._errors = [new OJSRuntimeError("error", e.start, e.end, e.message)];
                     // this.runtimeUpdated();
                 });

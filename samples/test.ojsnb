@@ -1,0 +1,350 @@
+{
+    "id": "8f58e0bf4ecc8bee",
+    "slug": null,
+    "trashed": false,
+    "description": "",
+    "likes": 1,
+    "publish_level": "shared",
+    "forks": 0,
+    "fork_of": null,
+    "update_time": "2022-08-27T07:34:08.924Z",
+    "publish_time": "2022-08-27T07:34:08.924Z",
+    "publish_version": 104,
+    "latest_version": 104,
+    "thumbnail": "b582a017e500c80e490c14aad4f11ed7673616be4ef47b1d691dd5e8bfd63e41",
+    "default_thumbnail": "b582a017e500c80e490c14aad4f11ed7673616be4ef47b1d691dd5e8bfd63e41",
+    "roles": [],
+    "sharing": null,
+    "owner": {
+        "id": "ecffd59db269e2b5",
+        "github_login": "GordonSmith",
+        "avatar_url": "https://avatars.observableusercontent.com/avatar/78b1e9a8876f3e6bb69bf1b0cbe8833994e77a8bdd7893eef27fe59c995b0fe0",
+        "login": "gordonsmith",
+        "name": "Gordon Smith",
+        "bio": "",
+        "home_url": "http://hpccsystems.com",
+        "type": "individual",
+        "tier": "basic"
+    },
+    "creator": {
+        "id": "ecffd59db269e2b5",
+        "github_login": "GordonSmith",
+        "avatar_url": "https://avatars.observableusercontent.com/avatar/78b1e9a8876f3e6bb69bf1b0cbe8833994e77a8bdd7893eef27fe59c995b0fe0",
+        "login": "gordonsmith",
+        "name": "Gordon Smith",
+        "bio": "",
+        "home_url": "http://hpccsystems.com",
+        "tier": "basic"
+    },
+    "authors": [
+        {
+            "id": "ecffd59db269e2b5",
+            "avatar_url": "https://avatars.observableusercontent.com/avatar/78b1e9a8876f3e6bb69bf1b0cbe8833994e77a8bdd7893eef27fe59c995b0fe0",
+            "name": "Gordon Smith",
+            "login": "gordonsmith",
+            "bio": "",
+            "home_url": "http://hpccsystems.com",
+            "github_login": "GordonSmith",
+            "tier": "basic",
+            "approved": true,
+            "description": "Creator"
+        }
+    ],
+    "collections": [
+        {
+            "id": "f7f673c37cc6d998",
+            "type": "public",
+            "slug": "graphviz",
+            "title": "Graphviz",
+            "description": "",
+            "update_time": "2021-10-04T07:21:17.392Z",
+            "pinned": false,
+            "ordered": false,
+            "custom_thumbnail": null,
+            "default_thumbnail": "13d99dde637b681c70c89e339dfc2c898d5ef33bc82a8fa4f600e089fb5c45a8",
+            "thumbnail": "13d99dde637b681c70c89e339dfc2c898d5ef33bc82a8fa4f600e089fb5c45a8",
+            "listing_count": 2,
+            "parent_collection_count": 0,
+            "owner": {
+                "id": "ecffd59db269e2b5",
+                "github_login": "GordonSmith",
+                "avatar_url": "https://avatars.observableusercontent.com/avatar/78b1e9a8876f3e6bb69bf1b0cbe8833994e77a8bdd7893eef27fe59c995b0fe0",
+                "login": "gordonsmith",
+                "name": "Gordon Smith",
+                "bio": "",
+                "home_url": "http://hpccsystems.com",
+                "type": "individual",
+                "tier": "basic"
+            }
+        }
+    ],
+    "files": [
+        {
+            "id": "34b2ca53f79302366533209379ed35a298de735be474cdc400b98a2d313fce5dd7bb44ed75baabf7bea77c3cd2b28a1a3f5e137a39003d9eaa4ee836ea69d6ac",
+            "url": "https://static.observableusercontent.com/files/34b2ca53f79302366533209379ed35a298de735be474cdc400b98a2d313fce5dd7bb44ed75baabf7bea77c3cd2b28a1a3f5e137a39003d9eaa4ee836ea69d6ac",
+            "download_url": "https://static.observableusercontent.com/files/34b2ca53f79302366533209379ed35a298de735be474cdc400b98a2d313fce5dd7bb44ed75baabf7bea77c3cd2b28a1a3f5e137a39003d9eaa4ee836ea69d6ac?response-content-disposition=attachment%3Bfilename*%3DUTF-8%27%27data_2022-04-25T10_24_22.csv",
+            "name": "data_2022-04-25T10_24_22.csv",
+            "create_time": "2022-08-24T08:10:52.552Z",
+            "status": "public",
+            "size": 24338,
+            "mime_type": "text/csv",
+            "content_encoding": "gzip"
+        }
+    ],
+    "comments": [
+        {
+            "id": "60f9b93fe5eacc57",
+            "content": "This is javascript",
+            "node_id": 5,
+            "create_time": "2022-08-24T08:15:30.437Z",
+            "update_time": null,
+            "resolved": false,
+            "user": {
+                "id": "ecffd59db269e2b5",
+                "github_login": "GordonSmith",
+                "avatar_url": "https://avatars.observableusercontent.com/avatar/78b1e9a8876f3e6bb69bf1b0cbe8833994e77a8bdd7893eef27fe59c995b0fe0",
+                "login": "gordonsmith",
+                "name": "Gordon Smith",
+                "bio": "",
+                "home_url": "http://hpccsystems.com",
+                "tier": "basic"
+            }
+        },
+        {
+            "id": "7ed3839332815939",
+            "content": "This is markdown",
+            "node_id": 7,
+            "create_time": "2022-08-24T08:15:47.609Z",
+            "update_time": null,
+            "resolved": false,
+            "user": {
+                "id": "ecffd59db269e2b5",
+                "github_login": "GordonSmith",
+                "avatar_url": "https://avatars.observableusercontent.com/avatar/78b1e9a8876f3e6bb69bf1b0cbe8833994e77a8bdd7893eef27fe59c995b0fe0",
+                "login": "gordonsmith",
+                "name": "Gordon Smith",
+                "bio": "",
+                "home_url": "http://hpccsystems.com",
+                "tier": "basic"
+            }
+        }
+    ],
+    "commenting_lock": null,
+    "suggestion_from": null,
+    "suggestions_to": [],
+    "version": 104,
+    "title": "",
+    "license": "apache-2.0",
+    "copyright": "Copyright 2022 Gordon Smith",
+    "nodes": [
+        {
+            "id": 0,
+            "value": "zzz = 42",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 1,
+            "value": "mutable xxx = zzz;",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 2,
+            "value": "xxx",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 3,
+            "value": "++xxx",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 4,
+            "value": "mutable xxx",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 5,
+            "value": "++mutable xxx",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 6,
+            "value": "```js\nimport { data } with { newRawData as rawData } from \"@gordonsmith/3d-sample\";\n```",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 7,
+            "value": "viewof x = DOM.range()",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 8,
+            "value": "viewof x",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 9,
+            "value": "viewof x.tagName",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 10,
+            "value": "y = viewof x;",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 11,
+            "value": "y.value;",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 12,
+            "value": "x",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 13,
+            "value": "x*100",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 14,
+            "value": "42",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 15,
+            "value": "{\n  return 42;\n}",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 16,
+            "value": "# Serializer Test",
+            "pinned": true,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 17,
+            "value": "import {dot} from \"@gordonsmith/graphviz\"",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 18,
+            "value": "Plotly = require(\"https://cdn.plot.ly/plotly-latest.min.js\")",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 19,
+            "value": "JavaScript = 42;",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 20,
+            "value": "## Markdown",
+            "pinned": true,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 21,
+            "value": "<h1>HTML</h1>",
+            "pinned": false,
+            "mode": "html",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 22,
+            "value": "viewof table = Inputs.table(cars)",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 23,
+            "value": "| name   | quantity |\n| ------ | -------- |\n| apples | 12       |\n| pears  | 34       |",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 24,
+            "value": "cars",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 25,
+            "value": "FileAttachment(\"data_2022-04-25T10_24_22.csv\").csv()",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        }
+    ],
+    "resolutions": []
+}

@@ -10,13 +10,13 @@ const pkg = require("./package.json");
 const plugins = [
     alias({
         entries: [
-            { find: "@hpcc-js/common", replacement: "@hpcc-js/common/lib-es6/index.js" }
+            { find: "@hpcc-js/common", replacement: "@hpcc-js/common" }
         ]
     }),
     nodeResolve({
         preferBuiltins: true
     }),
-    commonjs({}),
+    commonjs(),
     sourcemaps(),
     postcss({
         extensions: [".css"],
@@ -29,6 +29,21 @@ export default [{
     output: [{
         file: "dist/webview.js",
         format: "umd",
+        sourcemap: true,
+        name: pkg.name
+    }],
+    treeshake: {
+        moduleSideEffects: (id, external) => {
+            if (id.indexOf(".css") >= 0) return true;
+            return false;
+        }
+    },
+    plugins: plugins
+}, {
+    input: "./lib-es6/notebook-renderers/ojsRenderer",
+    output: [{
+        file: "dist/ojsRenderer.js",
+        format: "es",
         sourcemap: true,
         name: pkg.name
     }],
