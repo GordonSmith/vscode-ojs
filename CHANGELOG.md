@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.17](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.16...v0.4.17) (2022-08-31)
+
+
+### Bug Fixes
+
+*  Cleaner parser / interpreter ([02e2a2b](https://github.com/GordonSmith/vscode-ojs/commit/02e2a2bc7adb280ca9f5a6db238877b40b688e07))
+
 ### [0.4.16](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.15...v0.4.16) (2022-08-28)
 
 ### [0.4.15](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.14...v0.4.15) (2022-08-28)
