@@ -42,7 +42,7 @@ if (window["__hpcc_test"]) {
     const compiler = new OMDRuntime("#placeholder");
 
     compiler.watch(notifcations => {
-        console.log(notifcations);
+        console.info(notifcations);
     });
 
     compiler.evaluate("", `\

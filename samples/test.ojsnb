@@ -147,7 +147,7 @@
         },
         {
             "id": 1,
-            "value": "mutable xxx = zzz;",
+            "value": "mutable xxx = ()=>zzz;",
             "pinned": true,
             "mode": "js",
             "data": null,
@@ -155,7 +155,7 @@
         },
         {
             "id": 2,
-            "value": "xxx",
+            "value": "mutable xxx()",
             "pinned": true,
             "mode": "js",
             "data": null,
@@ -179,7 +179,7 @@
         },
         {
             "id": 5,
-            "value": "++mutable xxx",
+            "value": "++mutable xxx()",
             "pinned": true,
             "mode": "js",
             "data": null,
