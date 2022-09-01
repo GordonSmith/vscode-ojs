@@ -4,7 +4,7 @@
         "rootDir": "./src",
         "module": "es6",
         "moduleResolution": "node",
-        "target": "ES2019",
+        "target": "ES2021",
         "outDir": "lib-es6",
         "sourceMap": true,
         "noImplicitAny": false,

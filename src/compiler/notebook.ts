@@ -58,7 +58,4 @@ export class Notebook {
     importVariable(name: string, alias: string, otherModule: ohq.Module): ohq.Variable {
         return this._main.import(name, alias, otherModule);
     }
-
-    removeCell(id: string) {
-    }
 }
