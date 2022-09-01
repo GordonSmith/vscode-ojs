@@ -1,5 +1,5 @@
 /* eslint-disable no-inner-declarations */
-import { OJSRuntime, OJSRuntimeError, OJSSyntaxError, OMDRuntime, VariableValue } from "@hpcc-js/observable-md";
+import { OJSRuntime, OJSSyntaxError, OMDRuntime, VariableValue } from "@hpcc-js/observable-md";
 import { hashSum, IObserverHandle } from "@hpcc-js/util";
 
 export interface Message {
@@ -35,7 +35,7 @@ interface VSCodeAPI {
 
 declare const acquireVsCodeApi: () => VSCodeAPI;
 
-const placeholder = document.getElementById("placeholder");
+const placeholder = document.getElementById("placeholder")!;
 
 if (window["__hpcc_test"]) {
     placeholder.innerText = "";

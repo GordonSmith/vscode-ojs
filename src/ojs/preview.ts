@@ -29,7 +29,7 @@ export class Preview {
         // Otherwise, create a new panel.
         const localResourceRoots = [
             vscode.Uri.file(path.join(ctx.extensionPath, "dist")),
-            ...vscode.workspace.workspaceFolders.map(wf => wf.uri)
+            ...vscode.workspace.workspaceFolders?.map(wf => wf.uri) ?? []
         ];
         const panel = vscode.window.createWebviewPanel(
             Preview.viewType,
@@ -75,7 +75,7 @@ export class Preview {
     }
 
     _callbackID = 0;
-    _callbacks: { [key: number]: (msg: WebviewMessage) => void } = {};
+    _callbacks: { [key: number]: (msg: ValueMessage) => void } = {};
     _doc: vscode.TextDocument;
     async init() {
         // Handle messages from the webview
@@ -91,7 +91,7 @@ export class Preview {
         // }, 1000);
         return new Promise((resolve, reject) => {
             this._panel.webview.onDidReceiveMessage((message: WebviewMessage) => {
-                const callback: (msg: WebviewMessage) => void = this._callbacks[message.callbackID];
+                const callback: (msg: WebviewMessage) => void = message.callbackID && this._callbacks[message.callbackID];
                 if (callback) {
                     callback(message);
                 } else {

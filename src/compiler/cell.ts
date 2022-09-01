@@ -1,35 +1,48 @@
-import { Inspector } from "@observablehq/inspector";
 import { observablehq as ohq } from "./types";
 import { Notebook } from "./notebook";
 import { parseCell } from "./parser";
 import { obfuscatedImport } from "./util";
+import { Writer } from "./writer";
+
+function encode(str: string) {
+    return str
+        // .split("\\").join("\\\\")
+        .split("`").join("\\`")
+        // .split("$").join("\\$")
+        ;
+}
+
+class NullObserver implements ohq.Inspector {
+    pending() {
+    }
+    fulfilled(value: any) {
+    }
+    rejected(error: any) {
+    }
+}
+export const nullObserver = new NullObserver();
+
+const nullObserverFactory: ohq.InspectorFactory = (name?: string) => nullObserver;
 
 export class Cell {
 
     protected _notebook: Notebook;
-    protected _variable: ohq.Variable;                                                  //  Regular variable
-    protected _initialValue: ohq.Variable;                                              //  Cell is "mutable"
-    protected _variableValue: ohq.Variable;                                             //  Cell is a "viewof" or "mutable"
-    protected _imported: { variable: ohq.Variable, variableValue?: ohq.Variable }[];    //  Cell is an import
+    protected _id: string | number;
     protected _observer: ohq.InspectorFactory;
+    protected _variables = new Set<ohq.Variable>();
 
-    constructor(notebook: Notebook, observer: ohq.InspectorFactory) {
+    constructor(notebook: Notebook, observer: ohq.InspectorFactory = nullObserverFactory) {
         this._notebook = notebook;
         this._observer = observer;
     }
 
     reset() {
-        this._imported?.forEach(v => {
-            v.variable.delete();
-            v.variableValue?.delete();
-        });
-        this._initialValue?.delete();
-        this._variable?.delete();
-        this._variableValue?.delete();
+        this._variables?.forEach(v => v.delete());
+        this._variables.clear();
     }
 
     dispose() {
-        this.reset();
+        this._notebook.disposeCell(this);
     }
 
     async importFile(partial) {
@@ -54,48 +67,83 @@ export class Cell {
         return obfuscatedImport(`https://api.observablehq.com/${partial[0] === "@" ? partial : `d/${partial}`}.js?v=3`);
     }
 
-    async interpret(cellSource: string) {
+    protected _cellSource: string = "";
+    text(): string;
+    text(cellSource: string, languageId?: string): this;
+    text(cellSource?: string, languageId: string = "ojs"): string | this {
+        if (arguments.length === 0) return this._cellSource;
+        if (languageId === "markdown") {
+            languageId = "md";
+        }
+        this._cellSource = languageId === "ojs" ? cellSource! : `${languageId}\`${encode(cellSource!)}\``;
+        return this;
+    }
+
+    async evaluate() {
         this.reset();
 
-        const parsed = parseCell(cellSource);
-        if (parsed.import) {
-            const impMod: any = [".", "/"].indexOf(parsed.import.src[0]) === 0 ?
-                await this.importFile(parsed.import.src) :
-                await this.importNotebook(parsed.import.src);
+        const parsed = parseCell(this._cellSource);
+        switch (parsed.type) {
+            case "import":
+                const impMod: any = [".", "/"].indexOf(parsed.src[0]) === 0 ?
+                    await this.importFile(parsed.src) :
+                    await this.importNotebook(parsed.src);
 
-            let mod = this._notebook.createModule(impMod.default);
-            if (parsed.import.injections.length) {
-                mod = mod.derive(parsed.import.injections, this._notebook.main());
-            }
-
-            this._imported = parsed.import.specifiers.map(spec => {
-                const viewof = spec.view ? "viewof " : "";
-                const retVal = {
-                    variable: this._notebook.importVariable(viewof + spec.name, viewof + spec.alias, mod),
-                    variableValue: undefined
-                };
-                if (spec.view) {
-                    retVal.variableValue = this._notebook.importVariable(spec.name, spec.alias, mod);
+                let mod = this._notebook.createModule(impMod.default);
+                if (parsed.injections.length) {
+                    mod = mod.derive(parsed.injections, this._notebook.main());
                 }
-                return retVal;
-            });
-            this._variable = this._notebook.createVariable(this._observer());
-            this._variable.define(undefined, ["md"], md => {
-                return md`\`\`\`JavaScript
-${cellSource}
+
+                parsed.specifiers.forEach(spec => {
+                    const viewof = spec.view ? "viewof " : "";
+                    this._variables.add(this._notebook.importVariable(viewof + spec.name, viewof + spec.alias, mod));
+                    if (spec.view) {
+                        this._variables.add(this._notebook.importVariable(spec.name, spec.alias, mod));
+                    }
+                });
+                this._variables.add(this._notebook.createVariable(this._observer(), undefined, ["md"], md => {
+                    return md`\`\`\`JavaScript
+${this._cellSource}
 \`\`\``;
-            });
-        } else {
-            if (parsed.initialValue) {
-                this._initialValue = this._notebook.createVariable();
-                this._initialValue.define(parsed.initialValue.id, parsed.initialValue.inputs, parsed.initialValue.func);
-            }
-            this._variable = this._notebook.createVariable(this._observer(parsed.id));
-            this._variable.define(parsed.id, parsed.inputs, parsed.func);
-            if (parsed.viewofValue) {
-                this._variableValue = this._notebook.createVariable(parsed.initialValue && this._observer(parsed.viewofValue.id));
-                this._variableValue.define(parsed.viewofValue.id, parsed.viewofValue.inputs, parsed.viewofValue.func);
-            }
+                }));
+                break;
+            case "viewof":
+                this._variables.add(this._notebook.createVariable(this._observer(parsed.variable.id), parsed.variable.id, parsed.variable.inputs, parsed.variable.func));
+                this._variables.add(this._notebook.createVariable(this._observer(parsed.variableValue.id), parsed.variableValue.id, parsed.variableValue.inputs, parsed.variableValue.func));
+                break;
+            case "mutable":
+                this._variables.add(this._notebook.createVariable(undefined, parsed.initial.id, parsed.initial.inputs, parsed.initial.func));
+                this._variables.add(this._notebook.createVariable(this._observer(parsed.variable.id), parsed.variable.id, parsed.variable.inputs, parsed.variable.func));
+                this._variables.add(this._notebook.createVariable(this._observer(parsed.variableValue.id), parsed.variableValue.id, parsed.variableValue.inputs, parsed.variableValue.func));
+                break;
+            case "variable":
+                this._variables.add(this._notebook.createVariable(this._observer(parsed.id), parsed.id, parsed.inputs, parsed.func));
+                break;
+        }
+    }
+
+    compile(writer: Writer) {
+        const parsed = parseCell(this._cellSource);
+        let id;
+        switch (parsed.type) {
+            case "import":
+                writer.import(parsed);
+                break;
+            case "viewof":
+                id = writer.function(parsed.variable);
+                writer.define(parsed.variable, true, false, id);
+                writer.define(parsed.variableValue, true, true);
+                break;
+            case "mutable":
+                id = writer.function(parsed.initial);
+                writer.define(parsed.initial, false, false, id);
+                writer.define(parsed.variable, true, true);
+                writer.define(parsed.variableValue, true, true);
+                break;
+            case "variable":
+                id = writer.function(parsed);
+                writer.define(parsed, true, false, id);
+                break;
         }
     }
 }

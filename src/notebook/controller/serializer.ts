@@ -1,6 +1,8 @@
-import { NotebookSerializer, CancellationToken, NotebookData, NotebookCellData, NotebookCellKind } from "vscode";
+import { env, NotebookSerializer, CancellationToken, NotebookData, NotebookCellData, NotebookCellKind } from "vscode";
 import { TextDecoder, TextEncoder } from "util";
 import { observablehq as ohq } from "../../compiler/types";
+import { Notebook } from "../../compiler/notebook";
+import { Writer } from "../../compiler/writer";
 
 export class Serializer implements NotebookSerializer {
     async deserializeNotebook(content: Uint8Array, _token: CancellationToken): Promise<NotebookData> {
@@ -13,10 +15,10 @@ export class Serializer implements NotebookSerializer {
             notebook = {
                 files: [],
                 nodes: []
-            } as ohq.Notebook;
+            } as unknown as ohq.Notebook;
         }
 
-        const cells = notebook.nodes.map(node => {
+        const cells = notebook.nodes?.map(node => {
             const retVal = new NotebookCellData(node.mode === "md" ?
                 NotebookCellKind.Markup :
                 NotebookCellKind.Code, node.value,
@@ -37,9 +39,10 @@ export class Serializer implements NotebookSerializer {
     }
 
     async serializeNotebook(data: NotebookData, _token: CancellationToken): Promise<Uint8Array> {
-        const src: ohq.Notebook = data.metadata?.notebook;
-        src.nodes = [];
+        const jsonNotebook: ohq.Notebook = data.metadata?.notebook;
+        jsonNotebook.nodes = [];
 
+        const notebook = new Notebook(jsonNotebook);
         let id = 0;
         for (const cell of data.cells) {
             const item = {
@@ -53,9 +56,14 @@ export class Serializer implements NotebookSerializer {
                         "js" :
                         cell.languageId
             };
-            src.nodes.push(item);
+            jsonNotebook.nodes.push(item);
+            notebook.createCell().text(cell.value, cell.languageId);
             ++id;
         }
-        return new TextEncoder().encode(JSON.stringify(src, undefined, 4));
+        const writer = new Writer();
+        notebook.compile(writer);
+        env.clipboard.writeText(writer.toString());
+
+        return new TextEncoder().encode(JSON.stringify(jsonNotebook, undefined, 4));
     }
 }
