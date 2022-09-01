@@ -47,8 +47,12 @@ export class Notebook {
         return this._runtime.module(define);
     }
 
-    createVariable(inspector?: ohq.Inspector): ohq.Variable {
-        return this._main.variable(inspector);
+    createVariable(inspector?: ohq.Inspector, name?: string | null, inputs?: string[], definition?: any): ohq.Variable {
+        const retVal = this._main.variable(inspector);
+        if (arguments.length > 1) {
+            retVal.define(name, inputs, definition);
+        }
+        return retVal;
     }
 
     importVariable(name: string, alias: string, otherModule: ohq.Module): ohq.Variable {

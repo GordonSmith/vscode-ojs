@@ -1,46 +1,58 @@
-import { parseCell as ohqParseCell } from "@observablehq/parser";
-import { calcRefs, createFunction } from "./util";
+import { walk, parseCell as ohqParseCell } from "@observablehq/parser";
+import { ancestor } from "acorn-walk";
+import { createFunction, Refs } from "./util";
 
-type IdIdentifier = { type: "Identifier", name: string };
-type IdViewExpression = { type: "ViewExpression", id: IdIdentifier };
-type IdMutableExpression = { type: "MutableExpression", id: IdIdentifier };
-type Id = null | IdIdentifier | IdViewExpression | IdMutableExpression;
+function calcRefs(cellAst, cellStr): Refs {
+    if (cellAst.references === undefined) return { inputs: [], args: [], patches: [] };
 
-type BodyType = "BinaryExpression" | "BlockStatement" | "Literal" | "YieldExpression" | "CallExpression" | "MemberExpression" | "Identifier" | "ViewExpression" | "MutableExpression" | "ImportDeclaration";
-interface BodyAny {
-    type: BodyType;
-    [key: string]: any;
+    const dedup = {};
+    cellAst.references.forEach(r => dedup[cellStr.substring(r.start, r.end)] = true);
+    const retVal: Refs = {
+        inputs: Object.keys(dedup),
+        args: Object.keys(dedup).map(r => r.split(" ").join("_")),
+        patches: []
+    };
+    const pushPatch = (node, newText) => retVal.patches.push({ start: node.start - cellAst.body.start, end: node.end - cellAst.body.start, newText });
+    ancestor(cellAst.body, {
+        Identifier(node) {
+            const value = cellStr.substring(node.start, node.end);
+            if (dedup[value]) {
+            }
+        },
+        MutableExpression(node) {
+            const value = cellStr.substring(node.start, node.end);
+            const newText = value.split(" ").join("_") + ".value";
+            pushPatch(node, newText);
+        },
+        ViewExpression(node) {
+            const value = cellStr.substring(node.start, node.end);
+            const newText = value.split(" ").join("_");
+            pushPatch(node, newText);
+        },
+        ThisExpression(node, ancestors: acorn.Node[]) {
+            const value = cellStr.substring(node.start, node.end);
+            if (value === "this" && !ancestors.find(n => n.type === "FunctionExpression")) {
+                pushPatch(node, "(this === window ? undefined : this.valueOf())");
+            }
+        }
+    }, walk);
+    return retVal;
 }
 
-type Body = null | BodyAny;
-
 interface ParsedCell {
-    type: "ParsedImport"
+    type: "import" | "viewof" | "mutable" | "variable" | "identifier"
 }
 
 interface ParsedImportCell extends ParsedCell {
-    type: "ParsedImport"
+    type: "import"
     src: string;
-    injections: { name: string, alias: string }[];
     specifiers: { view: boolean, name: string, alias?: string }[];
+    injections: { name: string, alias: string }[];
 }
 
-interface ParsedVariable {
-    id: null | string,
-    inputs: string[],
-    func: any,
-}
-
-interface ParseResponse extends ParsedVariable {
-    initialValue?: ParsedVariable
-    viewofValue?: ParsedVariable;
-    import?: ParsedImportCell;
-    debug: any
-}
-
-function parseImportDeclaration(cellAst): ParsedImportCell {
+function parseImportExpression(cellAst): ParsedImportCell {
     return {
-        type: "ParsedImport",
+        type: "import",
         src: cellAst.body.source.value,
         specifiers: cellAst.body.specifiers?.map(spec => {
             return {
@@ -58,112 +70,96 @@ function parseImportDeclaration(cellAst): ParsedImportCell {
     };
 }
 
-// function parseBody(cellStr: string, cellAst) {
-//     switch ((cellAst.body as Body)?.type) {
-//         case "ImportDeclaration":
-//             return parseImportDeclaration(cellStr);
-//         case undefined:
-//             break;
-//         case "ViewExpression":
-//         case "Identifier":
-//         case "BinaryExpression":
-//         case "BlockStatement":
-//         case "CallExpression":
-//         case "Literal":
-//         case "MemberExpression":
-//         case "YieldExpression":
-//             retVal.func = retVal.func ?? createFunction(refs, bodyStr, cellAst.async, cellAst.generator, ["BlockStatement"].indexOf(cellAst.body.type) >= 0);
-//             break;
-//         default:
-//             console.warn(`Unexpected cell.body.type:  ${cellAst.body?.type}`);
-//             retVal.func = retVal.func ?? createFunction(refs, bodyStr, cellAst.async, cellAst.generator, ["BlockStatement"].indexOf(cellAst.body.type) >= 0);
-//     }
+interface ParsedVariable {
+    id: null | string,
+    inputs: string[],
+    func: any,
+}
 
-// }
+interface ParsedViewCell extends ParsedCell {
+    type: "viewof",
+    variable: ParsedVariable;
+    variableValue: ParsedVariable;
+}
 
-export function parseCell(cellStr: string): ParseResponse {
+function parseViewExpression(cellStr: string, cellAst, refs: Refs, bodyStr?: string): ParsedViewCell {
+    const id = cellAst.id && cellStr.substring(cellAst.id.start, cellAst.id.end);
+    return {
+        type: "viewof",
+        variable: {
+            id,
+            inputs: refs.inputs,
+            func: createFunction(refs, cellAst.async, cellAst.generator, cellAst.body.type === "BlockStatement", bodyStr)
+        },
+        variableValue: {
+            id: cellAst?.id?.id?.name,
+            inputs: ["Generators", id],
+            func: (G, _) => G.input(_)
+        }
+    };
+}
+
+interface ParsedMutableCell extends ParsedCell {
+    type: "mutable",
+    initial: ParsedVariable;
+    variable: ParsedVariable;
+    variableValue: ParsedVariable;
+}
+
+function parseMutableExpression(cellStr: string, cellAst, refs: Refs, bodyStr?: string): ParsedMutableCell {
+    const id = cellAst.id && cellStr.substring(cellAst.id.start, cellAst.id.end);
+    const initialValueId = cellAst?.id?.id?.name;
+    const initialId = `initial ${initialValueId}`;
+    return {
+        type: "mutable",
+        initial: {
+            id: initialId,
+            inputs: refs.inputs,
+            func: createFunction(refs, cellAst.async, cellAst.generator, cellAst.body.type === "BlockStatement", bodyStr)
+        },
+        variable: {
+            id,
+            inputs: ["Mutable", initialId],
+            func: (M, _) => new M(_)
+        },
+        variableValue: {
+            id: initialValueId,
+            inputs: [id],
+            func: _ => _.generator
+        }
+    };
+}
+
+interface ParsedVariableCell extends ParsedCell {
+    type: "variable",
+    id: null | string,
+    inputs: string[],
+    func: any,
+}
+
+function parseVariableExpression(cellStr: string, cellAst, refs: Refs, bodyStr?: string): ParsedVariableCell {
+    return {
+        type: "variable",
+        id: cellAst.id && cellStr.substring(cellAst.id?.start, cellAst.id?.end),
+        inputs: refs.inputs,
+        func: createFunction(refs, cellAst.async, cellAst.generator, cellAst.body.type === "BlockStatement", bodyStr)
+    };
+}
+
+export function parseCell(cellStr: string): ParsedImportCell | ParsedViewCell | ParsedMutableCell | ParsedVariableCell {
     const cellAst = ohqParseCell(cellStr);
+    if ((cellAst.body)?.type == "ImportDeclaration") {
+        return parseImportExpression(cellAst);
+    }
     const refs = calcRefs(cellAst, cellStr);
 
-    const retVal: ParseResponse = {
-        id: null,
-        inputs: refs.inputs,
-        func: undefined,
-        debug: cellAst
-    };
-
-    const cellId = cellAst.id as Id;
-    const bodyStr = cellAst.body ? cellStr.substring(cellAst.body.start, cellAst.body.end) : "";
-    switch (cellId?.type) {
+    const bodyStr = cellAst.body && cellStr.substring(cellAst.body.start, cellAst.body.end);
+    switch (cellAst.id?.type) {
         case "ViewExpression":
-            retVal.id = cellStr.substring(cellAst.id.start, cellAst.id.end);
-            retVal.viewofValue = {
-                id: cellAst?.id?.id?.name,
-                inputs: ["Generators", retVal.id],
-                func: (G, _) => G.input(_)
-            };
-            break;
+            return parseViewExpression(cellStr, cellAst, refs, bodyStr);
         case "MutableExpression":
-            retVal.initialValue = {
-                id: `initial ${cellAst?.id?.id?.name}`,
-                inputs: refs.inputs,
-                func: createFunction(refs, bodyStr, cellAst.async, cellAst.generator, ["BlockStatement"].indexOf(cellAst.body.type) >= 0)
-            };
-            retVal.id = cellStr.substring(cellAst.id.start, cellAst.id.end);
-            retVal.inputs = ["Mutable", retVal.initialValue.id];
-            retVal.func = (M, _) => new M(_);
-            retVal.viewofValue = {
-                id: cellAst?.id?.id?.name,
-                inputs: [retVal.id],
-                func: _ => _.generator
-            };
-            break;
-        case undefined:
-            break;
-        case "Identifier":
-            retVal.id = cellStr.substring(cellAst.id.start, cellAst.id.end);
-            break;
+            return parseMutableExpression(cellStr, cellAst, refs, bodyStr);
         default:
-            console.warn(`Unexpected cell.id.type:  ${cellAst.id?.type}`);
-            retVal.id = cellStr.substring(cellAst.id.start, cellAst.id.end);
+            return parseVariableExpression(cellStr, cellAst, refs, bodyStr);
     }
-
-    switch ((cellAst.body as Body)?.type) {
-        case "ImportDeclaration":
-            retVal.import = {
-                type: "ParsedImport",
-                src: cellAst.body.source.value,
-                specifiers: cellAst.body.specifiers?.map(spec => {
-                    return {
-                        view: spec.view,
-                        name: spec.imported.name,
-                        alias: (spec.local?.name && spec.imported.name !== spec.local.name) ? spec.local.name : spec.imported.name
-                    };
-                }) ?? [],
-                injections: cellAst.body.injections?.map(inj => {
-                    return {
-                        name: inj.imported.name,
-                        alias: inj.local?.name ?? inj.imported.name
-                    };
-                }) ?? [],
-            };
-            break;
-        case undefined:
-            break;
-        case "ViewExpression":
-        case "Identifier":
-        case "BinaryExpression":
-        case "BlockStatement":
-        case "CallExpression":
-        case "Literal":
-        case "MemberExpression":
-        case "YieldExpression":
-            retVal.func = retVal.func ?? createFunction(refs, bodyStr, cellAst.async, cellAst.generator, ["BlockStatement"].indexOf(cellAst.body.type) >= 0);
-            break;
-        default:
-            // console.warn(`Unexpected cell.body.type:  ${cellAst.body?.type}`);
-            retVal.func = retVal.func ?? createFunction(refs, bodyStr, cellAst.async, cellAst.generator, ["BlockStatement"].indexOf(cellAst.body.type) >= 0);
-    }
-
-    return retVal;
 }
