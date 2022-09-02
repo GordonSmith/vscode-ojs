@@ -24,7 +24,7 @@ export class Writer {
         return `\
 ${this._imports.join("\n")}
 
-${this._functions.join("\n").split("\n) {").join(") {")}
+${this._functions.join("\n").split("\n) {").join("){")}
 
 export default function define(runtime, observer) {
   const main = runtime.module();
@@ -54,18 +54,22 @@ export default function define(runtime, observer) {
     }
 
     function(variable: ParsedVariable) {
-        variable.id = variable.id ?? `${++this._functionUid}`;
-        this._functions.push(`${variable.func?.toString()?.replace("anonymous", `_${variable.id}`)}`);
+        let id = variable.id ?? `${++this._functionUid}`;
+        const idParts = id.split(" ");
+        id = `_${idParts[idParts.length - 1]}`;
+        this._functions.push(`${variable.func?.toString()?.replace("anonymous", `${id}`)}`);
+        return id;
     }
 
-    define(variable: ParsedVariable) {
-        const func = variable.inputs[0] === "Generators" ?
-            variable.func?.toString() :
-            `_${variable.id.split("viewof ").join("")}`;
+    define(variable: ParsedVariable, observable = true, inlineFunc = false, funcId: string = variable.id) {
+        const observe = observable ? `.variable(observer(${variable.id ? JSON.stringify(variable.id) : ""}))` : "";
+        const id = variable.id ? `${JSON.stringify(variable.id)}, ` : "";
         const inputs = variable.inputs.length ? `[${variable.inputs.map(i => JSON.stringify(i)).join(", ")}], ` : "";
-        this._defines.push(`main.variable(observer(${JSON.stringify(variable.id)})).define(${JSON.stringify(variable.id)}, ${inputs}${func});`);
+        const func = inlineFunc ?
+            variable.func?.toString() :
+            funcId;
+        this._defines.push(`main${observe}.define(${id}${inputs}${func});`);
     }
-
 }
 
 export class Cell {
@@ -166,27 +170,25 @@ ${this._cellSource}
 
     compile(writer: Writer) {
         const parsed = parseCell(this._cellSource);
+        let id;
         switch (parsed.type) {
             case "import":
                 writer.import(parsed);
                 break;
             case "viewof":
-                writer.function({
-                    ...parsed.variable,
-                    id: parsed.variableValue.id
-                });
-                writer.define(parsed.variable);
-                writer.define(parsed.variableValue);
+                id = writer.function(parsed.variable);
+                writer.define(parsed.variable, true, false, id);
+                writer.define(parsed.variableValue, true, true);
                 break;
             case "mutable":
-                writer.function(parsed.initial);
-                writer.define(parsed.initial);
-                writer.define(parsed.variable);
-                writer.define(parsed.variableValue);
+                id = writer.function(parsed.initial);
+                writer.define(parsed.initial, false, false, id);
+                writer.define(parsed.variable, true, true);
+                writer.define(parsed.variableValue, true, true);
                 break;
             case "variable":
-                writer.function(parsed);
-                writer.define(parsed);
+                id = writer.function(parsed);
+                writer.define(parsed, true, false, id);
                 break;
         }
     }
