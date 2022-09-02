@@ -1,16 +1,83 @@
 import { observablehq as ohq } from "./types";
 import { Notebook } from "./notebook";
-import { parseCell } from "./parser";
+import { parseCell, ParsedImportCell, ParsedVariable } from "./parser";
 import { obfuscatedImport } from "./util";
+
+function escape(str: string) {
+    return str
+        .split("`").join("\\`")
+        ;
+}
+
+export class Writer {
+
+    protected _imports: string[] = [];
+    protected _functions: string[] = [];
+    protected _defines: string[] = [];
+    protected _defineUid = 0;
+    protected _functionUid = 0;
+
+    constructor() {
+    }
+
+    toString() {
+        return `\
+${this._imports.join("\n")}
+
+${this._functions.join("\n").split("\n) {").join(") {")}
+
+export default function define(runtime, observer) {
+  const main = runtime.module();
+
+  ${this._defines.join("\n  ")}
+
+  return main;
+}\n`;
+    }
+
+    import(imp: ParsedImportCell) {
+        this._imports.push(`import define${++this._defineUid} from "${imp.src}"; `);
+        const injections = imp.injections.map(inj => {
+            return inj.name === inj.alias ?
+                `"${inj.name}"` :
+                `{name: "${inj.name}", alias: "${inj.alias}"}`;
+        });
+        const derive = imp.injections.length ? `.derive([${injections.join(", ")}], main)` : "";
+        this._defines.push(`const child${this._defineUid} = runtime.module(define${this._defineUid})${derive};`);
+        imp.specifiers.forEach(s => {
+            this._defines.push(`main.import("${s.name}"${s.alias && s.alias !== s.name ? `, "${s.alias}"` : ""}, child${this._defineUid}); `);
+        });
+        // if (imp.specifiers.filter(s => s.view).length) {
+        //     this._defines.push(`main.import(${imp.specifiers.filter(s => s.view).map(s => s.name + (s.alias ? `as ${s.alias}` : "")).join(", ")}, child${this._defineUid}); `);
+        // }
+        // this._defines.push(`main.import("selection", "cars", child1); `);
+    }
+
+    function(variable: ParsedVariable) {
+        variable.id = variable.id ?? `${++this._functionUid}`;
+        this._functions.push(`${variable.func?.toString()?.replace("anonymous", `_${variable.id}`)}`);
+    }
+
+    define(variable: ParsedVariable) {
+        const func = variable.inputs[0] === "Generators" ?
+            variable.func?.toString() :
+            `_${variable.id.split("viewof ").join("")}`;
+        const inputs = variable.inputs.length ? `[${variable.inputs.map(i => JSON.stringify(i)).join(", ")}], ` : "";
+        this._defines.push(`main.variable(observer(${JSON.stringify(variable.id)})).define(${JSON.stringify(variable.id)}, ${inputs}${func});`);
+    }
+
+}
 
 export class Cell {
 
     protected _notebook: Notebook;
-    protected _variables: ohq.Variable[] = [];
+    protected _id: string | number;
     protected _observer: ohq.InspectorFactory;
+    protected _variables: ohq.Variable[] = [];
 
-    constructor(notebook: Notebook, observer: ohq.InspectorFactory) {
+    constructor(notebook: Notebook, id: string | number, observer: ohq.InspectorFactory) {
         this._notebook = notebook;
+        this._id = id;
         this._observer = observer;
     }
 
@@ -20,7 +87,7 @@ export class Cell {
     }
 
     dispose() {
-        this.reset();
+        this._notebook.disposeCell(this._id);
     }
 
     async importFile(partial) {
@@ -45,10 +112,19 @@ export class Cell {
         return obfuscatedImport(`https://api.observablehq.com/${partial[0] === "@" ? partial : `d/${partial}`}.js?v=3`);
     }
 
-    async interpret(cellSource: string) {
+    protected _cellSource: string = "";
+    text(cellSource: string, languageId: string = "ojs") {
+        if (languageId === "markdown") {
+            languageId = "md";
+        }
+        this._cellSource = languageId === "ojs" ? cellSource : `${languageId}\`${escape(cellSource)}\``;
+        return this;
+    }
+
+    async evaluate() {
         this.reset();
 
-        const parsed = parseCell(cellSource);
+        const parsed = parseCell(this._cellSource);
         switch (parsed.type) {
             case "import":
                 const impMod: any = [".", "/"].indexOf(parsed.src[0]) === 0 ?
@@ -69,7 +145,7 @@ export class Cell {
                 });
                 this._variables.push(this._notebook.createVariable(this._observer(), undefined, ["md"], md => {
                     return md`\`\`\`JavaScript
-${cellSource}
+${this._cellSource}
 \`\`\``;
                 }));
                 break;
@@ -84,6 +160,33 @@ ${cellSource}
                 break;
             case "variable":
                 this._variables.push(this._notebook.createVariable(this._observer(parsed.id), parsed.id, parsed.inputs, parsed.func));
+                break;
+        }
+    }
+
+    compile(writer: Writer) {
+        const parsed = parseCell(this._cellSource);
+        switch (parsed.type) {
+            case "import":
+                writer.import(parsed);
+                break;
+            case "viewof":
+                writer.function({
+                    ...parsed.variable,
+                    id: parsed.variableValue.id
+                });
+                writer.define(parsed.variable);
+                writer.define(parsed.variableValue);
+                break;
+            case "mutable":
+                writer.function(parsed.initial);
+                writer.define(parsed.initial);
+                writer.define(parsed.variable);
+                writer.define(parsed.variableValue);
+                break;
+            case "variable":
+                writer.function(parsed);
+                writer.define(parsed);
                 break;
         }
     }

@@ -33,7 +33,9 @@ export function createFunction(refs: Refs, async = false, generator = false, blo
     refs.patches.forEach(r => {
         body = body.substring(0, r.start) + r.newText + body.substring(r.end);
     });
-    return new (funcType(async, generator))(...refs.args, blockStatement ? body.substring(1, body.length - 1).trim() : `return (${body});`);
+    return new (funcType(async, generator))(...refs.args, blockStatement ?
+        body.substring(1, body.length - 1).trim() :
+        `return (\n${body}\n);`);
 }
 
 //  Hide "import" from bundlers as they have a habit of replacing "import" with "require"

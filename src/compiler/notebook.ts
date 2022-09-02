@@ -1,12 +1,13 @@
 import { Runtime, Library } from "@observablehq/runtime";
 import { FileAttachments } from "@observablehq/stdlib";
-import { Cell } from "./cell";
+import { Cell, Writer } from "./cell";
 import { observablehq as ohq } from "./types";
 
 export class Notebook {
 
     protected _runtime: ohq.Runtime;
     protected _main: ohq.Module;
+    protected _cells: { [id: string]: Cell } = {};
 
     constructor(notebook?: ohq.Notebook, plugins: object = {}) {
         const files = {};
@@ -32,10 +33,28 @@ export class Notebook {
         this._runtime.dispose();
         delete this._runtime;
         delete this._main;
+        this._cells = {};
     }
 
-    createCell(inspector: ohq.InspectorFactory): Cell {
-        return new Cell(this, inspector);
+    createCell(id: string | number, inspector?: ohq.InspectorFactory): Cell {
+        this.disposeCell(id);
+        const newCell = new Cell(this, id, inspector);
+        this._cells[id] = newCell;
+        return newCell;
+    }
+
+    disposeCell(id: string | number) {
+        this._cells[id]?.reset();
+        delete this._cells[id];
+    }
+
+    compile(writer: Writer) {
+        for (const key in this._cells) {
+            try {
+                this._cells[key].compile(writer);
+            } catch (e) {
+            }
+        }
     }
 
     //  ObservableHQ  ---

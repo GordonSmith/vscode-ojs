@@ -39,11 +39,11 @@ function calcRefs(cellAst, cellStr): Refs {
     return retVal;
 }
 
-interface ParsedCell {
+export interface ParsedCell {
     type: "import" | "viewof" | "mutable" | "variable" | "identifier"
 }
 
-interface ParsedImportCell extends ParsedCell {
+export interface ParsedImportCell extends ParsedCell {
     type: "import"
     src: string;
     specifiers: { view: boolean, name: string, alias?: string }[];
@@ -70,13 +70,13 @@ function parseImportExpression(cellAst): ParsedImportCell {
     };
 }
 
-interface ParsedVariable {
+export interface ParsedVariable {
     id: null | string,
     inputs: string[],
     func: any,
 }
 
-interface ParsedViewCell extends ParsedCell {
+export interface ParsedViewCell extends ParsedCell {
     type: "viewof",
     variable: ParsedVariable;
     variableValue: ParsedVariable;
