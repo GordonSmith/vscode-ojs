@@ -14,7 +14,7 @@ export function encode(str: string) {
         ;
 }
 
-const isObservableFile = (languageId: string) => languageId === "omd" || languageId === "ojs";
+const isObservableFile = (languageId?: string) => languageId === "omd" || languageId === "ojs";
 
 export let commands: Commands;
 export class Commands {
@@ -51,7 +51,7 @@ export class Commands {
     }
 
     async preview(fileUri?: vscode.Uri) {
-        let textDocument: vscode.TextDocument;
+        let textDocument: vscode.TextDocument | undefined;
         if (fileUri) {
             textDocument = await vscode.workspace.openTextDocument(fileUri);
         } else if (vscode.window.activeTextEditor) {
@@ -171,19 +171,21 @@ ${encode(node.value)}
                 if (textEditor) {
                     InsertText(textEditor, () => text);
                 } else {
-                    const folder = vscode.workspace.workspaceFolders[0]?.uri.path;
-                    const filePath = path.posix.join(folder, `Untitled-${Math.round(1000 + Math.random() * 1000)}.${languageId}`);
-                    const newFile = vscode.Uri.parse("untitled://" + filePath);
-                    const document = await vscode.workspace.openTextDocument(newFile);
-                    const edit = new vscode.WorkspaceEdit();
-                    edit.insert(newFile, new vscode.Position(0, 0), text);
-                    await vscode.workspace.applyEdit(edit).then(success => {
-                        if (success) {
-                            vscode.window.showTextDocument(document);
-                        } else {
-                            vscode.window.showInformationMessage("Error!");
-                        }
-                    });
+                    const folder = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders[0]?.uri.path;
+                    if (folder) {
+                        const filePath = path.posix.join(folder, `Untitled-${Math.round(1000 + Math.random() * 1000)}.${languageId}`);
+                        const newFile = vscode.Uri.parse("untitled://" + filePath);
+                        const document = await vscode.workspace.openTextDocument(newFile);
+                        const edit = new vscode.WorkspaceEdit();
+                        edit.insert(newFile, new vscode.Position(0, 0), text);
+                        await vscode.workspace.applyEdit(edit).then(success => {
+                            if (success) {
+                                vscode.window.showTextDocument(document);
+                            } else {
+                                vscode.window.showInformationMessage("Error!");
+                            }
+                        });
+                    }
                 }
             }
         }

@@ -1,10 +1,8 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import { observablehq as ohq } from "../../compiler/types";
-
-function encodeID(id: string) {
-    return id.split(" ").join("_");
-}
+import { Notebook } from "../../compiler/notebook";
+import { Cell } from "../../compiler/cell";
 
 export interface OJSOutput {
     uri: string;
@@ -12,6 +10,8 @@ export interface OJSOutput {
     folder: string;
     notebook: ohq.Notebook;
 }
+
+const notebooks: { [uri: string]: { notebook: Notebook, cells: { [id: string]: Cell } } } = {};
 
 export class Controller {
     readonly controllerId = "ojs-kernal";
@@ -36,13 +36,15 @@ export class Controller {
         const ojsMessagaging = vscode.notebooks.createRendererMessaging("ojs-notebook-renderer");
         ojsMessagaging.onDidReceiveMessage(event => {
             switch (event.message.command) {
-                case "fetchConfigs":
-                    ojsMessagaging.postMessage({
-                        type: "fetchConfigsResponse",
-                        configurations: "hello"
-                    }, event.editor);
+                case "renderOutputItem":
+                    break;
+                case "disposeOutputItem":
                     break;
             }
+            // ojsMessagaging.postMessage({
+            //     type: "fetchConfigsResponse",
+            //     configurations: "hello"
+            // }, event.editor);
         });
 
         vscode.workspace.onDidChangeNotebookDocument(evt => {
@@ -56,19 +58,9 @@ export class Controller {
 
     private async executeOJS(cell: vscode.NotebookCell, uri: vscode.Uri): Promise<vscode.NotebookCellOutputItem> {
 
-        // debugger;
-
-        // function qt(a) {
-        //     console.log(a, this);
+        // if (!this._notebook) {
+        //     this._notebook = new Notebook(cell.notebook.metadata.notebook);
         // }
-
-        // const qt2 = new Function("a", "debugger; console.log(a, this);");
-
-        // qt("111");
-        // qt.call("222", "333");
-        // qt2("444");
-        // qt2.call("555", "666");
-        // // qt.apply("444", "555");
 
         const retVal: OJSOutput = {
             uri: uri.toString(),

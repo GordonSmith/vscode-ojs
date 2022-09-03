@@ -2,8 +2,7 @@ import { env, NotebookSerializer, CancellationToken, NotebookData, NotebookCellD
 import { TextDecoder, TextEncoder } from "util";
 import { observablehq as ohq } from "../../compiler/types";
 import { Notebook } from "../../compiler/notebook";
-import { Writer } from "../../compiler/cell";
-import * as fs from "../../util/fs";
+import { Writer } from "../../compiler/writer";
 
 export class Serializer implements NotebookSerializer {
     async deserializeNotebook(content: Uint8Array, _token: CancellationToken): Promise<NotebookData> {
@@ -16,10 +15,10 @@ export class Serializer implements NotebookSerializer {
             notebook = {
                 files: [],
                 nodes: []
-            } as ohq.Notebook;
+            } as unknown as ohq.Notebook;
         }
 
-        const cells = notebook.nodes.map(node => {
+        const cells = notebook.nodes?.map(node => {
             const retVal = new NotebookCellData(node.mode === "md" ?
                 NotebookCellKind.Markup :
                 NotebookCellKind.Code, node.value,
@@ -58,7 +57,7 @@ export class Serializer implements NotebookSerializer {
                         cell.languageId
             };
             jsonNotebook.nodes.push(item);
-            notebook.createCell(id).text(cell.value, cell.languageId);
+            notebook.createCell().text(cell.value, cell.languageId);
             ++id;
         }
         const writer = new Writer();

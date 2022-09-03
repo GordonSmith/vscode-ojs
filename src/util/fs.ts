@@ -101,7 +101,7 @@ export async function eclTempFile(document: TextDocument): Promise<DisposableFil
         dispose: () => { }
     };
     if (document.isUntitled) {
-        tmpFile = await writeTempFile({ prefix: leafname(document.fileName), content: document.getText(), folder: workspace.workspaceFolders[0]?.uri?.fsPath, ext: "ecl" });
+        tmpFile = await writeTempFile({ prefix: leafname(document.fileName), content: document.getText(), folder: workspace.workspaceFolders && workspace.workspaceFolders[0]?.uri?.fsPath, ext: "ecl" });
     } else if (document.isDirty) {
         tmpFile = await writeTempFile({ prefix: leafname(document.fileName), content: document.getText(), folder: dirname(document.fileName), ext: "ecl" });
     }

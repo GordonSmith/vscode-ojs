@@ -35,7 +35,7 @@ interface VSCodeAPI {
 
 declare const acquireVsCodeApi: () => VSCodeAPI;
 
-const placeholder = document.getElementById("placeholder");
+const placeholder = document.getElementById("placeholder")!;
 
 if (window["__hpcc_test"]) {
     placeholder.innerText = "";

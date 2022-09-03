@@ -70,8 +70,9 @@ function parseImportExpression(cellAst): ParsedImportCell {
     };
 }
 
-export interface ParsedVariable {
-    id: null | string,
+export interface ParsedVariable extends ParsedCell {
+    type: "variable"
+    id?: string,
     inputs: string[],
     func: any,
 }
@@ -87,11 +88,13 @@ function parseViewExpression(cellStr: string, cellAst, refs: Refs, bodyStr?: str
     return {
         type: "viewof",
         variable: {
+            type: "variable",
             id,
             inputs: refs.inputs,
             func: createFunction(refs, cellAst.async, cellAst.generator, cellAst.body.type === "BlockStatement", bodyStr)
         },
         variableValue: {
+            type: "variable",
             id: cellAst?.id?.id?.name,
             inputs: ["Generators", id],
             func: (G, _) => G.input(_)
@@ -113,16 +116,19 @@ function parseMutableExpression(cellStr: string, cellAst, refs: Refs, bodyStr?: 
     return {
         type: "mutable",
         initial: {
+            type: "variable",
             id: initialId,
             inputs: refs.inputs,
             func: createFunction(refs, cellAst.async, cellAst.generator, cellAst.body.type === "BlockStatement", bodyStr)
         },
         variable: {
+            type: "variable",
             id,
             inputs: ["Mutable", initialId],
             func: (M, _) => new M(_)
         },
         variableValue: {
+            type: "variable",
             id: initialValueId,
             inputs: [id],
             func: _ => _.generator
@@ -132,7 +138,7 @@ function parseMutableExpression(cellStr: string, cellAst, refs: Refs, bodyStr?: 
 
 interface ParsedVariableCell extends ParsedCell {
     type: "variable",
-    id: null | string,
+    id: string,
     inputs: string[],
     func: any,
 }

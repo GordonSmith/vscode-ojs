@@ -31,7 +31,7 @@ export function createFunction(refs: Refs, async = false, generator = false, blo
 
     refs.patches.sort((l, r) => r.start - l.start);
     refs.patches.forEach(r => {
-        body = body.substring(0, r.start) + r.newText + body.substring(r.end);
+        body = body!.substring(0, r.start) + r.newText + body!.substring(r.end);
     });
     return new (funcType(async, generator))(...refs.args, blockStatement ?
         body.substring(1, body.length - 1).trim() :
