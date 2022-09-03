@@ -4,6 +4,14 @@ import { parseCell } from "./parser";
 import { obfuscatedImport } from "./util";
 import { Writer } from "./writer";
 
+function encode(str: string) {
+    return str
+        // .split("\\").join("\\\\")
+        .split("`").join("\\`")
+        // .split("$").join("\\$")
+        ;
+}
+
 class NullObserver implements ohq.Inspector {
     pending() {
     }
@@ -60,11 +68,14 @@ export class Cell {
     }
 
     protected _cellSource: string = "";
-    text(cellSource: string, languageId: string = "ojs") {
+    text(): string;
+    text(cellSource: string, languageId?: string): this;
+    text(cellSource?: string, languageId: string = "ojs"): string | this {
+        if (arguments.length === 0) return this._cellSource;
         if (languageId === "markdown") {
             languageId = "md";
         }
-        this._cellSource = languageId === "ojs" ? cellSource : `${languageId}\`${escape(cellSource)}\``;
+        this._cellSource = languageId === "ojs" ? cellSource! : `${languageId}\`${encode(cellSource!)}\``;
         return this;
     }
 
