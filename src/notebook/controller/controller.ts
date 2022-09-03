@@ -3,6 +3,7 @@ import * as path from "path";
 import { observablehq as ohq } from "../../compiler/types";
 import { Notebook } from "../../compiler/notebook";
 import { Cell } from "../../compiler/cell";
+import { parseCell } from "../../compiler/parser";
 
 export interface OJSOutput {
     uri: string;
@@ -56,17 +57,17 @@ export class Controller {
         this._controller.dispose();
     }
 
-    private async executeOJS(cell: vscode.NotebookCell, uri: vscode.Uri): Promise<vscode.NotebookCellOutputItem> {
+    ojsSource(cell: vscode.NotebookCell) {
+        return cell.document.languageId === "ojs" ?
+            cell.document.getText() :
+            `${cell.document.languageId}\`${cell.document.getText()}\``;
+    }
 
-        // if (!this._notebook) {
-        //     this._notebook = new Notebook(cell.notebook.metadata.notebook);
-        // }
+    private async executeOJS(cell: vscode.NotebookCell, uri: vscode.Uri): Promise<vscode.NotebookCellOutputItem> {
 
         const retVal: OJSOutput = {
             uri: uri.toString(),
-            ojsSource: cell.document.languageId === "ojs" ?
-                cell.document.getText() :
-                `${cell.document.languageId}\`${cell.document.getText()}\``,
+            ojsSource: this.ojsSource(cell),
             folder: path.dirname(cell.document.uri.path),
             notebook: cell.notebook.metadata.notebook
         };
@@ -77,6 +78,12 @@ export class Controller {
         const execution = this._controller.createNotebookCellExecution(cell);
         execution.executionOrder = ++this._executionOrder;
         execution.start(Date.now());
+        const success = true;
+        // try {
+        //     await parseCell(this.ojsSource(cell));
+        // } catch (e) {
+        //     success = false;
+        // }
         const cellOutput = new vscode.NotebookCellOutput([], {});
         await execution.replaceOutput(cellOutput);
         switch (cell.document.languageId) {
@@ -86,12 +93,19 @@ export class Controller {
                 break;
         }
         await execution.replaceOutput(cellOutput);
-        execution.end(true, Date.now());
+        execution.end(success, Date.now());
     }
 
     private async execute(cells: vscode.NotebookCell[], notebook: vscode.NotebookDocument): Promise<void> {
+        // const visible = vscode.window.activeNotebookEditor?.visibleRanges;
         for (const cell of cells) {
             await this.executeCell(cell, notebook);
+            // if (cells.length > 1) {
+            //     await vscode.window.activeNotebookEditor?.revealRange(new vscode.NotebookRange(cell.index, cell.index));
+            // }
         }
+        // if (cells.length > 1 && visible?.length) {
+        //     await vscode.window.activeNotebookEditor?.revealRange(visible[0]);
+        // }
     }
 }
