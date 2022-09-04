@@ -1,4 +1,4 @@
-# Observable JavaScript | Markdown
+# ObservableHQ Notebook | JavaScript | Markdown
 ![Pull Build Test](https://img.shields.io/github/workflow/status/GordonSmith/vscode-ojs/Pull%20Build%20Test.svg?logo=github&label=Pull%20Build%20Test)
 
 VS Code extension for Observable "JavaScript" and "Markdown".  This extension would not have been possible without the following:
@@ -18,10 +18,7 @@ VS Code extension for Observable "JavaScript" and "Markdown".  This extension wo
 4. In VS Code open the file.
 5. Click "Run All" in the notebook toolbar.
 
-**⚠ WARNING: Cells are rendered "on demand".**  
-When a notebook is long, some cells will not be fully executed until they are scrolled into view, given the reactive nature of Observable Notebooks and the general pattern to `import` dependencies at the bottom of the notebook, this means you may need to scroll to the end, before the imported code is executed...
-
-## Quick Start with Observable JavaScript | Markdown
+## Quick Start with ObservableHQ JavaScript (.ojs) | Markdown (.omd)
 
 ![Demo GIF](./images/ojsDemo.gif)
 
