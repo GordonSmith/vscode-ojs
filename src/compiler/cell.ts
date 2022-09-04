@@ -12,7 +12,7 @@ function encode(str: string) {
         ;
 }
 
-class NullObserver implements ohq.Inspector {
+export class NullObserver implements ohq.Inspector {
     pending() {
     }
     fulfilled(value: any) {
@@ -22,7 +22,7 @@ class NullObserver implements ohq.Inspector {
 }
 export const nullObserver = new NullObserver();
 
-const nullObserverFactory: ohq.InspectorFactory = (name?: string) => nullObserver;
+export const nullObserverFactory: ohq.InspectorFactory = (name?: string) => nullObserver;
 
 export class Cell {
 
@@ -109,7 +109,7 @@ ${this._cellSource}
                 break;
             case "viewof":
                 this._variables.add(this._notebook.createVariable(this._observer(parsed.variable.id), parsed.variable.id, parsed.variable.inputs, parsed.variable.func));
-                this._variables.add(this._notebook.createVariable(this._observer(parsed.variableValue.id), parsed.variableValue.id, parsed.variableValue.inputs, parsed.variableValue.func));
+                this._variables.add(this._notebook.createVariable(undefined, parsed.variableValue.id, parsed.variableValue.inputs, parsed.variableValue.func));
                 break;
             case "mutable":
                 this._variables.add(this._notebook.createVariable(undefined, parsed.initial.id, parsed.initial.inputs, parsed.initial.func));
@@ -132,7 +132,7 @@ ${this._cellSource}
             case "viewof":
                 id = writer.function(parsed.variable);
                 writer.define(parsed.variable, true, false, id);
-                writer.define(parsed.variableValue, true, true);
+                writer.define(parsed.variableValue, false, true);
                 break;
             case "mutable":
                 id = writer.function(parsed.initial);
