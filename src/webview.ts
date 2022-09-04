@@ -1,6 +1,11 @@
 /* eslint-disable no-inner-declarations */
-import { OJSRuntime, OJSSyntaxError, OMDRuntime, VariableValue } from "@hpcc-js/observable-md";
+import { OJSSyntaxError, VariableValue } from "@hpcc-js/observable-md";
 import { hashSum, IObserverHandle } from "@hpcc-js/util";
+
+import { renderOJS, renderOMD } from "./compiler/index";
+import { Notebook } from "./compiler/notebook";
+
+import "../src/webview.css";
 
 export interface Message {
     callbackID?: string;
@@ -39,13 +44,7 @@ const placeholder = document.getElementById("placeholder")!;
 
 if (window["__hpcc_test"]) {
     placeholder.innerText = "";
-    const compiler = new OMDRuntime("#placeholder");
-
-    compiler.watch(notifcations => {
-        console.info(notifcations);
-    });
-
-    compiler.evaluate("", `\
+    const notebook = renderOMD(`\
 # OMD Generator Test
 
 ~~~
@@ -73,12 +72,20 @@ viewof; cars;
 \${JSON.stringify(cars, undefined, 2)}
 ~~~
 
-`, ".");
+`, placeholder);
+
+    // const compiler = new OMDRuntime("#placeholder");
+
+    // compiler.watch(notifcations => {
+    //     console.info(notifcations);
+    // });
+
+    // compiler.evaluate("", , ".");
 } else {
     const vscode = acquireVsCodeApi();
 
     let hash: string;
-    let compiler: OJSRuntime | OMDRuntime;
+    let notebook: Notebook;
     let watcher: IObserverHandle;
 
     function stringify(value: any): string {
@@ -135,49 +142,79 @@ viewof; cars;
                 watcher.release();
             }
 
-            placeholder.innerText = "";
-            compiler = languageId === "omd" ? new OMDRuntime("#placeholder") : new OJSRuntime("#placeholder");
+            const callback = {
+                pending() {
+                },
 
-            watcher = compiler.watch(variableValues => {
-                vscode.postMessage<ValueMessage>({
-                    command: "values",
-                    content: valuesContent(variableValues)
-                });
-            });
-
-            compiler.evaluate("", encode(content), folder)
-                .then(variableValues => {
+                fulfilled(value: any) {
                     vscode.postMessage<ValueMessage>({
                         command: "values",
-                        content: valuesContent(variableValues),
+                        content: [{
+                            uid: "",
+                            error: false,
+                            value: stringify(value)
+                        }],
                         callbackID
                     });
-                }).catch((e: OJSSyntaxError) => {
-                    // this._errors = [new OJSRuntimeError("error", e.start, e.end, e.message)];
-                    // this.runtimeUpdated();
-                });
+                },
+
+                rejected(error: any) {
+                    vscode.postMessage<ValueMessage>({
+                        command: "values",
+                        content: [{
+                            uid: "",
+                            error: true,
+                            value: stringify(error)
+                        }],
+                        callbackID
+                    });
+                }
+
+            };
+
+            placeholder.innerText = "";
+            notebook = languageId === "omd" ? renderOMD(encode(content), placeholder, callback) : renderOJS(encode(content), placeholder, callback);
+
+            // watcher = compiler.watch(variableValues => {
+            //     vscode.postMessage<ValueMessage>({
+            //         command: "values",
+            //         content: valuesContent(variableValues)
+            //     });
+            // });
+
+            // compiler.evaluate("", encode(content), folder)
+            //     .then(variableValues => {
+            //         vscode.postMessage<ValueMessage>({
+            //             command: "values",
+            //             content: valuesContent(variableValues),
+            //             callbackID
+            //         });
+            //     }).catch((e: OJSSyntaxError) => {
+            //         // this._errors = [new OJSRuntimeError("error", e.start, e.end, e.message)];
+            //         // this.runtimeUpdated();
+            //     });
         } else {
-            compiler.refresh().then(variableValues => {
-                vscode.postMessage<ValueMessage>({
-                    command: "values",
-                    content: valuesContent(variableValues),
-                    callbackID
-                });
-            });
+            // compiler.refresh().then(variableValues => {
+            //     vscode.postMessage<ValueMessage>({
+            //         command: "values",
+            //         content: valuesContent(variableValues),
+            //         callbackID
+            //     });
+            // });
         }
     }
 
     function pull(url: string, callbackID: string) {
-        placeholder.innerText = `Importing notebook:  ${url}`;
-        compiler = new OJSRuntime("#placeholder");
-        compiler.pull(url).then(text => {
-            placeholder.innerText = "";
-            vscode.postMessage({
-                command: "pullResponse",
-                content: text,
-                callbackID
-            });
-        });
+        // placeholder.innerText = `Importing notebook:  ${url}`;
+        // compiler = new OJSRuntime("#placeholder");
+        // compiler.pull(url).then(text => {
+        //     placeholder.innerText = "";
+        //     vscode.postMessage({
+        //         command: "pullResponse",
+        //         content: text,
+        //         callbackID
+        //     });
+        // });
     }
 
     async function echo(content: string) {

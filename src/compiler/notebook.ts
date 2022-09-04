@@ -1,23 +1,45 @@
+import { omd2ojs, ojsParse } from "@hpcc-js/observable-md/dist/index.node.js";
 import { Runtime, Library } from "@observablehq/runtime";
 import { FileAttachments } from "@observablehq/stdlib";
-import { Cell } from "./cell";
+import { Cell, nullObserverFactory } from "./cell";
 import { observablehq as ohq } from "./types";
 import { Writer } from "./writer";
 
 export class Notebook {
 
+    protected _observerFactory: ohq.InspectorFactory;
     protected _runtime: ohq.Runtime;
     protected _main: ohq.Module;
     protected _cells: Set<Cell> = new Set<Cell>();
 
-    constructor(notebook?: ohq.Notebook, plugins: object = {}) {
+    constructor(notebook?: ohq.Notebook, observerFactory: ohq.InspectorFactory = nullObserverFactory, plugins: object = {}) {
+        this._observerFactory = observerFactory;
+        this.create(notebook, plugins);
+    }
+
+    parseOJS(ojs: string) {
+        this.dispose();
+        this.create();
+        const parsed = ojsParse(ojs);
+        parsed.cells.forEach((cell, idx) => {
+            this.createCell(this._observerFactory).text(ojs.substring(cell.start, cell.end), "ojs");
+        });
+        this.interpret();
+    }
+
+    parseOMD(omd: string) {
+        const tmp = omd2ojs(omd);
+        this.parseOJS(tmp.ojsArr.map(row => row.ojs).join("\n"));
+    }
+
+    create(notebook?: Partial<ohq.Notebook>, plugins: object = {}) {
         const files = {};
         notebook?.files?.forEach(f => files[f.name] = f.url);
 
         const library = new Library();
         library.FileAttachment = function () {
             return FileAttachments(name => {
-                return files[name];
+                return files[name] ?? name;
             });
         };
 
@@ -44,6 +66,10 @@ export class Notebook {
     disposeCell(cell: Cell) {
         cell.reset();
         this._cells.delete(cell);
+    }
+
+    interpret() {
+        this._cells.forEach(cell => cell.evaluate());
     }
 
     compile(writer: Writer) {
