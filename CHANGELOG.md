@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.18](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.17...v0.4.18) (2022-09-04)
+
+
+### Bug Fixes
+
+* **renderer:** Workaround delay loading of cells ([22a5683](https://github.com/GordonSmith/vscode-ojs/commit/22a56839891dd1242258b464ea2fbc0772473661))
+
 ### [0.4.17](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.16...v0.4.17) (2022-08-31)
 
 
