@@ -5,6 +5,8 @@ import { Notebook } from "../../compiler/notebook";
 import { Cell, nullObserver } from "../../compiler/cell";
 import { observablehq } from "src/compiler/types";
 
+import "../../../src/notebook/renderers/renderer.css";
+
 export const activate: ActivationFunction = context => {
 
     const notebooks: { [uri: string]: Notebook } = {};
