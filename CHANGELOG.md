@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.19](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.18...v0.4.19) (2022-09-04)
+
+
+### Features
+
+*  Switch preview over to use new compiler ([9779b4e](https://github.com/GordonSmith/vscode-ojs/commit/9779b4ebfb10c3e8d76b00fedce22b1464050db5))
+
 ### [0.4.18](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.17...v0.4.18) (2022-09-04)
 
 
