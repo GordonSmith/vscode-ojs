@@ -75,11 +75,11 @@ export class Meta {
     private constructor() {
     }
 
-    static attach(doc: vscode.TextDocument): Meta | undefined {
+    static attach(doc: vscode.TextDocument): Meta {
         if (!meta.has(doc.uri.fsPath)) {
             meta.set(doc.uri.fsPath, new Meta());
         }
-        const m = meta.get(doc.uri.fsPath);
+        const m = meta.get(doc.uri.fsPath)!;
         if (!m._doc || m._doc.version < doc.version) {
             return m.refresh(doc);
         }
@@ -112,7 +112,7 @@ export class Meta {
                 this._cells.forEach(cell => {
                     this._cellMap[cell.uid] = cell;
                 });
-            } catch (e) {
+            } catch (e: any) {
                 const pos = e.pos || 0;
                 let raisedAt = e.raisedAt || pos;
                 raisedAt += raisedAt === pos ? 1 : 0;
@@ -145,7 +145,7 @@ export class Meta {
     updateRuntimeValues() {
         const ojsConfig = vscode.workspace.getConfiguration("ojs");
         const includeValues = ojsConfig.get<boolean>("showRuntimeValues");
-        const errors = [];
+        const errors: vscode.Diagnostic[] = [];
         this._cells.forEach(cell => {
             if (includeValues || cell.value.error) {
                 errors.push(new vscode.Diagnostic(cell.idRange || cell.range, cell.value.value, cell.value.error ? vscode.DiagnosticSeverity.Warning : vscode.DiagnosticSeverity.Information));

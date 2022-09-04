@@ -153,13 +153,13 @@ export namespace observablehq {
 
     export interface Variable {
         delete();
-        define(name: string | null, inputs: string[], definition: any);
+        define(name?: string, inputs?: string[], definition?: any);
     }
 
     export interface Module {
         variable(inspector?: Inspector): Variable;
         derive(specifiers: string[] | { name: string, alias: string }[], source: any);
-        import(name: string, alias: string, mod: Module): Variable;
+        import(name: string, alias: string | undefined, mod: Module): Variable;
     }
 
     export interface Runtime {

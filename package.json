@@ -23,7 +23,7 @@
   ],
   "main": "./dist/extension.js",
   "scripts": {
-    "clean": "rimraf out lib* dist types *.vsix",
+    "clean": "rimraf out lib* dist types *.vsix *.tsbuildinfo",
     "compile": "tsc",
     "compile-watch": "npm run compile -- -watch",
     "compile-es6": "tsc --module es6 --outDir ./lib-es6",

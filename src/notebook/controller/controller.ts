@@ -1,10 +1,7 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import { observablehq as ohq } from "../../compiler/types";
-
-function encodeID(id: string) {
-    return id.split(" ").join("_");
-}
+import { parseCell } from "../../compiler/parser";
 
 export interface OJSOutput {
     uri: string;
@@ -22,6 +19,10 @@ export class Controller {
     private readonly _controller: vscode.NotebookController;
     private _executionOrder = 0;
 
+    private _ojsMessagaging: vscode.NotebookRendererMessaging;
+
+    private _oldId = new Map<vscode.NotebookCell, string>();
+
     constructor() {
         this._controller = vscode.notebooks.createNotebookController(
             this.controllerId,
@@ -33,20 +34,17 @@ export class Controller {
         this._controller.supportsExecutionOrder = true;
         this._controller.executeHandler = this.execute.bind(this);
 
-        const ojsMessagaging = vscode.notebooks.createRendererMessaging("ojs-notebook-renderer");
-        ojsMessagaging.onDidReceiveMessage(event => {
+        this._ojsMessagaging = vscode.notebooks.createRendererMessaging("ojs-notebook-renderer");
+        this._ojsMessagaging.onDidReceiveMessage(event => {
             switch (event.message.command) {
-                case "fetchConfigs":
-                    ojsMessagaging.postMessage({
-                        type: "fetchConfigsResponse",
-                        configurations: "hello"
-                    }, event.editor);
+                case "renderOutputItem":
+                    break;
+                case "disposeOutputItem":
                     break;
             }
         });
 
         vscode.workspace.onDidChangeNotebookDocument(evt => {
-            // evt.notebook.uri.toString();
         });
     }
 
@@ -54,52 +52,61 @@ export class Controller {
         this._controller.dispose();
     }
 
-    private async executeOJS(cell: vscode.NotebookCell, uri: vscode.Uri): Promise<vscode.NotebookCellOutputItem> {
+    ojsSource(cell: vscode.NotebookCell) {
+        return cell.document.languageId === "ojs" ?
+            cell.document.getText() :
+            `${cell.document.languageId}\`${cell.document.getText()}\``;
+    }
 
-        // debugger;
+    private ojsOutput(cell: vscode.NotebookCell, uri: vscode.Uri): OJSOutput {
 
-        // function qt(a) {
-        //     console.log(a, this);
-        // }
-
-        // const qt2 = new Function("a", "debugger; console.log(a, this);");
-
-        // qt("111");
-        // qt.call("222", "333");
-        // qt2("444");
-        // qt2.call("555", "666");
-        // // qt.apply("444", "555");
-
-        const retVal: OJSOutput = {
+        return {
             uri: uri.toString(),
-            ojsSource: cell.document.languageId === "ojs" ?
-                cell.document.getText() :
-                `${cell.document.languageId}\`${cell.document.getText()}\``,
+            ojsSource: this.ojsSource(cell),
             folder: path.dirname(cell.document.uri.path),
             notebook: cell.notebook.metadata.notebook
         };
-        return vscode.NotebookCellOutputItem.json(retVal, "application/gordonsmith.ojs+json");
     }
 
-    private async executeCell(cell: vscode.NotebookCell, notebook: vscode.NotebookDocument): Promise<void> {
+    private executeOJS(ojsOutput: OJSOutput): vscode.NotebookCellOutputItem {
+        return vscode.NotebookCellOutputItem.json(ojsOutput, "application/gordonsmith.ojs+json");
+    }
+
+    private async executeCell(cell: vscode.NotebookCell, notebook: vscode.NotebookDocument): Promise<[string, OJSOutput, string?]> {
         const execution = this._controller.createNotebookCellExecution(cell);
         execution.executionOrder = ++this._executionOrder;
         execution.start(Date.now());
+        let success = true;
+        try {
+            await parseCell(this.ojsSource(cell));
+        } catch (e) {
+            success = false;
+        }
+        const oldId = this._oldId.get(cell);
         const cellOutput = new vscode.NotebookCellOutput([], {});
         await execution.replaceOutput(cellOutput);
+        this._oldId.set(cell, (cellOutput as any).id);
+        let ojsOutput;
         switch (cell.document.languageId) {
             case "ojs":
             case "html":
-                cellOutput.items.push(await this.executeOJS(cell, notebook.uri));
+                ojsOutput = this.ojsOutput(cell, notebook.uri);
+                cellOutput.items.push(this.executeOJS(ojsOutput));
                 break;
         }
         await execution.replaceOutput(cellOutput);
-        execution.end(true, Date.now());
+        execution.end(success, Date.now());
+        return [(cellOutput as any).id, ojsOutput, oldId];
     }
 
     private async execute(cells: vscode.NotebookCell[], notebook: vscode.NotebookDocument): Promise<void> {
+        const outputs: [string, OJSOutput, string?][] = [];
         for (const cell of cells) {
-            await this.executeCell(cell, notebook);
+            outputs.push(await this.executeCell(cell, notebook));
         }
+        this._ojsMessagaging.postMessage({
+            command: "renderOutputItem",
+            outputs
+        });
     }
 }
