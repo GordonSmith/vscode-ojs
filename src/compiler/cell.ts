@@ -113,7 +113,7 @@ ${this._cellSource}
                 break;
             case "mutable":
                 this._variables.add(this._notebook.createVariable(undefined, parsed.initial.id, parsed.initial.inputs, parsed.initial.func));
-                this._variables.add(this._notebook.createVariable(this._observer(parsed.variable.id), parsed.variable.id, parsed.variable.inputs, parsed.variable.func));
+                this._variables.add(this._notebook.createVariable(undefined, parsed.variable.id, parsed.variable.inputs, parsed.variable.func));
                 this._variables.add(this._notebook.createVariable(this._observer(parsed.variableValue.id), parsed.variableValue.id, parsed.variableValue.inputs, parsed.variableValue.func));
                 break;
             case "variable":
@@ -137,7 +137,7 @@ ${this._cellSource}
             case "mutable":
                 id = writer.function(parsed.initial);
                 writer.define(parsed.initial, false, false, id);
-                writer.define(parsed.variable, true, true);
+                writer.define(parsed.variable, false, true);
                 writer.define(parsed.variableValue, true, true);
                 break;
             case "variable":
