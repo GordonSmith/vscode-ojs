@@ -1,9 +1,6 @@
-import { Inspector } from "@observablehq/inspector";
 import type { ActivationFunction } from "vscode-notebook-renderer";
+import { Notebook, Cell, Observer, nullObserver, ohq } from "@hpcc-js/observablehq-compiler";
 import type { OJSOutput } from "../controller/controller";
-import { Notebook } from "../../compiler/notebook";
-import { Cell, nullObserver } from "../../compiler/cell";
-import { observablehq } from "src/compiler/types";
 
 // import "../../../src/notebook/renderers/renderer.css";
 
@@ -29,18 +26,20 @@ export const activate: ActivationFunction = context => {
 
     function render(id: string, data: OJSOutput, element?: HTMLElement) {
         if (!notebooks[data.uri]) {
-            notebooks[data.uri] = new Notebook(data.notebook);
+            notebooks[data.uri] = new Notebook()
+                .notebook(data.notebook)
+                ;
         }
         if (cells[id] && !cells[id].element && element) {
             disposeCell(id);
         }
         if (!cells[id]) {
             cells[id] = {
-                cell: notebooks[data.uri].createCell((name): observablehq.Inspector => {
+                cell: notebooks[data.uri].createCell((name): ohq.Inspector => {
                     if (element) {
                         const div = document.createElement("div");
                         element.appendChild(div);
-                        return new Inspector(div);
+                        return new Observer(div);
                     }
                     return nullObserver;
                 }),

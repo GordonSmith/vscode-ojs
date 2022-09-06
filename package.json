@@ -51,13 +51,8 @@
     "update": "npx npm-check-updates -u -t minor"
   },
   "devDependencies": {
-    "@hpcc-js/common": "2.71.1",
-    "@hpcc-js/observable-md": "2.53.1",
+    "@hpcc-js/observablehq-compiler": "2.53.1",
     "@hpcc-js/util": "2.49.0",
-    "@observablehq/inspector": "3.2.4",
-    "@observablehq/parser": "6.0.0",
-    "@observablehq/runtime": "4.23.0",
-    "@observablehq/stdlib": "3.19.8",
     "@rollup/plugin-alias": "3.1.9",
     "@rollup/plugin-commonjs": "22.0.2",
     "@rollup/plugin-node-resolve": "13.3.0",

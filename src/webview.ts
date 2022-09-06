@@ -1,9 +1,6 @@
 /* eslint-disable no-inner-declarations */
-import { OJSSyntaxError, VariableValue } from "@hpcc-js/observable-md";
 import { hashSum, IObserverHandle } from "@hpcc-js/util";
-
-import { renderOJS, renderOMD } from "./compiler/index";
-import { Notebook } from "./compiler/notebook";
+import { Notebook, renderOJS, renderOMD } from "@hpcc-js/observablehq-compiler";
 
 import "../src/webview.css";
 
@@ -115,24 +112,6 @@ viewof; cars;
         return value;
     }
 
-    function valuesContent(variableValues: VariableValue[]): Value[] {
-        return variableValues.map(n => {
-            return {
-                uid: n.variable.uid(),
-                error: n.type === "rejected",
-                value: stringify(n.value)
-            };
-        });
-    }
-
-    function encode(str: string) {
-        return str
-            // .split("\\").join("\\\\")
-            // .split("`").join("\\`")
-            // .split("$").join("\\$")
-            ;
-    }
-
     function evaluate(content: string, languageId: string, folder: string, callbackID: string) {
         const newHash = hashSum(content);
         if (hash !== newHash) {
@@ -173,7 +152,7 @@ viewof; cars;
             };
 
             placeholder.innerText = "";
-            notebook = languageId === "omd" ? renderOMD(encode(content), placeholder, callback) : renderOJS(encode(content), placeholder, callback);
+            notebook = languageId === "omd" ? renderOMD(content, placeholder, { callback, folder }) : renderOJS(content, placeholder, { callback, folder });
 
             // watcher = compiler.watch(variableValues => {
             //     vscode.postMessage<ValueMessage>({
@@ -246,7 +225,7 @@ viewof; cars;
 
     const prevState = vscode.getState();
     if (prevState) {
-        evaluate(prevState.content, prevState.languageId, prevState.callbackID, prevState.folder);
+        evaluate(prevState.content, prevState.languageId, prevState.folder, prevState.callbackID);
     }
 
 }

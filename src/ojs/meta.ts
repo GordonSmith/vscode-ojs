@@ -134,10 +134,12 @@ export class Meta {
     update(values: Value[]) {
         values.forEach(v => {
             const cell = this._cellMap[v.uid];
-            cell.value = {
-                error: v.error,
-                value: v.value
-            };
+            if (cell) {
+                cell.value = {
+                    error: v.error,
+                    value: v.value
+                };
+            }
         });
         this.updateRuntimeValues();
     }

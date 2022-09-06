@@ -1,7 +1,5 @@
-import { mol } from "./myLib.ojs";
+import { mol } with {three as two} from "./myLib.ojs";
+
+three = 3;
 
 mol;
-
-42;
-
-md`# Hello and Welcome ${mol}`;

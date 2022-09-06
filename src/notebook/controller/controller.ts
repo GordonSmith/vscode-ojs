@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import { observablehq as ohq } from "../../compiler/types";
-import { parseCell } from "../../compiler/parser";
+import { ohq, parseCell } from "@hpcc-js/observablehq-compiler";
 import { reporter } from "../../telemetry/index";
 
 function encode(str: string) {

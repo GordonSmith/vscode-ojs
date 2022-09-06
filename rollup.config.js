@@ -1,4 +1,3 @@
-import alias from "@rollup/plugin-alias";
 import commonjs from "@rollup/plugin-commonjs";
 import sourcemaps from "rollup-plugin-sourcemaps";
 import nodeResolve from "@rollup/plugin-node-resolve";
@@ -8,12 +7,8 @@ import postcss from "rollup-plugin-postcss";
 const pkg = require("./package.json");
 
 const plugins = [
-    alias({
-        entries: [
-            { find: "@hpcc-js/common", replacement: "@hpcc-js/common" }
-        ]
-    }),
     nodeResolve({
+        moduleDirectories: ["./node_modules", "../hpcc-js/node_modules"],
         preferBuiltins: true
     }),
     commonjs(),
