@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import fetch from "node-fetch";
+import { reporter } from "../../telemetry/index";
 
 export let commands: Commands;
 export class Commands {
@@ -31,6 +32,7 @@ export class Commands {
                 }
             }).then(r => r.json() as any);
             if (nb) {
+                reporter.sendTelemetryEvent("command.download", { title: nb.title });
                 const saveUri = await vscode.window.showSaveDialog({
                     defaultUri: vscode.Uri.file(`${nb.title}.ojsnb`),
                     filters: {

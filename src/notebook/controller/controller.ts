@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import { observablehq as ohq } from "../../compiler/types";
 import { parseCell } from "../../compiler/parser";
+import { reporter } from "../../telemetry/index";
 
 export interface OJSOutput {
     uri: string;
@@ -102,6 +103,7 @@ export class Controller {
     private async execute(cells: vscode.NotebookCell[], notebook: vscode.NotebookDocument): Promise<void> {
         const outputs: [string, OJSOutput, string?][] = [];
         for (const cell of cells) {
+            reporter.sendTelemetryEvent("controller.execute.cell");
             outputs.push(await this.executeCell(cell, notebook));
         }
         this._ojsMessagaging.postMessage({
