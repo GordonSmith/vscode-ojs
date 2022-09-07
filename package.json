@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "observable-js",
-  "version": "0.4.19",
+  "version": "0.4.20",
   "publisher": "GordonSmith",
   "displayName": "Observable JS",
   "description": "Interpreter for ObservableHQ Notebooks - Includes VS Code Notebooks with Observale, Observable \"Markdown\" files with embedded Observable (.omd) and Observable \"JavaScript\" files.",
