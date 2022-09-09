@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.22](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.21...v0.4.22) (2022-09-09)
+
+
+### Features
+
+*  Add support for more cell types ([6b2b18e](https://github.com/GordonSmith/vscode-ojs/commit/6b2b18e586879a211709a8b33dbe0455fa1870cc))
+
 ### [0.4.21](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.20...v0.4.21) (2022-09-07)
 
 
