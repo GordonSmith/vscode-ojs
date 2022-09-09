@@ -4,6 +4,12 @@ import { observablehq as ohq } from "../../compiler/types";
 import { parseCell } from "../../compiler/parser";
 import { reporter } from "../../telemetry/index";
 
+function encode(str: string) {
+    return str
+        .split("`").join("\\`")
+        ;
+}
+
 export interface OJSOutput {
     uri: string;
     ojsSource: string;
@@ -15,7 +21,7 @@ export class Controller {
     readonly controllerId = "ojs-kernal";
     readonly notebookType = "ojs-notebook";
     readonly label = "OJS Notebook";
-    readonly supportedLanguages = ["ojs", "html", "svg", "dot"];
+    readonly supportedLanguages = ["ojs", "omd", "html", "svg", "dot", "mermaid", "tex", "javascript"];
 
     private readonly _controller: vscode.NotebookController;
     private _executionOrder = 0;
@@ -54,9 +60,21 @@ export class Controller {
     }
 
     ojsSource(cell: vscode.NotebookCell) {
-        return cell.document.languageId === "ojs" ?
-            cell.document.getText() :
-            `${cell.document.languageId}\`${cell.document.getText()}\``;
+        switch (cell.document.languageId) {
+            case "ojs":
+                return cell.document.getText();
+            case "omd":
+                return `md\`${encode(cell.document.getText())}\``;
+            case "html":
+                return `htl.html\`${encode(cell.document.getText())}\``;
+            case "tex":
+                return `tex.block\`${encode(cell.document.getText())}\``;
+            case "javascript":
+                return `{${cell.document.getText()}}`;
+            default:
+                return `${cell.document.languageId}\`${cell.document.getText()}\``;
+
+        }
     }
 
     private ojsOutput(cell: vscode.NotebookCell, uri: vscode.Uri): OJSOutput {
@@ -91,6 +109,9 @@ export class Controller {
         switch (cell.document.languageId) {
             case "ojs":
             case "html":
+            case "dot":
+            case "mermaid":
+            default:
                 ojsOutput = this.ojsOutput(cell, notebook.uri);
                 cellOutput.items.push(this.executeOJS(ojsOutput));
                 break;

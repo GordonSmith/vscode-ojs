@@ -4,8 +4,10 @@
   "version": "0.4.21",
   "publisher": "GordonSmith",
   "displayName": "Observable JS",
-  "description": "Interpreter for ObservableHQ Notebooks - Includes VS Code Notebooks with Observale, Observable \"Markdown\" files with embedded Observable (.omd) and Observable \"JavaScript\" files.",
+  "description": "Interpreter for ObservableHQ Notebooks - Includes VS Code Notebooks with Observable, Observable \"Markdown\" files with embedded Observable (.omd) and Observable \"JavaScript\" files.",
   "icon": "images/ObservableJS.png",
+  "readme": "README.md",
+  "license": "SEE LICENSE IN LICENSE.txt",
   "categories": [
     "Programming Languages",
     "Data Science",
@@ -22,6 +24,7 @@
     "@hpcc-js/observable-md"
   ],
   "main": "./dist/extension.js",
+  "browser": "./dist-web/extension",
   "scripts": {
     "clean": "rimraf out lib* dist types *.vsix *.tsbuildinfo",
     "compile": "tsc",
@@ -103,9 +106,7 @@
   "engines": {
     "vscode": "^1.70.0"
   },
-  "extensionDependencies": [
-    "vscode.javascript"
-  ],
+  "extensionDependencies": [],
   "activationEvents": [
     "onLanguage:ojs",
     "onNotebook:ojs-notebook",
@@ -121,22 +122,22 @@
       {
         "id": "ojs",
         "extensions": [
-          "ojs"
+          "ojs",
+          "OJS"
         ],
         "aliases": [
-          "OJS",
-          "ojs"
+          "Observable JavaScript (OJS)"
         ],
         "configuration": "./ojs.configuration.json"
       },
       {
         "id": "omd",
         "extensions": [
-          "omd"
+          "omd",
+          "OMD"
         ],
         "aliases": [
-          "OMD",
-          "omd"
+          "Observable Markdown (OMD)"
         ],
         "configuration": "./omd.configuration.json"
       }

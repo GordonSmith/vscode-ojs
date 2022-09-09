@@ -1,0 +1,140 @@
+{
+    "id": "df43e9bfccb61dab",
+    "slug": "dot",
+    "trashed": false,
+    "description": "",
+    "likes": 80,
+    "publish_level": "public",
+    "forks": 13,
+    "fork_of": null,
+    "update_time": "2022-04-12T23:05:04.182Z",
+    "publish_time": "2018-02-01T14:30:30.259Z",
+    "publish_version": 135,
+    "latest_version": 135,
+    "thumbnail": "557949e9175dc43701f9586ad5a22325e9c27462603a09638ec1bf5686dd74ca",
+    "default_thumbnail": "557949e9175dc43701f9586ad5a22325e9c27462603a09638ec1bf5686dd74ca",
+    "roles": [],
+    "sharing": null,
+    "owner": {
+        "id": "f35c755083683fe5",
+        "avatar_url": "https://avatars.observableusercontent.com/avatar/5a51c3b908225a581d20577e488e2aba8cbc9541c52982c638638c370c3e5e8e",
+        "login": "observablehq",
+        "name": "Observable",
+        "bio": "Use data to think, together.",
+        "home_url": "https://observablehq.com",
+        "type": "team",
+        "tier": "enterprise"
+    },
+    "creator": {
+        "id": "074c414ad1d825f5",
+        "github_login": "mbostock",
+        "avatar_url": "https://avatars.observableusercontent.com/avatar/82811927da99f8938001b2ef1f552ad2c47083e46ebc55a3a146a5a5848c4519",
+        "login": "mbostock",
+        "name": "Mike Bostock",
+        "bio": "Building a better computational medium. Founder @observablehq. Creator @d3. Former @nytgraphics. Pronounced BOSS-tock.",
+        "home_url": "https://bost.ocks.org/mike/",
+        "tier": "basic"
+    },
+    "authors": [],
+    "collections": [
+        {
+            "id": "d9df4fb5263ace62",
+            "type": "public",
+            "slug": "visualization",
+            "title": "Visualization",
+            "description": "Explore and explain patterns in quantitative data using D3, Vega, and Observable Plot",
+            "update_time": "2022-03-14T18:55:44.501Z",
+            "pinned": true,
+            "ordered": false,
+            "custom_thumbnail": "09e385d95ce7df7d392b0133d68e97dd5675378190775d038d21516ea62178ba",
+            "default_thumbnail": "1ef827a19d556921d616d53f79fdd6f9eb4d030acb243d70559be3993e4a7292",
+            "thumbnail": "09e385d95ce7df7d392b0133d68e97dd5675378190775d038d21516ea62178ba",
+            "listing_count": 82,
+            "parent_collection_count": 1,
+            "owner": {
+                "id": "f35c755083683fe5",
+                "avatar_url": "https://avatars.observableusercontent.com/avatar/5a51c3b908225a581d20577e488e2aba8cbc9541c52982c638638c370c3e5e8e",
+                "login": "observablehq",
+                "name": "Observable",
+                "bio": "Use data to think, together.",
+                "home_url": "https://observablehq.com",
+                "type": "team",
+                "tier": "enterprise"
+            }
+        }
+    ],
+    "files": [],
+    "comments": [],
+    "commenting_lock": null,
+    "suggestion_from": null,
+    "suggestions_to": [],
+    "version": 135,
+    "title": "Graphviz",
+    "license": null,
+    "copyright": "",
+    "nodes": [
+        {
+            "id": 0,
+            "name": "",
+            "value": "# Sample Cell Types ",
+            "mode": "md"
+        },
+        {
+            "id": 1,
+            "name": "",
+            "value": "a = 42;\r\n",
+            "mode": "js"
+        },
+        {
+            "id": 2,
+            "name": "",
+            "value": "b = 2",
+            "mode": "js"
+        },
+        {
+            "id": 3,
+            "name": "",
+            "value": "mol = a + b",
+            "mode": "js"
+        },
+        {
+            "id": 4,
+            "name": "",
+            "value": "# Markdown with Observable ${mol}",
+            "mode": "omd"
+        },
+        {
+            "id": 5,
+            "name": "",
+            "value": "<h1>Hello ${mol}</h1>",
+            "mode": "html"
+        },
+        {
+            "id": 6,
+            "name": "",
+            "value": "<svg height=\"100\" width=\"100\">\r\n  <circle cx=\"50\" cy=\"50\" r=${mol} stroke=\"black\" stroke-width=\"3\" fill=\"red\" />\r\n</svg> ",
+            "mode": "svg"
+        },
+        {
+            "id": 7,
+            "name": "",
+            "value": "f(x) = \\int_{-\\infty}^\\infty\r\n    ${mol}\\hat f(\\xi)\\,e^{2 \\pi i \\xi x}\r\n    \\,d\\xi",
+            "mode": "tex"
+        },
+        {
+            "id": 8,
+            "name": "",
+            "value": "gantt\r\ndateFormat YYYY-MM-DD\r\ntitle Adding GANTT diagram to mermaid\r\nexcludes weekdays 2014-01-10\r\n\r\nsection A section\r\nCompleted task :done, des1, 2014-01-06,2014-01-08\r\nActive task :active, des2, 2014-01-09, 3d\r\nFuture task : des3, after des2, 5d\r\nFuture task2 ${mol}: des4, after des3, 5d\r\n",
+            "mode": "mermaid"
+        },
+        {
+            "id": 9,
+            "value": "digraph G {\r\n  subgraph cluster_0 {\r\n    style=filled;\r\n    color=lightgrey;\r\n    node [style=filled,color=white];\r\n    a0 -> a1 -> a2 -> a3;\r\n    label = \"process #1\";\r\n  }\r\n  subgraph cluster_1 {\r\n    node [style=filled];\r\n    b0 -> b1 -> b2 -> b3;\r\n    label = \"process #2\";\r\n    color=blue\r\n  }\r\n  start -> a0;\r\n  start -> b0;\r\n  a1 -> b3;\r\n  b2 -> a3;\r\n  a3 -> a0;\r\n  a3 -> end;\r\n  b3 -> end;\r\n  start [shape=Mdiamond];\r\n  end [shape=Msquare];\r\n}\r\n",
+            "pinned": true,
+            "mode": "dot",
+            "data": null,
+            "name": ""
+        }
+    ],
+    "resolutions": []
+}

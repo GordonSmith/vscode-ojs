@@ -87,9 +87,12 @@ module.exports = (env, argv) => [
     }),
     // makeConfig(argv, {
     //     entry: {
-    //         webview: "./lib-es6/webview.js"
+    //         "extension": "./lib-es6/extension.js"
     //     },
-    //     target: "web",
-    //     libraryTarget: "module"
+    //     target: "webworker",
+    //     dist: "dist-web",
+    //     externals: {
+    //         fs: "commonjs fs"
+    //     }
     // })
 ];

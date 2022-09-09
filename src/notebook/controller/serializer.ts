@@ -19,14 +19,24 @@ export class Serializer implements NotebookSerializer {
         }
 
         const cells = notebook.nodes?.map(node => {
+            let kind: NotebookCellKind;
+            let mode: string;
+            switch (node.mode) {
+                case "md":
+                    kind = NotebookCellKind.Markup;
+                    mode = "markdown";
+                    break;
+                case "js":
+                    kind = NotebookCellKind.Code;
+                    mode = "ojs";
+                    break;
+                default:
+                    kind = NotebookCellKind.Code;
+                    mode = node.mode;
+            }
             const retVal = new NotebookCellData(node.mode === "md" ?
                 NotebookCellKind.Markup :
-                NotebookCellKind.Code, node.value,
-                node.mode === "md" ?
-                    "markdown" :
-                    node.mode === "html" ?
-                        "html" :
-                        "ojs");
+                NotebookCellKind.Code, node.value, mode);
             retVal.metadata = retVal.metadata ?? {};
             retVal.metadata.node = node;
             return retVal;
@@ -45,16 +55,26 @@ export class Serializer implements NotebookSerializer {
         const notebook = new Notebook(jsonNotebook);
         let id = 0;
         for (const cell of data.cells) {
+            let mode: string;
+            switch (cell.kind) {
+                case NotebookCellKind.Markup:
+                    mode = "md";
+                    break;
+                default:
+                    switch (cell.languageId) {
+                        case "ojs":
+                            mode = "js";
+                            break;
+                        default:
+                            mode = cell.languageId;
+                    }
+            }
             const item = {
                 ...cell.metadata?.node,
                 id: id,
                 name: "",
                 value: cell.value,
-                mode: cell.kind === NotebookCellKind.Markup ?
-                    "md" :
-                    cell.languageId === "ojs" ?
-                        "js" :
-                        cell.languageId
+                mode
             };
             jsonNotebook.nodes.push(item);
             notebook.createCell().text(cell.value, cell.languageId);
@@ -62,7 +82,6 @@ export class Serializer implements NotebookSerializer {
         }
         const writer = new Writer();
         notebook.compile(writer);
-        env.clipboard.writeText(writer.toString());
 
         return new TextEncoder().encode(JSON.stringify(jsonNotebook, undefined, 4));
     }
