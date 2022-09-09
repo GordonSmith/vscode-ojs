@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.25](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.24...v0.4.25) (2022-09-09)
+
+
+### Bug Fixes
+
+*  Remove browser entry point ([14046c6](https://github.com/GordonSmith/vscode-ojs/commit/14046c6bc235a16f9186e2e5d3c3b5457fdae4fc))
+
 ### [0.4.24](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.22...v0.4.24) (2022-09-09)
 
 
