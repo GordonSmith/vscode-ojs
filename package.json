@@ -24,7 +24,6 @@
     "@hpcc-js/observable-md"
   ],
   "main": "./dist/extension.js",
-  "browser": "./dist-web/extension",
   "scripts": {
     "clean": "rimraf out lib* dist types *.vsix *.tsbuildinfo",
     "compile": "tsc",
