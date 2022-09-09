@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.23](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.22...v0.4.23) (2022-09-09)
+
+
+### Features
+
+*  Add extension pack ([b107547](https://github.com/GordonSmith/vscode-ojs/commit/b107547f81fc1df35ba2ef6fe58465e4dc264581))
+
 ### [0.4.22](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.21...v0.4.22) (2022-09-09)
 
 
