@@ -1,0 +1,45 @@
+{
+  "private": true,
+  "name": "js-notebook-extension-pack",
+  "version": "1.0.4",
+  "publisher": "GordonSmith",
+  "displayName": "JavsaScript Notebook Extension Pack",
+  "description": "Popular extensions for Observable JavaScript Notebooks in Visual Studio Code.",
+  "icon": "LanguageJS_color_128x.png",
+  "readme": "README.md",
+  "author": {
+    "name": "Gordon Smith"
+  },
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": [
+    "Extension Packs"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GordonSmith/vscode-ojs.git",
+    "directory": "ExtensionPack"
+  },
+  "keywords": [
+    "JavaScript",
+    "ObservableHQ",
+    "MarkDown",
+    "html",
+    "svg",
+    "GraphViz",
+    "dot",
+    "mermaid",
+    "latex"
+  ],
+  "scripts": {
+    "vsce-publish": "vsce publish",
+    "vsce-package": "vsce package -o ./gordonsmith.js-notebook-extension-pack.vsix"
+  },
+  "extensionPack": [
+    "GordonSmith.observable-js",
+    "joaompinto.vscode-graphviz",
+    "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
+    "james-yu.latex-workshop"
+  ]
+}
