@@ -1,9 +1,9 @@
-import { env, NotebookSerializer, CancellationToken, NotebookData, NotebookCellData, NotebookCellKind } from "vscode";
+import * as vscode from "vscode";
 import { TextDecoder, TextEncoder } from "util";
-import { ohq, Notebook, Writer } from "@hpcc-js/observablehq-compiler";
+import { ohq, NotebookData, Writer } from "@hpcc-js/observablehq-compiler";
 
-export class Serializer implements NotebookSerializer {
-    async deserializeNotebook(content: Uint8Array, _token: CancellationToken): Promise<NotebookData> {
+export class Serializer implements vscode.NotebookSerializer {
+    async deserializeNotebook(content: Uint8Array, _token: vscode.CancellationToken): Promise<vscode.NotebookData> {
         const contents = new TextDecoder("utf-8").decode(content);
 
         let notebook: ohq.Notebook;
@@ -17,47 +17,44 @@ export class Serializer implements NotebookSerializer {
         }
 
         const cells = notebook.nodes?.map(node => {
-            let kind: NotebookCellKind;
+            let kind: vscode.NotebookCellKind;
             let mode: string;
             switch (node.mode) {
                 case "md":
-                    kind = NotebookCellKind.Markup;
+                    kind = vscode.NotebookCellKind.Markup;
                     mode = "markdown";
                     break;
                 case "js":
-                    kind = NotebookCellKind.Code;
+                    kind = vscode.NotebookCellKind.Code;
                     mode = "ojs";
                     break;
                 default:
-                    kind = NotebookCellKind.Code;
+                    kind = vscode.NotebookCellKind.Code;
                     mode = node.mode;
             }
-            const retVal = new NotebookCellData(node.mode === "md" ?
-                NotebookCellKind.Markup :
-                NotebookCellKind.Code, node.value, mode);
+            const retVal = new vscode.NotebookCellData(node.mode === "md" ?
+                vscode.NotebookCellKind.Markup :
+                vscode.NotebookCellKind.Code, node.value, mode);
             retVal.metadata = retVal.metadata ?? {};
             retVal.metadata.node = node;
             return retVal;
         });
 
-        const retVal = new NotebookData(cells);
+        const retVal = new vscode.NotebookData(cells);
         retVal.metadata = retVal.metadata ?? {};
         retVal.metadata.notebook = notebook;
         return retVal;
     }
 
-    async serializeNotebook(data: NotebookData, _token: CancellationToken): Promise<Uint8Array> {
+    async serializeNotebook(data: vscode.NotebookData, _token: vscode.CancellationToken): Promise<Uint8Array> {
         const jsonNotebook: ohq.Notebook = data.metadata?.notebook;
         jsonNotebook.nodes = [];
 
-        const notebook = new Notebook()
-            .notebook(jsonNotebook)
-            ;
         let id = 0;
         for (const cell of data.cells) {
             let mode: string;
             switch (cell.kind) {
-                case NotebookCellKind.Markup:
+                case vscode.NotebookCellKind.Markup:
                     mode = "md";
                     break;
                 default:
@@ -69,19 +66,17 @@ export class Serializer implements NotebookSerializer {
                             mode = cell.languageId;
                     }
             }
-            const item = {
+            jsonNotebook.nodes.push({
                 ...cell.metadata?.node,
                 id: id,
                 name: "",
                 value: cell.value,
                 mode
-            };
-            jsonNotebook.nodes.push(item);
-            notebook.createCell().text(cell.value, cell.languageId);
+            });
             ++id;
         }
-        const writer = new Writer();
-        notebook.compile(writer);
+        // const writer = new Writer();
+        // notebook.compile(writer);
 
         return new TextEncoder().encode(JSON.stringify(jsonNotebook, undefined, 4));
     }

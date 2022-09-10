@@ -1,13 +1,14 @@
 import type { ActivationFunction } from "vscode-notebook-renderer";
-import { Notebook, Cell, Observer, nullObserver, ohq } from "@hpcc-js/observablehq-compiler";
+import { Notebook, Mode, Node, Observer, nullObserver, ohq } from "@hpcc-js/observablehq-compiler";
 import type { OJSOutput } from "../controller/controller";
+import { cell2node, languageId2Mode, text2value } from "../controller/util";
 
 // import "../../../src/notebook/renderers/renderer.css";
 
 export const activate: ActivationFunction = context => {
 
     const notebooks: { [uri: string]: Notebook } = {};
-    const cells: { [id: string]: { cell: Cell, element?: HTMLElement } } = {};
+    const nodes: { [id: string]: { node: Node, element?: HTMLElement } } = {};
 
     context.onDidReceiveMessage!(e => {
         switch (e.command) {
@@ -27,40 +28,38 @@ export const activate: ActivationFunction = context => {
     function render(id: string, data: OJSOutput, element?: HTMLElement) {
         if (!notebooks[data.uri]) {
             notebooks[data.uri] = new Notebook()
-                .notebook(data.notebook)
+                .ohqNotebook(data.notebook)
                 ;
         }
-        if (cells[id] && !cells[id].element && element) {
+        if (nodes[id] && !nodes[id].element && element) {
             disposeCell(id);
         }
-        if (!cells[id]) {
-            cells[id] = {
-                cell: notebooks[data.uri].createCell((name): ohq.Inspector => {
+        if (!nodes[id]) {
+            nodes[id] = {
+                node: notebooks[data.uri].createCell((name): ohq.Inspector => {
                     if (element) {
                         const div = document.createElement("div");
                         element.appendChild(div);
                         return new Observer(div);
                     }
                     return nullObserver;
-                }),
+                })
             };
         }
-        if (cells[id].cell.text() !== data.ojsSource) {
-            cells[id].cell
-                .text(data.ojsSource)
-                .evaluate()
-                .catch(e => {
-                    if (element) {
-                        element.innerText = `ERROR:  ${e.message}`;
-                    }
-                });
+        const { mode, value } = cell2node(data.languageId, data.text);
+        if (nodes[id].node.mode() !== mode || nodes[id].node.value() !== value) {
+            nodes[id].node
+                .mode(mode)
+                .value(value)
+                .interpret()
+                ;
         }
     }
 
     function disposeCell(id: string) {
-        if (cells[id]) {
-            cells[id].cell.dispose();
-            delete cells[id];
+        if (nodes[id]) {
+            nodes[id].node.dispose();
+            delete nodes[id];
         }
     }
 
@@ -74,7 +73,7 @@ export const activate: ActivationFunction = context => {
             if (id) {
                 disposeCell(id);
             } else {
-                Object.keys(cells).forEach(disposeCell);
+                Object.keys(nodes).forEach(disposeCell);
             }
         }
     };

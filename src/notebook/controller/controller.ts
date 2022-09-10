@@ -2,25 +2,21 @@ import * as vscode from "vscode";
 import * as path from "path";
 import { ohq, parseCell } from "@hpcc-js/observablehq-compiler";
 import { reporter } from "../../telemetry/index";
-
-function encode(str: string) {
-    return str
-        .split("`").join("\\`")
-        ;
-}
+import { LanguageId, Languages, text2value } from "./util";
 
 export interface OJSOutput {
-    uri: string;
-    ojsSource: string;
-    folder: string;
     notebook: ohq.Notebook;
+    folder: string;
+    uri: string;
+    languageId: LanguageId;
+    text: string;
 }
 
 export class Controller {
     readonly controllerId = "ojs-kernal";
     readonly notebookType = "ojs-notebook";
     readonly label = "OJS Notebook";
-    readonly supportedLanguages = ["ojs", "omd", "html", "svg", "dot", "mermaid", "tex", "javascript"];
+    readonly supportedLanguages = Languages;
 
     private readonly _controller: vscode.NotebookController;
     private _executionOrder = 0;
@@ -58,31 +54,16 @@ export class Controller {
         this._controller.dispose();
     }
 
-    ojsSource(cell: vscode.NotebookCell) {
-        switch (cell.document.languageId) {
-            case "ojs":
-                return cell.document.getText();
-            case "omd":
-                return `md\`${encode(cell.document.getText())}\``;
-            case "html":
-                return `htl.html\`${encode(cell.document.getText())}\``;
-            case "tex":
-                return `tex.block\`${encode(cell.document.getText())}\``;
-            case "javascript":
-                return `{${cell.document.getText()}}`;
-            default:
-                return `${cell.document.languageId}\`${cell.document.getText()}\``;
-
-        }
-    }
-
     private ojsOutput(cell: vscode.NotebookCell, uri: vscode.Uri): OJSOutput {
-
+        if (Languages.indexOf(cell.document.languageId as LanguageId) < 0) {
+            console.error(`Unknown languageID:  ${cell.document.languageId}`);
+        }
         return {
-            uri: uri.toString(),
-            ojsSource: this.ojsSource(cell),
+            notebook: cell.notebook.metadata.notebook,
             folder: path.dirname(cell.document.uri.path),
-            notebook: cell.notebook.metadata.notebook
+            uri: uri.toString(),
+            languageId: cell.document.languageId as LanguageId,
+            text: cell.document.getText()
         };
     }
 
@@ -96,7 +77,7 @@ export class Controller {
         execution.start(Date.now());
         let success = true;
         try {
-            await parseCell(this.ojsSource(cell));
+            await parseCell(text2value(cell.document.languageId as LanguageId, cell.document.getText()));
         } catch (e) {
             success = false;
         }
@@ -104,17 +85,8 @@ export class Controller {
         const cellOutput = new vscode.NotebookCellOutput([], {});
         await execution.replaceOutput(cellOutput);
         this._oldId.set(cell, (cellOutput as any).id);
-        let ojsOutput;
-        switch (cell.document.languageId) {
-            case "ojs":
-            case "html":
-            case "dot":
-            case "mermaid":
-            default:
-                ojsOutput = this.ojsOutput(cell, notebook.uri);
-                cellOutput.items.push(this.executeOJS(ojsOutput));
-                break;
-        }
+        const ojsOutput = this.ojsOutput(cell, notebook.uri);
+        cellOutput.items.push(this.executeOJS(ojsOutput));
         await execution.replaceOutput(cellOutput);
         execution.end(success, Date.now());
         return [(cellOutput as any).id, ojsOutput, oldId];
