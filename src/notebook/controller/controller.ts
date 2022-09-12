@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import { observablehq as ohq } from "../../compiler/types";
-import { parseCell } from "../../compiler/parser";
+import { ohq, ojs2notebook } from "@hpcc-js/observablehq-compiler";
 import { reporter } from "../../telemetry/index";
 
 function encode(str: string) {
@@ -97,7 +96,7 @@ export class Controller {
         execution.start(Date.now());
         let success = true;
         try {
-            await parseCell(this.ojsSource(cell));
+            ojs2notebook(this.ojsSource(cell));
         } catch (e) {
             success = false;
         }
