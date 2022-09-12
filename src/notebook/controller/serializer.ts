@@ -1,6 +1,6 @@
 import { env, NotebookSerializer, CancellationToken, NotebookData, NotebookCellData, NotebookCellKind } from "vscode";
+import type { ohq } from "@hpcc-js/observablehq-compiler";
 import { TextDecoder, TextEncoder } from "util";
-import { observablehq as ohq } from "../../compiler/types";
 import { Notebook } from "../../compiler/notebook";
 import { Writer } from "../../compiler/writer";
 

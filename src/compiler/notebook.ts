@@ -1,8 +1,8 @@
+import type { ohq } from "@hpcc-js/observablehq-compiler";
 import { omd2ojs, ojsParse } from "@hpcc-js/observable-md/dist/index.node.js";
 import { Runtime, Library } from "@observablehq/runtime";
 import { FileAttachments } from "@observablehq/stdlib";
 import { Cell, nullObserverFactory } from "./cell";
-import { observablehq as ohq } from "./types";
 import { Writer } from "./writer";
 
 export class Notebook {

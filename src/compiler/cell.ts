@@ -1,4 +1,4 @@
-import { observablehq as ohq } from "./types";
+import type { ohq } from "@hpcc-js/observablehq-compiler";
 import { Notebook } from "./notebook";
 import { parseCell } from "./parser";
 import { obfuscatedImport } from "./util";

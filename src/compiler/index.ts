@@ -1,14 +1,14 @@
+import type { ohq } from "@hpcc-js/observablehq-compiler";
 import { Inspector } from "@observablehq/inspector";
 import { Notebook } from "./notebook";
 import { nullObserver, NullObserver } from "./cell";
-import { observablehq } from "./types";
 
 class HookedObserver extends NullObserver {
 
     private _inspector: Inspector;
-    private _callback: observablehq.Inspector;
+    private _callback: ohq.Inspector;
 
-    constructor(private _element: HTMLElement, callback: observablehq.Inspector) {
+    constructor(private _element: HTMLElement, callback: ohq.Inspector) {
         super();
         this._inspector = new Inspector(this._element);
         this._callback = callback;
@@ -30,7 +30,7 @@ class HookedObserver extends NullObserver {
     }
 }
 
-export function renderOJS(ojs: string, element: HTMLElement, callback: observablehq.Inspector = nullObserver) {
+export function renderOJS(ojs: string, element: HTMLElement, callback: ohq.Inspector = nullObserver) {
     const notebook = new Notebook(undefined, name => {
         const div = document.createElement("div");
         element.appendChild(div);
@@ -40,7 +40,7 @@ export function renderOJS(ojs: string, element: HTMLElement, callback: observabl
     return notebook;
 }
 
-export function renderOMD(omd: string, element: HTMLElement, callback: observablehq.Inspector = nullObserver) {
+export function renderOMD(omd: string, element: HTMLElement, callback: ohq.Inspector = nullObserver) {
     const notebook = new Notebook(undefined, name => {
         const div = document.createElement("div");
         element.appendChild(div);

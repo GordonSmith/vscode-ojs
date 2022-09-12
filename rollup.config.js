@@ -14,6 +14,7 @@ const plugins = [
         ]
     }),
     nodeResolve({
+        moduleDirectories: ["./node_modules", "../hpcc-js/node_modules"],
         preferBuiltins: true
     }),
     commonjs(),

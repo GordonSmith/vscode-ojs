@@ -22,89 +22,95 @@
         {
             "id": 3,
             "name": "",
-            "value": "### JavaScript",
+            "value": "",
             "mode": "md"
         },
         {
             "id": 4,
             "name": "",
+            "value": "### JavaScript",
+            "mode": "md"
+        },
+        {
+            "id": 5,
+            "name": "",
             "value": "const warning = \"JavaScript has limitations\";\r\nreturn warning; ",
             "mode": "javascript"
         },
         {
-            "id": 5,
+            "id": 6,
             "name": "",
             "value": "### ObservableHQ JavaScript",
             "mode": "md"
         },
         {
-            "id": 6,
+            "id": 7,
             "name": "",
             "value": "noWarning = \"ObservableHQ flavoured JavaScript has been designed specifically to work well in cells!!!\"",
             "mode": "js"
         },
         {
-            "id": 7,
+            "id": 8,
             "name": "",
             "value": "noWarning.toUpperCase();",
             "mode": "js"
         },
         {
-            "id": 8,
+            "id": 9,
             "name": "",
             "value": "### HTML",
             "mode": "md"
         },
         {
-            "id": 9,
+            "id": 10,
             "name": "",
             "value": "<hr>\r\n<p>My First Paragraph</p>\r\n<hr>\r\n<p>My second <b>paragraph</b>.</p>\r\n<hr>",
             "mode": "html"
         },
         {
-            "id": 10,
+            "id": 11,
             "name": "",
             "value": "### SVG",
             "mode": "md"
         },
         {
-            "id": 11,
+            "id": 12,
             "name": "",
             "value": "<svg version=\"1.1\" width=\"300\" height=\"200\" xmlns=\"http://www.w3.org/2000/svg\">\r\n  <rect width=\"100%\" height=\"100%\" fill=\"whitesmoke\" />\r\n  <circle cx=\"150\" cy=\"100\" r=\"80\" fill=\"red\" />\r\n  <text x=\"150\" y=\"125\" font-size=\"60\" text-anchor=\"middle\" fill=\"white\">SVG</text>\r\n</svg>",
             "mode": "svg"
         },
         {
-            "id": 12,
+            "id": 13,
             "name": "",
             "value": "### GraphViz (DOT)",
             "mode": "md"
         },
         {
-            "id": 13,
+            "id": 14,
             "name": "",
             "value": "digraph D {\r\n\r\n  A [shape=diamond]\r\n  B [shape=box]\r\n  C [shape=circle]\r\n\r\n  A -> B [style=dashed, color=grey] \r\n  A -> C [color=\"black:invis:black\"]\r\n  A -> D [penwidth=5, arrowhead=none]\r\n\r\n}",
             "mode": "dot"
         },
         {
-            "id": 14,
+            "id": 15,
             "name": "",
             "value": "### Mermaid",
             "mode": "md"
         },
         {
-            "id": 15,
+            "id": 16,
             "name": "",
             "value": "gantt\r\ndateFormat YYYY-MM-DD\r\ntitle Adding GANTT diagram to mermaid\r\nexcludes weekdays 2014-01-10\r\n\r\nsection A section\r\nCompleted task :done, des1, 2014-01-06,2014-01-08\r\nActive task :active, des2, 2014-01-09, 3d\r\nFuture task : des3, after des2, 5d\r\nFuture task2 : des4, after des3, 5d",
             "mode": "mermaid"
         },
         {
-            "id": 16,
+            "id": 17,
             "name": "",
             "value": "### LaTeX",
             "mode": "md"
         },
         {
-            "id": 17,
+            "id": 18,
             "name": "",
             "value": "f(x) = \\int_{-\\infty}^\\infty\r\n    \\hat f(\\xi)\\,e^{2 \\pi i \\xi x}\r\n    \\,d\\xi",
             "mode": "tex"

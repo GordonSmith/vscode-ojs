@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import { observablehq as ohq } from "../../compiler/types";
+import type { ohq } from "@hpcc-js/observablehq-compiler";
 import { parseCell } from "../../compiler/parser";
 import { reporter } from "../../telemetry/index";
 
