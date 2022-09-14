@@ -1,9 +1,7 @@
 /* eslint-disable no-inner-declarations */
-import { OJSSyntaxError, VariableValue } from "@hpcc-js/observable-md";
+import { Library, Runtime, Inspector } from "@observablehq/runtime";
+import { download, compile, omd2notebook, ojs2notebook } from "@hpcc-js/observablehq-compiler";
 import { hashSum, IObserverHandle } from "@hpcc-js/util";
-
-import { renderOJS, renderOMD } from "./compiler/index";
-import { Notebook } from "./compiler/notebook";
 
 import "../src/webview.css";
 
@@ -44,7 +42,8 @@ const placeholder = document.getElementById("placeholder")!;
 
 if (window["__hpcc_test"]) {
     placeholder.innerText = "";
-    const notebook = renderOMD(`\
+
+    const ohqnb = omd2notebook(`\
 # OMD Generator Test
 
 ~~~
@@ -72,20 +71,20 @@ viewof; cars;
 \${JSON.stringify(cars, undefined, 2)}
 ~~~
 
-`, placeholder);
-
-    // const compiler = new OMDRuntime("#placeholder");
-
-    // compiler.watch(notifcations => {
-    //     console.info(notifcations);
-    // });
-
-    // compiler.evaluate("", , ".");
+`);
+    compile(ohqnb).then(compiledNB => {
+        const library = new Library();
+        const runtime = new Runtime(library);
+        compiledNB(runtime, name => {
+            const div = document.createElement("div");
+            placeholder.appendChild(div);
+            return new Inspector(div);
+        });
+    });
 } else {
     const vscode = acquireVsCodeApi();
 
     let hash: string;
-    let notebook: Notebook;
     let watcher: IObserverHandle;
 
     function stringify(value: any): string {
@@ -115,23 +114,23 @@ viewof; cars;
         return value;
     }
 
-    function valuesContent(variableValues: VariableValue[]): Value[] {
-        return variableValues.map(n => {
-            return {
-                uid: n.variable.uid(),
-                error: n.type === "rejected",
-                value: stringify(n.value)
-            };
-        });
-    }
+    // function valuesContent(variableValues: VariableValue[]): Value[] {
+    //     return variableValues.map(n => {
+    //         return {
+    //             uid: n.variable.uid(),
+    //             error: n.type === "rejected",
+    //             value: stringify(n.value)
+    //         };
+    //     });
+    // }
 
-    function encode(str: string) {
-        return str
-            // .split("\\").join("\\\\")
-            // .split("`").join("\\`")
-            // .split("$").join("\\$")
-            ;
-    }
+    // function encode(str: string) {
+    //     return str
+    //         // .split("\\").join("\\\\")
+    //         // .split("`").join("\\`")
+    //         // .split("$").join("\\$")
+    //         ;
+    // }
 
     function evaluate(content: string, languageId: string, folder: string, callbackID: string) {
         const newHash = hashSum(content);
@@ -169,11 +168,20 @@ viewof; cars;
                         callbackID
                     });
                 }
-
             };
 
             placeholder.innerText = "";
-            notebook = languageId === "omd" ? renderOMD(encode(content), placeholder, callback) : renderOJS(encode(content), placeholder, callback);
+
+            const ohqnb = languageId === "omd" ? omd2notebook(content) : ojs2notebook(content);
+            compile(ohqnb, folder).then(compiledNB => {
+                const library = new Library();
+                const runtime = new Runtime(library);
+                compiledNB(runtime, name => {
+                    const div = document.createElement("div");
+                    placeholder.appendChild(div);
+                    return new Inspector(div);
+                });
+            });
 
             // watcher = compiler.watch(variableValues => {
             //     vscode.postMessage<ValueMessage>({

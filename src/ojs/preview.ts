@@ -1,4 +1,3 @@
-// import type { OJSSyntaxError, VariableValue } from "@hpcc-js/observable-md";
 import * as path from "path";
 import * as vscode from "vscode";
 import type { AlertMessage, LoadedMessage, Value, ValueMessage } from "../webview";

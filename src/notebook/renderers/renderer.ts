@@ -1,21 +1,31 @@
-import type { ohq } from "@hpcc-js/observablehq-compiler";
+import type { CellFunc, compileFunc, ohq } from "@hpcc-js/observablehq-compiler";
+import { compile } from "@hpcc-js/observablehq-compiler";
 import { Runtime } from "@observablehq/runtime";
 import { Inspector } from "@observablehq/inspector";
 import { Library } from "@observablehq/stdlib";
-import { compile, compileCell } from "@hpcc-js/observablehq-compiler";
 import type { ActivationFunction } from "vscode-notebook-renderer";
 import type { OJSOutput } from "../controller/controller";
-import { nullObserver } from "../../compiler/cell";
 
 // import "../../../src/notebook/renderers/renderer.css";
 
+class NullObserver implements ohq.Inspector {
+    pending() {
+    }
+    fulfilled(value: any) {
+    }
+    rejected(error: any) {
+    }
+}
+const nullObserver = new NullObserver();
+
 interface Renderer {
     runtime: ohq.Runtime;
+    define: compileFunc;
     main: ohq.Module;
 }
 
 interface Cell {
-    variables: any;
+    cellFunc: CellFunc;
     text: string;
     element?: HTMLElement;
 }
@@ -49,16 +59,17 @@ export const activate: ActivationFunction = context => {
     //     return nullObserver;
     // }) as ohq.Module;
 
-    async function render(id: string, data: OJSOutput, element?: HTMLElement) {
+    async function render(id: any, data: OJSOutput, element?: HTMLElement) {
 
         if (!notebooks[data.uri]) {
             const library = new Library();
-            const runtime = new Runtime(library, {}) as ohq.Runtime;
-            const define = await compile({ files: data.notebook.files, nodes: [] });
-            const main = define(runtime) as ohq.Nodule;
+            const runtime = new Runtime(library) as ohq.Runtime;
+            const define = await compile({ files: data.notebook.files, nodes: [] } as unknown as ohq.Notebook);
+            const main = define(runtime);
 
             notebooks[data.uri] = {
                 runtime,
+                define,
                 main
             };
         }
@@ -66,20 +77,21 @@ export const activate: ActivationFunction = context => {
             disposeCell(id);
         }
         if (!cells[id]) {
-            const cell = await compileCell({
+            const cellFunc: CellFunc = await notebooks[data.uri].define.appendCell({
                 id,
                 mode: "js",
                 value: data.ojsSource
             }, data.folder);
+            cellFunc(notebooks[data.uri].runtime, notebooks[data.uri].main, (name?: string): ohq.Inspector => {
+                if (element) {
+                    const div = document.createElement("div");
+                    element.appendChild(div);
+                    return new Inspector(div);
+                }
+                return nullObserver;
+            });
             cells[id] = {
-                variables: cell(notebooks[data.uri].runtime, notebooks[data.uri].main, (name?: string): ohq.Inspector => {
-                    if (element) {
-                        const div = document.createElement("div");
-                        element.appendChild(div);
-                        return new Inspector(div);
-                    }
-                    return nullObserver;
-                }),
+                cellFunc,
                 text: data.ojsSource,
                 element
             };
@@ -88,16 +100,9 @@ export const activate: ActivationFunction = context => {
 
     async function disposeCell(id: string) {
         if (cells[id]) {
-            cells[id].variables.forEach(v => {
-                try {
-                    v.delete();
-                } catch (e) {
-                }
-            });
+            cells[id].cellFunc.dispose();
             delete cells[id];
-            await notebooks[data.uri].runtime._compute();
         }
-
     }
 
     return {
