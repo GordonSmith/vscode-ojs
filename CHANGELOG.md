@@ -7,6 +7,13 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
+* Switch to new observable compiler ([841d250](https://github.com/GordonSmith/vscode-ojs/commit/841d2502f8ad5110a8d2b347c019f84ec4a1fe32))
+
+### [0.4.26](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.25...v0.4.26) (2022-09-16)
+
+
+### Features
+
 * Switch to new observable compiler ([a9708a7](https://github.com/GordonSmith/vscode-ojs/commit/a9708a782e5d524b92f993acfcae57f8c01daf6e))
 
 ### [0.4.25](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.24...v0.4.25) (2022-09-09)
