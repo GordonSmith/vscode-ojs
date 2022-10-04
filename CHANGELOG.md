@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.28](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.27...v0.4.28) (2022-10-04)
+
+
+### Bug Fixes
+
+*  package-lock.json out of sync ([522d81f](https://github.com/GordonSmith/vscode-ojs/commit/522d81fcf94dc566cb3f014e9ea217374e3b698f))
+
 ### [0.4.27](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.25...v0.4.27) (2022-10-04)
 
 
