@@ -1,3 +1,7 @@
 md`# Hello and Welcome!`;
 
-mol = 40 + 2+2;
+forty = 40;
+
+two = 2;
+
+mol = forty + two;

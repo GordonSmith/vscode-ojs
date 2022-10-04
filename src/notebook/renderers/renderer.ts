@@ -25,6 +25,7 @@ interface Renderer {
 }
 
 interface Cell {
+    renderer: Renderer;
     cellFunc: CellFunc;
     text: string;
     element?: HTMLElement;
@@ -60,11 +61,12 @@ export const activate: ActivationFunction = context => {
     // }) as ohq.Module;
 
     async function render(id: any, data: OJSOutput, element?: HTMLElement) {
+        data.folder = `https://file+.vscode-resource.vscode-cdn.net${data.folder}`;
 
         if (!notebooks[data.uri]) {
             const library = new Library();
             const runtime = new Runtime(library) as ohq.Runtime;
-            const define = await compile({ files: data.notebook.files, nodes: [] } as unknown as ohq.Notebook);
+            const define = await compile({ files: data.notebook.files, nodes: [] } as unknown as ohq.Notebook, { baseUrl: data.folder });
             const main = define(runtime);
 
             notebooks[data.uri] = {
@@ -77,20 +79,34 @@ export const activate: ActivationFunction = context => {
             disposeCell(id);
         }
         if (!cells[id]) {
-            const cellFunc: CellFunc = await notebooks[data.uri].define.appendCell({
+            const cellFunc: CellFunc = await notebooks[data.uri].define.set({
+                // ...data.node,
                 id,
                 mode: "js",
-                value: data.ojsSource
-            }, data.folder);
-            cellFunc(notebooks[data.uri].runtime, notebooks[data.uri].main, (name?: string): ohq.Inspector => {
+                value: data.ojsSource,
+            });
+            cellFunc(notebooks[data.uri].runtime, notebooks[data.uri].main, (name?: string, id?: string | number): ohq.Inspector => {
                 if (element) {
                     const div = document.createElement("div");
                     element.appendChild(div);
-                    return new Inspector(div);
+                    const inspector = new Inspector(div);
+                    return {
+                        pending() {
+                            div.innerText = "...pending...";
+                            inspector.pending();
+                        },
+                        fulfilled(value: any) {
+                            inspector.fulfilled(value);
+                        },
+                        rejected(error: any) {
+                            inspector.rejected(error);
+                        }
+                    };
                 }
                 return nullObserver;
             });
             cells[id] = {
+                renderer: notebooks[data.uri],
                 cellFunc,
                 text: data.ojsSource,
                 element
@@ -100,7 +116,7 @@ export const activate: ActivationFunction = context => {
 
     async function disposeCell(id: string) {
         if (cells[id]) {
-            cells[id].cellFunc.dispose();
+            cells[id].renderer.define.delete(id);
             delete cells[id];
         }
     }

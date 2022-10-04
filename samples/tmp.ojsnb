@@ -72,7 +72,7 @@
         {
             "id": 1,
             "name": "",
-            "value": "1 + 2\r\n",
+            "value": "import {text} from '@jashkenas/inputs'\r\n\r\nviewof name = text({\r\n  title: \"what's your name?\",\r\n  value: ''\r\n})",
             "mode": "js"
         },
         {

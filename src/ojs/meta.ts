@@ -1,4 +1,4 @@
-import { ojsParse, omdParse } from "@hpcc-js/observable-md/dist/index.node.js";
+import { omd2notebook, ojs2notebook, ohq } from "@hpcc-js/observablehq-compiler";
 import { hashSum } from "@hpcc-js/util";
 import * as vscode from "vscode";
 import type { Value } from "../webview";
@@ -11,18 +11,16 @@ function range(doc, start, end) {
 const meta: Map<string, Meta> = new Map<string, Meta>();
 export class Cell {
 
-    readonly id: string;
-    readonly uid: string;
+    readonly id: string | number;
     readonly idRange: vscode.Range | undefined;
     readonly range: vscode.Range;
 
-    constructor(private _doc: vscode.TextDocument, private _cell) {
-        if (_cell.id) {
-            this.id = _cell.input.substring(_cell.id.start, _cell.id.end);
-            this.idRange = range(this._doc, _cell.id.start, _cell.id.end);
+    constructor(private _doc: vscode.TextDocument, private _node: ohq.Node) {
+        if (_node.id) {
+            this.id = _node.id;
+            this.idRange = range(this._doc, _node.start, _node.end);
         }
-        this.uid = hashSum(_cell.input.substring(_cell.start, _cell.end));
-        this.range = range(this._doc, this._cell.start, this._cell.end);
+        this.range = range(this._doc, this._node.start, this._node.end);
     }
 
     value = {
@@ -38,29 +36,29 @@ export class Cell {
     }
 
     bodyRange(): vscode.Range {
-        return range(this._doc, this._cell.body.start, this._cell.body.end);
+        return range(this._doc, this._node.start, this._node.end);
     }
 
     symbolKind(): vscode.SymbolKind {
-        switch (this._cell?.body?.type) {
-            case "Literal":
-                return vscode.SymbolKind.Constant;
-            case "BlockStatement":
-                return vscode.SymbolKind.Function;
-            case "ImportDeclaration":
-                return vscode.SymbolKind.Package;
-            case "ViewExpression":
-                return vscode.SymbolKind.Object;
-        }
+        // switch (this._node?.body?.type) {
+        //     case "Literal":
+        //         return vscode.SymbolKind.Constant;
+        //     case "BlockStatement":
+        //         return vscode.SymbolKind.Function;
+        //     case "ImportDeclaration":
+        //         return vscode.SymbolKind.Package;
+        //     case "ViewExpression":
+        //         return vscode.SymbolKind.Object;
+        // }
         return vscode.SymbolKind.Variable;
     }
 
     label() {
-        return this.id ? this.id : "...";
+        return this.id ? "" + this.id : "...";
     }
 
     documentSymbol(): vscode.DocumentSymbol {
-        return new vscode.DocumentSymbol(this.label(), this._cell.body.type, this.symbolKind(), this.range, this.idRange || this.range);
+        return new vscode.DocumentSymbol(this.label(), "Unknown", this.symbolKind(), this.range, this.idRange || this.range);
     }
 
     hover(): vscode.Hover {
@@ -97,20 +95,23 @@ export class Meta {
             this._cellMap = {};
             this._errors = [];
             try {
-                let parsed;
+                let parsed: ohq.Notebook;
                 switch (this._doc.languageId) {
+                    case "ojsnb":
+                        parsed = JSON.parse(this._doc.getText());
+                        break;
                     case "omd":
-                        parsed = omdParse(this._doc.getText());
+                        parsed = omd2notebook(this._doc.getText());
                         break;
                     case "ojs":
                     default:
-                        parsed = ojsParse(this._doc.getText());
+                        parsed = ojs2notebook(this._doc.getText());
                         break;
                 }
 
-                this._cells = parsed.cells.map(cell => new Cell(this._doc, cell));
+                this._cells = parsed.nodes.map(node => new Cell(this._doc, node));
                 this._cells.forEach(cell => {
-                    this._cellMap[cell.uid] = cell;
+                    this._cellMap[cell.id] = cell;
                 });
             } catch (e: any) {
                 const pos = e.pos || 0;
@@ -144,10 +145,10 @@ export class Meta {
 
     updateRuntimeValues() {
         const ojsConfig = vscode.workspace.getConfiguration("ojs");
-        const includeValues = ojsConfig.get<boolean>("showRuntimeValues");
+        const includeValues = false;//ojsConfig.get<boolean>("showRuntimeValues");
         const errors: vscode.Diagnostic[] = [];
         this._cells.forEach(cell => {
-            if (includeValues || cell.value.error) {
+            if ((includeValues || cell.value.error) && cell.value.value) {
                 errors.push(new vscode.Diagnostic(cell.idRange || cell.range, cell.value.value, cell.value.error ? vscode.DiagnosticSeverity.Warning : vscode.DiagnosticSeverity.Information));
             }
         });

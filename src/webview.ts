@@ -1,9 +1,11 @@
 /* eslint-disable no-inner-declarations */
 import { Library, Runtime, Inspector } from "@observablehq/runtime";
-import { download, compile, omd2notebook, ojs2notebook } from "@hpcc-js/observablehq-compiler";
-import { hashSum, IObserverHandle } from "@hpcc-js/util";
+import { compile, omd2notebook, ojs2notebook } from "@hpcc-js/observablehq-compiler";
+import { hashSum, scopedLogger } from "@hpcc-js/util";
 
-import "../src/webview.css";
+import "@hpcc-js/observablehq-compiler/dist/index.css";
+
+const logger = scopedLogger("src/webview.ts");
 
 export interface Message {
     callbackID?: string;
@@ -20,7 +22,7 @@ export interface AlertMessage extends Message {
 }
 
 export interface Value {
-    uid: string;
+    uid: string | number;
     error: boolean;
     value: string;
 }
@@ -85,11 +87,12 @@ viewof; cars;
     const vscode = acquireVsCodeApi();
 
     let hash: string;
-    let watcher: IObserverHandle;
 
     function stringify(value: any): string {
         if (value instanceof Element) {
             return value.outerHTML;
+            // } else if (value instanceof Module) {
+
         }
         const type = typeof value;
         switch (type) {
@@ -98,6 +101,8 @@ viewof; cars;
             case "object":
                 if (Array.isArray(value)) {
                     return "[Array]";
+                } else if (!value.toString) {
+                    return "[object]";
                 }
                 break;
             case "string":
@@ -132,56 +137,59 @@ viewof; cars;
     //         ;
     // }
 
-    function evaluate(content: string, languageId: string, folder: string, callbackID: string) {
+    async function evaluate(content: string, languageId: string, folder: string, callbackID: string) {
         const newHash = hashSum(content);
         if (hash !== newHash) {
             hash = newHash;
 
-            if (watcher) {
-                watcher.release();
-            }
-
-            const callback = {
-                pending() {
-                },
-
-                fulfilled(value: any) {
-                    vscode.postMessage<ValueMessage>({
-                        command: "values",
-                        content: [{
-                            uid: "",
-                            error: false,
-                            value: stringify(value)
-                        }],
-                        callbackID
-                    });
-                },
-
-                rejected(error: any) {
-                    vscode.postMessage<ValueMessage>({
-                        command: "values",
-                        content: [{
-                            uid: "",
-                            error: true,
-                            value: stringify(error)
-                        }],
-                        callbackID
-                    });
-                }
-            };
-
             placeholder.innerText = "";
 
             const ohqnb = languageId === "omd" ? omd2notebook(content) : ojs2notebook(content);
-            compile(ohqnb, folder).then(compiledNB => {
-                const library = new Library();
+            const compiledNB = await compile(ohqnb, { baseUrl: folder }).catch(e => {
+                logger.error(e);
+            });
+            const library = new Library();
+            try {
                 const runtime = new Runtime(library);
-                compiledNB(runtime, name => {
+                compiledNB && compiledNB(runtime, (name, cellId) => {
                     const div = document.createElement("div");
                     placeholder.appendChild(div);
-                    return new Inspector(div);
+                    const inspector = new Inspector(div);
+                    return {
+                        pending() {
+                            inspector.pending();
+                        },
+
+                        fulfilled(value: any) {
+                            vscode.postMessage<ValueMessage>({
+                                command: "values",
+                                content: [{
+                                    uid: cellId,
+                                    error: false,
+                                    value: stringify(value)
+                                }],
+                                callbackID
+                            });
+                            inspector.fulfilled(value);
+                        },
+
+                        rejected(error: any) {
+                            vscode.postMessage<ValueMessage>({
+                                command: "values",
+                                content: [{
+                                    uid: cellId,
+                                    error: true,
+                                    value: stringify(error)
+                                }],
+                                callbackID
+                            });
+                            inspector.rejected(error);
+                        }
+                    };
                 });
-            });
+            } catch (e: any) {
+                logger.error(e);
+            }
 
             // watcher = compiler.watch(variableValues => {
             //     vscode.postMessage<ValueMessage>({
@@ -254,7 +262,7 @@ viewof; cars;
 
     const prevState = vscode.getState();
     if (prevState) {
-        evaluate(prevState.content, prevState.languageId, prevState.callbackID, prevState.folder);
+        evaluate(prevState.content, prevState.languageId, prevState.folder, prevState.callbackID);
     }
 
 }
