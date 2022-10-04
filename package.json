@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "observable-js",
-  "version": "0.4.26",
+  "version": "0.4.27",
   "publisher": "GordonSmith",
   "displayName": "Observable JS",
   "description": "Interpreter for ObservableHQ Notebooks - Includes VS Code Notebooks with Observable, Observable \"Markdown\" files with embedded Observable (.omd) and Observable \"JavaScript\" files.",
@@ -66,7 +66,7 @@
     "@rollup/plugin-replace": "^4.0.0",
     "@types/mocha": "9.1.1",
     "@types/node": "16.11.64",
-    "@types/vscode": "1.71.0",
+    "@types/vscode": "1.70.0",
     "@types/vscode-notebook-renderer": "1.72.0",
     "@typescript-eslint/eslint-plugin": "5.39.0",
     "@typescript-eslint/parser": "5.39.0",

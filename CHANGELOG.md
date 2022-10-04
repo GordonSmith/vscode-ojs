@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.27](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.25...v0.4.27) (2022-10-04)
+
+
+### Features
+
+*  Update exported HTML to use new compiler ([f5e9a95](https://github.com/GordonSmith/vscode-ojs/commit/f5e9a95374f9ab64d8d4ea9181c3a1289551de5b))
+* Switch to new observable compiler ([841d250](https://github.com/GordonSmith/vscode-ojs/commit/841d2502f8ad5110a8d2b347c019f84ec4a1fe32))
+
 ### [0.4.26](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.25...v0.4.26) (2022-09-16)
 
 
