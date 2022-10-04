@@ -1,7 +1,10 @@
-import { mol } from "./myLib.ojs";
+import { mol } with { thirtyeight as forty, four as two } from "./myLib.ojsnb";
+
+thirtyeight = 38;
+
+four = 4;
 
 mol;
 
-42;
-
 md`# Hello and Welcome ${mol}`;
+  

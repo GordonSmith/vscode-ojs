@@ -14,6 +14,7 @@ export interface OJSOutput {
     ojsSource: string;
     folder: string;
     notebook: ohq.Notebook;
+    node: ohq.Node
 }
 
 export class Controller {
@@ -77,12 +78,14 @@ export class Controller {
     }
 
     private ojsOutput(cell: vscode.NotebookCell, uri: vscode.Uri): OJSOutput {
+        const folder = path.dirname(cell.document.uri.path);
 
         return {
             uri: uri.toString(),
             ojsSource: this.ojsSource(cell),
-            folder: path.dirname(cell.document.uri.path),
-            notebook: cell.notebook.metadata.notebook
+            folder,
+            notebook: cell.notebook.metadata.notebook,
+            node: cell.metadata.node
         };
     }
 

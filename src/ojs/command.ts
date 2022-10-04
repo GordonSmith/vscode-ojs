@@ -1,3 +1,5 @@
+import { ohq } from "@hpcc-js/observable-shim";
+import { ojs2notebook, omd2notebook } from "@hpcc-js/observablehq-compiler";
 import * as fs from "fs";
 import fetch from "node-fetch";
 import * as path from "path";
@@ -191,60 +193,37 @@ ${encode(node.value)}
         }
     }
 
-    private exportTpl(title: string, languageId: string, text: string): string {
+    private exportTpl(title: string, notebook: ohq.Notebook): string {
         return `\
 <!doctype html>
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <title>${title}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@hpcc-js/common/font-awesome/css/font-awesome.min.css">
-    <style>
-    body {
-        padding: 0px;
-        margin: 8px;
-        background: white;
-        color: black;
-    }
-    #placeholder {
-        position: absolute;
-        left: 8px;
-        top: 8px;
-        right: 8px;
-        bottom: 8px;
-        max-width: 480px;
-    }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/@hpcc-js/observable-md/dist/index.full.js" type="text/javascript" charset="utf-8"></script>
-    <script>
-        var omdMod = window["@hpcc-js/observable-md"]
-    </script>
-
+  <meta charset="utf-8">
+  <title>${title}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@hpcc-js/observablehq-compiler/dist/index.css">
+  <script src="https://cdn.jsdelivr.net/npm/@observablehq/runtime/dist/runtime.umd.js" type="text/javascript" charset="utf-8"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@hpcc-js/observablehq-compiler/dist/index.min.js" type="text/javascript" charset="utf-8"></script>
+  <script>
+    var compilerMod = window["@hpcc-js/observablehq-compiler"]
+  </script>
 </head>
 
-<body onresize="doResize()">
-    <div id="placeholder">
-    </div>
-    <script>
-        var app = new omdMod.Observable()
-            .target("placeholder")
-            .showValues(true)
-            .mode("${languageId}")
-            .text(\`${encode(text)}\`)
-            ;
-
-        doResize();
-
-        function doResize() {
-        if (app) {
-            app
-                .resize()
-                .lazyRender()
-                ;
-        }
-    }
-    </script>
+<body>
+  <div id="placeholder" class="observablehq-root">
+  </div>
+  <script type="module">
+    const notebook = ${JSON.stringify(notebook, undefined, 4)};
+    const placeholder = document.getElementById("placeholder");
+    const compiledNB = await compilerMod.compile(notebook);
+    const library = new observablehq.Library();
+    const runtime = new observablehq.Runtime(library);
+    compiledNB(runtime, name => {
+      const div = document.createElement("div");
+      placeholder.appendChild(div);
+      return new observablehq.Inspector(div);
+    });
+  </script>
 </body>
 
 </html>
@@ -258,7 +237,8 @@ ${encode(node.value)}
             vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(htmlPath), saveLabel: "Export to HTML" }).then(resource => {
                 if (resource) {
                     const text = textDocument.getText();
-                    const html = this.exportTpl("", textDocument.languageId, text);
+                    const notebook = textDocument.languageId === "ojs" ? ojs2notebook(text) : omd2notebook(text);
+                    const html = this.exportTpl("", notebook);
                     fs.writeFile(resource.fsPath, html, "utf8", () => { });
                 }
             });
