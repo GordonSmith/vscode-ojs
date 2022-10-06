@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.29](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.28...v0.4.29) (2022-10-06)
+
+
+### Bug Fixes
+
+* Syncing between controller and renderer not 100% ([16cb6bc](https://github.com/GordonSmith/vscode-ojs/commit/16cb6bcc2d9fec8d0a866ae5ff80bca75b74eba9))
+
 ### [0.4.28](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.27...v0.4.28) (2022-10-04)
 
 
