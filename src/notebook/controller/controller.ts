@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
 import * as path from "path";
+import { v4 as uuidv4 } from "uuid";
+import { parseCell } from "@hpcc-js/observable-shim";
 import { ohq, ojs2notebook } from "@hpcc-js/observablehq-compiler";
 import { reporter } from "../../telemetry/index";
 
@@ -9,12 +11,17 @@ function encode(str: string) {
         ;
 }
 
+export interface OJSCell {
+    node: ohq.Node
+    ojsSource: string;
+}
+
 export interface OJSOutput {
     uri: string;
-    ojsSource: string;
     folder: string;
     notebook: ohq.Notebook;
-    node: ohq.Node
+    cell: OJSCell;
+    otherCells: OJSCell[]
 }
 
 export class Controller {
@@ -28,8 +35,6 @@ export class Controller {
 
     private _ojsMessagaging: vscode.NotebookRendererMessaging;
 
-    private _oldId = new Map<vscode.NotebookCell, string>();
-
     constructor() {
         this._controller = vscode.notebooks.createNotebookController(
             this.controllerId,
@@ -40,16 +45,6 @@ export class Controller {
         this._controller.supportedLanguages = this.supportedLanguages;
         this._controller.supportsExecutionOrder = true;
         this._controller.executeHandler = this.execute.bind(this);
-
-        this._ojsMessagaging = vscode.notebooks.createRendererMessaging("ojs-notebook-renderer");
-        this._ojsMessagaging.onDidReceiveMessage(event => {
-            switch (event.message.command) {
-                case "renderOutputItem":
-                    break;
-                case "disposeOutputItem":
-                    break;
-            }
-        });
 
         vscode.workspace.onDidChangeNotebookDocument(evt => {
         });
@@ -73,65 +68,65 @@ export class Controller {
                 return `{${cell.document.getText()}}`;
             default:
                 return `${cell.document.languageId}\`${cell.document.getText()}\``;
-
         }
     }
 
-    private ojsOutput(cell: vscode.NotebookCell, uri: vscode.Uri): OJSOutput {
+    private ojsCell(cell: vscode.NotebookCell): OJSCell {
+        return {
+            node: cell.metadata.node ?? { id: uuidv4(), mode: cell.document.languageId, value: cell.document.getText() },
+            ojsSource: this.ojsSource(cell)
+        };
+    }
+
+    private ojsOutput(cell: vscode.NotebookCell, uri: vscode.Uri, otherCells: vscode.NotebookCell[]): OJSOutput {
         const folder = path.dirname(cell.document.uri.path);
 
         return {
             uri: uri.toString(),
-            ojsSource: this.ojsSource(cell),
             folder,
             notebook: cell.notebook.metadata.notebook,
-            node: cell.metadata.node
+            cell: this.ojsCell(cell),
+            otherCells: otherCells.map(c => this.ojsCell(c))
         };
     }
 
-    private executeOJS(ojsOutput: OJSOutput): vscode.NotebookCellOutputItem {
+    private executeOJS(cell: vscode.NotebookCell, notebook: vscode.NotebookDocument, otherCells: vscode.NotebookCell[]): vscode.NotebookCellOutputItem {
+        try {
+            parseCell(this.ojsSource(cell));
+        } catch (e: any) {
+            const msg = e?.message ?? "Unknown Error";
+            return vscode.NotebookCellOutputItem.stderr(msg);
+        }
+        const ojsOutput = this.ojsOutput(cell, notebook.uri, otherCells);
         return vscode.NotebookCellOutputItem.json(ojsOutput, "application/gordonsmith.ojs+json");
     }
 
-    private async executeCell(cell: vscode.NotebookCell, notebook: vscode.NotebookDocument): Promise<[string, OJSOutput, string?]> {
+    private async executeCell(cell: vscode.NotebookCell, notebook: vscode.NotebookDocument, otherCells: vscode.NotebookCell[]) {
         const execution = this._controller.createNotebookCellExecution(cell);
         execution.executionOrder = ++this._executionOrder;
         execution.start(Date.now());
-        let success = true;
-        try {
-            ojs2notebook(this.ojsSource(cell));
-        } catch (e) {
-            success = false;
+        if (cell.outputs.length === 0) {
+            await execution.replaceOutput(new vscode.NotebookCellOutput([], {}));
         }
-        const oldId = this._oldId.get(cell);
-        const cellOutput = new vscode.NotebookCellOutput([], {});
-        await execution.replaceOutput(cellOutput);
-        this._oldId.set(cell, (cellOutput as any).id);
-        let ojsOutput;
+        const cellOutput = cell.outputs[0];
+        const outputItems: vscode.NotebookCellOutputItem[] = [];
         switch (cell.document.languageId) {
             case "ojs":
             case "html":
             case "dot":
             case "mermaid":
             default:
-                ojsOutput = this.ojsOutput(cell, notebook.uri);
-                cellOutput.items.push(this.executeOJS(ojsOutput));
+                outputItems.push(this.executeOJS(cell, notebook, otherCells));
                 break;
         }
-        await execution.replaceOutput(cellOutput);
-        execution.end(success, Date.now());
-        return [(cellOutput as any).id, ojsOutput, oldId];
+        await execution.replaceOutputItems(outputItems, cellOutput);
+        execution.end(outputItems.length === 1 && outputItems[0].mime.indexOf(".stderr") < 0, Date.now());
     }
 
     private async execute(cells: vscode.NotebookCell[], notebook: vscode.NotebookDocument): Promise<void> {
-        const outputs: [string, OJSOutput, string?][] = [];
         for (const cell of cells) {
             reporter.sendTelemetryEvent("controller.execute.cell");
-            outputs.push(await this.executeCell(cell, notebook));
+            this.executeCell(cell, notebook, cells.filter(c => c !== cell));
         }
-        this._ojsMessagaging.postMessage({
-            command: "renderOutputItem",
-            outputs
-        });
     }
 }

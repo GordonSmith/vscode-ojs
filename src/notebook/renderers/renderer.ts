@@ -4,7 +4,7 @@ import { Runtime } from "@observablehq/runtime";
 import { Inspector } from "@observablehq/inspector";
 import { Library } from "@observablehq/stdlib";
 import type { ActivationFunction } from "vscode-notebook-renderer";
-import type { OJSOutput } from "../controller/controller";
+import type { OJSCell, OJSOutput } from "../controller/controller";
 
 // import "../../../src/notebook/renderers/renderer.css";
 
@@ -25,44 +25,66 @@ interface Renderer {
 }
 
 interface Cell {
-    renderer: Renderer;
-    cellFunc: CellFunc;
     text: string;
     element?: HTMLElement;
+    renderer: Renderer;
+    cellFunc: CellFunc;
 }
 
 export const activate: ActivationFunction = context => {
 
     const notebooks: { [uri: string]: Renderer } = {};
-    const cells: { [id: string]: Cell } = {};
+    const cells: { [id: string | number]: Cell } = {};
+    let vscodeId: { [id: string]: string | number } = {};
 
-    context.onDidReceiveMessage!(e => {
-        switch (e.command) {
-            case "renderOutputItem":
-                e.outputs.forEach(([id, data, oldId]) => {
-                    if (oldId && oldId !== id) {
-                        disposeCell(oldId);
-                    }
-                    render(id, data);
-                });
-                break;
-            case "disposeOutputItem":
-                disposeCell(e.id);
+    async function update(id: string | number, renderer: Renderer, text: string, element?: HTMLElement) {
+
+        if (cells[id] && ((!cells[id].element && element) || cells[id].text !== text)) {
+            disposeCell(id);
+        } else if (cells[id]) {
         }
-    });
-
-    // , (name?: string): ohq.Inspector => {
-    //     if (element) {
-    //         const div = document.createElement("div");
-    //         element.appendChild(div);
-    //         return new Inspector(div);
-    //     }
-    //     return nullObserver;
-    // }) as ohq.Module;
+        if (!cells[id]) {
+            const cellFunc: CellFunc = await renderer.define.set({
+                // ...data.node,
+                id,
+                mode: "js",
+                value: text,
+            });
+            try {
+                cellFunc(renderer.runtime, renderer.main, (name?: string, id?: string | number): ohq.Inspector => {
+                    if (element) {
+                        element.replaceChildren(...[]);
+                        const div = document.createElement("div");
+                        element.appendChild(div);
+                        const inspector = new Inspector(div);
+                        return {
+                            pending() {
+                                div.innerText = "...pending...";
+                                inspector.pending();
+                            },
+                            fulfilled(value: any) {
+                                inspector.fulfilled(value);
+                            },
+                            rejected(error: any) {
+                                inspector.rejected(error);
+                            }
+                        };
+                    }
+                    return nullObserver;
+                });
+            } catch (e) {
+            }
+            cells[id] = {
+                renderer,
+                cellFunc,
+                text,
+                element
+            };
+        }
+    }
 
     async function render(id: any, data: OJSOutput, element?: HTMLElement) {
         data.folder = `https://file+.vscode-resource.vscode-cdn.net${data.folder}`;
-
         if (!notebooks[data.uri]) {
             const library = new Library();
             const runtime = new Runtime(library) as ohq.Runtime;
@@ -75,46 +97,15 @@ export const activate: ActivationFunction = context => {
                 main
             };
         }
-        if (cells[id] && ((!cells[id].element && element) || cells[id].text !== data.ojsSource)) {
-            disposeCell(id);
-        }
-        if (!cells[id]) {
-            const cellFunc: CellFunc = await notebooks[data.uri].define.set({
-                // ...data.node,
-                id,
-                mode: "js",
-                value: data.ojsSource,
-            });
-            cellFunc(notebooks[data.uri].runtime, notebooks[data.uri].main, (name?: string, id?: string | number): ohq.Inspector => {
-                if (element) {
-                    const div = document.createElement("div");
-                    element.appendChild(div);
-                    const inspector = new Inspector(div);
-                    return {
-                        pending() {
-                            div.innerText = "...pending...";
-                            inspector.pending();
-                        },
-                        fulfilled(value: any) {
-                            inspector.fulfilled(value);
-                        },
-                        rejected(error: any) {
-                            inspector.rejected(error);
-                        }
-                    };
-                }
-                return nullObserver;
-            });
-            cells[id] = {
-                renderer: notebooks[data.uri],
-                cellFunc,
-                text: data.ojsSource,
-                element
-            };
+        update(data.cell.node.id, notebooks[data.uri], data.cell.ojsSource, element);
+        vscodeId[id] = data.cell.node.id;
+
+        for (const cell of data.otherCells) {
+            update(cell.node.id, notebooks[data.uri], cell.ojsSource);
         }
     }
 
-    async function disposeCell(id: string) {
+    function disposeCell(id: string | number) {
         if (cells[id]) {
             cells[id].renderer.define.delete(id);
             delete cells[id];
@@ -129,9 +120,11 @@ export const activate: ActivationFunction = context => {
 
         async disposeOutputItem(id?: string) {
             if (id) {
-                await disposeCell(id);
+                disposeCell(vscodeId[id]);
+                delete vscodeId[id];
             } else {
-                await Promise.all(Object.keys(cells).map(disposeCell));
+                Object.keys(cells).map(disposeCell);
+                vscodeId = {};
             }
         }
     };

@@ -1,8 +1,7 @@
-import { env, NotebookSerializer, CancellationToken, NotebookData, NotebookCellData, NotebookCellKind } from "vscode";
 import type { ohq } from "@hpcc-js/observablehq-compiler";
+import { NotebookSerializer, CancellationToken, NotebookData, NotebookCellData, NotebookCellKind } from "vscode";
+import { v4 as uuidv4 } from "uuid";
 import { TextDecoder, TextEncoder } from "util";
-// import { Notebook } from "../../compiler/notebook";
-// import { Writer } from "../../compiler/writer";
 
 export class Serializer implements NotebookSerializer {
     async deserializeNotebook(content: Uint8Array, _token: CancellationToken): Promise<NotebookData> {
@@ -52,7 +51,6 @@ export class Serializer implements NotebookSerializer {
         const jsonNotebook: ohq.Notebook = data.metadata?.notebook;
         jsonNotebook.nodes = [];
 
-        let id = 0;
         for (const cell of data.cells) {
             let mode: string;
             switch (cell.kind) {
@@ -69,14 +67,13 @@ export class Serializer implements NotebookSerializer {
                     }
             }
             const item = {
-                ...cell.metadata?.node,
-                id: id,
+                id: uuidv4(),
                 name: "",
+                ...cell.metadata?.node,
                 value: cell.value,
                 mode
             };
             jsonNotebook.nodes.push(item);
-            ++id;
         }
 
         return new TextEncoder().encode(JSON.stringify(jsonNotebook, undefined, 4));
