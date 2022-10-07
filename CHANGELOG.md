@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.30](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.29...v0.4.30) (2022-10-07)
+
+
+### Bug Fixes
+
+*  Add async renderer support for vscode v1.72.0 ([8bfdb5b](https://github.com/GordonSmith/vscode-ojs/commit/8bfdb5bde18390bb76642d72ccf9fb3b74eaef43))
+
 ### [0.4.29](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.28...v0.4.29) (2022-10-06)
 
 
