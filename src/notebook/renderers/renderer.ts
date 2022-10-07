@@ -2,21 +2,8 @@ import type { CellFunc, compileFunc, ohq } from "@hpcc-js/observablehq-compiler"
 import { compile } from "@hpcc-js/observablehq-compiler";
 import { Runtime } from "@observablehq/runtime";
 import { Inspector } from "@observablehq/inspector";
-import { Library } from "@observablehq/stdlib";
 import type { ActivationFunction } from "vscode-notebook-renderer";
-import type { OJSCell, OJSOutput } from "../controller/controller";
-
-// import "../../../src/notebook/renderers/renderer.css";
-
-class NullObserver implements ohq.Inspector {
-    pending() {
-    }
-    fulfilled(value: any) {
-    }
-    rejected(error: any) {
-    }
-}
-const nullObserver = new NullObserver();
+import type { OJSOutput } from "../controller/controller";
 
 interface Renderer {
     runtime: ohq.Runtime;
@@ -28,12 +15,11 @@ interface Cell {
     text: string;
     element?: HTMLElement;
     renderer: Renderer;
-    cellFunc: CellFunc;
 }
 
 export const activate: ActivationFunction = context => {
 
-    const notebooks: { [uri: string]: Renderer } = {};
+    const notebooks: { [uri: string]: Promise<Renderer> } = {};
     const cells: { [id: string | number]: Cell } = {};
     let vscodeId: { [id: string]: string | number } = {};
 
@@ -41,67 +27,79 @@ export const activate: ActivationFunction = context => {
 
         if (cells[id] && ((!cells[id].element && element) || cells[id].text !== text)) {
             disposeCell(id);
-        } else if (cells[id]) {
         }
         if (!cells[id]) {
+            cells[id] = {
+                renderer,
+                text,
+                element
+            };
             const cellFunc: CellFunc = await renderer.define.set({
                 // ...data.node,
                 id,
                 mode: "js",
                 value: text,
             });
-            try {
+            await new Promise<void>(resolve => {
                 cellFunc(renderer.runtime, renderer.main, (name?: string, id?: string | number): ohq.Inspector => {
                     if (element) {
-                        element.replaceChildren(...[]);
                         const div = document.createElement("div");
                         element.appendChild(div);
                         const inspector = new Inspector(div);
                         return {
+                            _node: inspector._node,
                             pending() {
                                 div.innerText = "...pending...";
                                 inspector.pending();
                             },
                             fulfilled(value: any) {
+                                resolve();
                                 inspector.fulfilled(value);
                             },
                             rejected(error: any) {
+                                resolve();
                                 inspector.rejected(error);
                             }
                         };
                     }
-                    return nullObserver;
+                    return {
+                        pending() {
+                        },
+                        fulfilled(value: any) {
+                            resolve();
+                        },
+                        rejected(error: any) {
+                            resolve();
+                        }
+                    };
                 });
-            } catch (e) {
-            }
-            cells[id] = {
-                renderer,
-                cellFunc,
-                text,
-                element
-            };
+            });
         }
+    }
+
+    async function createRenderer(data: OJSOutput): Promise<Renderer> {
+        if (!notebooks[data.uri]) {
+            const runtime = new Runtime() as ohq.Runtime;
+            notebooks[data.uri] = compile({ files: data.notebook.files, nodes: [] } as unknown as ohq.Notebook, { baseUrl: data.folder })
+                .then(define => {
+                    return {
+                        runtime,
+                        define,
+                        main: define(runtime)
+                    };
+                });
+        }
+        return notebooks[data.uri];
     }
 
     async function render(id: any, data: OJSOutput, element?: HTMLElement) {
         data.folder = `https://file+.vscode-resource.vscode-cdn.net${data.folder}`;
-        if (!notebooks[data.uri]) {
-            const library = new Library();
-            const runtime = new Runtime(library) as ohq.Runtime;
-            const define = await compile({ files: data.notebook.files, nodes: [] } as unknown as ohq.Notebook, { baseUrl: data.folder });
-            const main = define(runtime);
-
-            notebooks[data.uri] = {
-                runtime,
-                define,
-                main
-            };
-        }
-        update(data.cell.node.id, notebooks[data.uri], data.cell.ojsSource, element);
+        const renderer = await createRenderer(data);
+        await update(data.cell.node.id, renderer, data.cell.ojsSource, element);
         vscodeId[id] = data.cell.node.id;
 
         for (const cell of data.otherCells) {
-            update(cell.node.id, notebooks[data.uri], cell.ojsSource);
+            update(cell.node.id, renderer, cell.ojsSource);
         }
     }
 
@@ -115,7 +113,7 @@ export const activate: ActivationFunction = context => {
     return {
         renderOutputItem(outputItem, element) {
             const data: OJSOutput = outputItem.json();
-            render(outputItem.id, data, element);
+            return render(outputItem.id, data, element);
         },
 
         async disposeOutputItem(id?: string) {
