@@ -101,6 +101,7 @@ export const activate: ActivationFunction = context => {
         for (const cell of data.otherCells) {
             update(cell.node.id, renderer, cell.ojsSource);
         }
+        console.log(renderer.define.toString());
     }
 
     function disposeCell(id: string | number) {

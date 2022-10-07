@@ -28,7 +28,7 @@ export class Controller {
     readonly controllerId = "ojs-kernal";
     readonly notebookType = "ojs-notebook";
     readonly label = "OJS Notebook";
-    readonly supportedLanguages = ["ojs", "omd", "html", "svg", "dot", "mermaid", "tex", "javascript"];
+    readonly supportedLanguages = ["ojs", "omd", "html", "svg", "dot", "mermaid", "tex", "sql", "javascript"];
 
     private readonly _controller: vscode.NotebookController;
     private _executionOrder = 0;
@@ -64,6 +64,8 @@ export class Controller {
                 return `htl.html\`${encode(cell.document.getText())}\``;
             case "tex":
                 return `tex.block\`${encode(cell.document.getText())}\``;
+            case "sql":
+                return `${cell.metadata.node?.name} = db.sql\`${encode(cell.document.getText())}\`;`;
             case "javascript":
                 return `{${cell.document.getText()}}`;
             default:
