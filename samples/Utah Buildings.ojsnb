@@ -1,0 +1,387 @@
+{
+    "id": "0e2bf0c02a1963c5",
+    "slug": "geoarrow-and-geoparquet-in-deck-gl",
+    "trashed": false,
+    "description": "",
+    "likes": 42,
+    "publish_level": "public",
+    "forks": 0,
+    "fork_of": null,
+    "update_time": "2022-09-11T08:41:51.366Z",
+    "publish_time": "2022-08-11T18:11:57.364Z",
+    "publish_version": 481,
+    "latest_version": 481,
+    "thumbnail": "405d99268f1ae3e6e0c2cc616eafc19cbe22e4605bbfe4cb705a44251af93989",
+    "default_thumbnail": "1166bcf77f115f0045b4309a2d3c8afc9045f999ef78f0ee03bbfac55ab83ed0",
+    "roles": [],
+    "sharing": null,
+    "owner": {
+        "id": "d003201354321004",
+        "github_login": "kylebarron",
+        "avatar_url": "https://avatars.observableusercontent.com/avatar/44cb66c7f0a9ebb9723da7ce21de149f23fbbd65c09d4350e7e468d430b80f18",
+        "login": "kylebarron",
+        "name": "Kyle Barron",
+        "bio": "",
+        "home_url": "https://kylebarron.dev",
+        "type": "individual",
+        "tier": "basic"
+    },
+    "creator": {
+        "id": "d003201354321004",
+        "github_login": "kylebarron",
+        "avatar_url": "https://avatars.observableusercontent.com/avatar/44cb66c7f0a9ebb9723da7ce21de149f23fbbd65c09d4350e7e468d430b80f18",
+        "login": "kylebarron",
+        "name": "Kyle Barron",
+        "bio": "",
+        "home_url": "https://kylebarron.dev",
+        "tier": "basic"
+    },
+    "authors": [
+        {
+            "id": "d003201354321004",
+            "avatar_url": "https://avatars.observableusercontent.com/avatar/44cb66c7f0a9ebb9723da7ce21de149f23fbbd65c09d4350e7e468d430b80f18",
+            "name": "Kyle Barron",
+            "login": "kylebarron",
+            "bio": "",
+            "home_url": "https://kylebarron.dev",
+            "github_login": "kylebarron",
+            "tier": "basic",
+            "approved": true,
+            "description": ""
+        }
+    ],
+    "collections": [
+        {
+            "id": "12189391458021a4",
+            "type": "public",
+            "slug": "geoparquet",
+            "title": "Cloud-Native Geo",
+            "description": "Cloud-Native geo from the browser.",
+            "update_time": "2022-08-10T21:56:10.999Z",
+            "pinned": false,
+            "ordered": true,
+            "custom_thumbnail": null,
+            "default_thumbnail": "0ade3c01b371f64e1cabc66f3951ff8a443b9705309bba88ede9b3f58c92529b",
+            "thumbnail": "0ade3c01b371f64e1cabc66f3951ff8a443b9705309bba88ede9b3f58c92529b",
+            "listing_count": 3,
+            "parent_collection_count": 0,
+            "owner": {
+                "id": "d003201354321004",
+                "github_login": "kylebarron",
+                "avatar_url": "https://avatars.observableusercontent.com/avatar/44cb66c7f0a9ebb9723da7ce21de149f23fbbd65c09d4350e7e468d430b80f18",
+                "login": "kylebarron",
+                "name": "Kyle Barron",
+                "bio": "",
+                "home_url": "https://kylebarron.dev",
+                "type": "individual",
+                "tier": "basic"
+            }
+        }
+    ],
+    "files": [],
+    "comments": [],
+    "commenting_lock": null,
+    "suggestion_from": null,
+    "suggestions_to": [],
+    "version": 481,
+    "title": "GeoArrow and GeoParquet in deck.gl",
+    "license": null,
+    "copyright": "",
+    "nodes": [
+        {
+            "id": 0,
+            "value": "## Demo fo Jo!\r\n\r\nThis demo uses data from Microsoft's computer-generated [dataset of building footprints in the U.S.](https://github.com/microsoft/USBuildingFootprints) The entire dataset contains nearly 130 million building polygons, so to keep the size managable, its been filtered to only contain building foot prints for Utah, picked as it has over **1 million building footprints and more than 7 million total coordinates**!\r\n",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 1,
+            "value": "### Loading the data\r\n\r\nThe raw data happens to have been stored in a parquet file, it could have been stored as GeoJSON, TopoJSON or delivered from a Roxie.",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 2,
+            "value": "We'll start by loading the GeoParquet file and parsing it to an Arrow table.",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 3,
+            "value": "parquetBuffer = fetch(\"./Utah.parquet\").then((response) => {\r\n    return response.arrayBuffer();\r\n})",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 4,
+            "value": "arrowTable = {\r\n  const parquetBytes = new Uint8Array(parquetBuffer);\r\n  const decodedArrowBytes = parquet.readParquet(parquetBytes);\r\n  const arrowTable = arrow.tableFromIPC(decodedArrowBytes);\r\n  return arrowTable;\r\n}",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 5,
+            "value": "This dataset has only a single column, the geometry column, so we'll select that.",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 6,
+            "value": "arrowTable.schema.fields[0]",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 7,
+            "name": "",
+            "value": "...and a typical row looks like this:",
+            "mode": "md"
+        },
+        {
+            "id": 8,
+            "value": "geometryColumn = arrowTable.getChildAt(0)",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 9,
+            "value": "#### Familiar \"logical\" data layout\r\n\r\nGeoArrow's Arrow-native geometry encoding has a familiar logical data layout. In the Arrow JS API you can use `.get()` to access the logical parts of a geometry. This enables a high-level API of looping over coordinates just like GeoJSON.  Again we can tak a peek at the first row(s)",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 10,
+            "value": "{\r\n  const firstGeometry = geometryColumn.get(0);\r\n  const firstRing = firstGeometry.get(0);\r\n  const firstCoord = firstRing.get(0);\r\n  return firstCoord.toArray();\r\n}",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 11,
+            "value": "Expanding this array output to verify inner coordinates:",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 12,
+            "value": "// Pretty print the first geometry\r\n// One ring with five coordinates\r\n{\r\n  const firstGeom = geometryColumn.get(0);\r\n  const printedGeom = [];\r\n  for (const ring of firstGeom) {\r\n    const printedRing = [];\r\n    for (const coord of ring) {\r\n      const printedCoord = [coord.get(0), coord.get(1)];\r\n      printedRing.push(printedCoord);\r\n    }\r\n    printedGeom.push(printedRing);\r\n  }\r\n  return printedGeom;\r\n}",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 13,
+            "value": "#### Zero-copy access to underlying buffer\n",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 14,
+            "value": "Since this is a two-dimensional polygon dataset, the geometry column is stored as\n\n```\nList<List<FixedSizeList<double>[2]>>\n```",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 15,
+            "value": "At the top level, the `offsets` of the array correspond to indexes _into_ `RingIndices` (the second level of nesting) for the start of each new polygon.",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 16,
+            "value": "// Note that `data` here is an array with only one element because this Parquet file only had one row group\r\n// Otherwise we'd need to do this process for each batch of columnar data\r\npolygonIndices = geometryColumn.data[0].valueOffsets",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 17,
+            "value": "At the first level of nesting, the `offsets` correspond to indexes _into_ the coordinate array (the third level of nesting) for the start of each ring.",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 18,
+            "value": "ringIndices = geometryColumn.getChildAt(0).data[0].valueOffsets",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 19,
+            "value": "This means that get an array of indexes where each _polygon_ starts, we need to perform a lookup between these two arrays. Namely, the _i<sup>th</sup>_ element of `polygonIndices` tells the index within `ringIndices` where the _i<sup>th</sup>_ polygon begins.",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 20,
+            "value": "resolvedPolygonIndices = {\r\n  const resolvedIndices = new Int32Array(polygonIndices.length);\r\n  for (let i = 0; i < resolvedIndices.length; ++i) {\r\n    // Perform the lookup into the ringIndices array using the polygonIndices array\r\n    resolvedIndices[i] = ringIndices[polygonIndices[i]]\r\n  }\r\n  return resolvedIndices;\r\n}",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 21,
+            "value": "At the second level of nesting, we have the coordinate array. Each row contains one coordinate pair: a list of size two.",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 22,
+            "value": "coordinateVector = geometryColumn.getChildAt(0).getChildAt(0)",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 23,
+            "value": "At the third level of nesting, we have a flat array of coordinates. The `Float64Array` view onto this buffer (`flatCoordinateArray`) below, is what we'll pass into deck.gl.",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 24,
+            "value": "flatCoordinateVector = geometryColumn.getChildAt(0).getChildAt(0).getChildAt(0)",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 25,
+            "value": "flatCoordinateArray = flatCoordinateVector.data[0].values",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 26,
+            "value": "Now we're ready to render our data with deck.gl. Since this is a polygon dataset, we'll use the [`SolidPolygonLayer`](https://deck.gl/docs/api-reference/layers/solid-polygon-layer).",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 27,
+            "value": "deckglLayer = {\r\n  // Refer to https://deck.gl/docs/api-reference/layers/solid-polygon-layer#use-binary-attributes\r\n  const data = {\r\n    // Number of geometries\r\n    length: arrowTable.numRows,\r\n    // Indices into coordinateArray where each polygon starts\r\n    startIndices: resolvedPolygonIndices,\r\n    // Flat coordinates array\r\n    attributes: {\r\n      getPolygon: { value: flatCoordinateArray, size: 2 }\r\n    }\r\n  };\r\n  const layer = new deck.SolidPolygonLayer({\r\n    // This is an Observable hack - changing the id will force the layer to refresh when the cell reevaluates\r\n    id: `layer-${Date.now()}`,\r\n    data,\r\n    // Skip normalization for binary data\r\n    _normalize: false,\r\n    // Counter-clockwise winding order\r\n    _windingOrder: \"CCW\",\r\n    getFillColor: [0, 100, 60, 160],\r\n  });\r\n\r\n  deckglMap.setProps({ layers: [layer] });\r\n\r\n  return layer;\r\n}",
+            "pinned": true,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 28,
+            "value": "Voila! 1 million building footprints in Utah rendered at once:",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 29,
+            "value": "mapContainer = html`<div style=\"height:800px\"></div>`",
+            "pinned": false,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 30,
+            "value": "## Future work\n\n- Polygons with holes. This dataset consisted only of simple polygons without holes and it's not clear that deck.gl's binary format can handle polygons with holes today.\n- Handle GeoArrow natively in deck.gl?",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 31,
+            "value": "# Acknowledgments\n\nThanks to Avi Bryant for this week at [Gradient Retreat](https://www.gradientretreat.com/). Thanks to Tom MacWright, Brandon Liu, Rachel Binx, and James Tyrwhitt-Drake for feedback. Thanks to Joris Van den Bossche for his [helpful notebook](https://nbviewer.org/gist/jorisvandenbossche/00e5c4a54f7b94375ccc6921c07825a0) outlining the Python GeoArrow API. ",
+            "pinned": false,
+            "mode": "md",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 32,
+            "value": "// Load the parquet-wasm library\r\nparquet = {\r\n  const parquetModule = await import(\r\n    \"https://unpkg.com/parquet-wasm@0.4.0-beta.3/esm/arrow2.js\"\r\n  );\r\n  // Need to await the default export first to initialize the WebAssembly code\r\n  await parquetModule.default();\r\n  return parquetModule;\r\n}",
+            "pinned": false,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 33,
+            "value": "deck = require.alias({\r\n  h3: {}\r\n})(\"deck.gl@8.8.6/dist.min.js\")",
+            "pinned": false,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 34,
+            "value": "deckglMap = {\r\n  // This is an Observable hack: clear previously generated content\r\n  mapContainer.innerHTML = \"\";\r\n\r\n  return new deck.DeckGL({\r\n    // The HTML container to render into\r\n    container: mapContainer,\r\n    map: mapboxgl,\r\n    mapStyle:\r\n      \"https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json\",\r\n\r\n    // Viewport settings\r\n    initialViewState: {\r\n      longitude: -111.91530172951025,\r\n      latitude: 40.63403641639511,\r\n      zoom: 11,\r\n      pitch: 0,\r\n      bearing: 0\r\n    },\r\n    controller: true\r\n  });\r\n}",
+            "pinned": false,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 35,
+            "value": "mapboxgl = require(\"mapbox-gl@1.6.0/dist/mapbox-gl.js\")",
+            "pinned": false,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        },
+        {
+            "id": 36,
+            "value": "arrow = require(\"apache-arrow\")",
+            "pinned": false,
+            "mode": "js",
+            "data": null,
+            "name": ""
+        }
+    ],
+    "resolutions": []
+}

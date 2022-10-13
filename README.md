@@ -8,6 +8,7 @@
 - [Markdown](https://www.markdownguide.org/)
 - [ObservableHQ Markdown](https://observablehq.com/@observablehq/markdown-quick-reference?collection=@observablehq/notebook-fundamentals)
 - [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)
+- [SQL](https://en.wikipedia.org/wiki/SQL)
 - [SVG](https://developer.mozilla.org/en-US/docs/Web/SVG)
 - [GraphViz (DOT)](https://graphviz.org/)
 - [Mermaid](https://mermaid-js.github.io/mermaid/#/)

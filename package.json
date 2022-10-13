@@ -51,14 +51,13 @@
     "update": "npx npm-check-updates -u -t minor"
   },
   "devDependencies": {
-    "@hpcc-js/observable-md": "2.54.4",
-    "@hpcc-js/observable-shim": "2.4.0",
-    "@hpcc-js/observablehq-compiler": "1.2.1",
-    "@hpcc-js/util": "2.50.0",
+    "@hpcc-js/observable-md": "2.54.6",
+    "@hpcc-js/observable-shim": "2.5.0",
+    "@hpcc-js/observablehq-compiler": "1.2.2",
+    "@hpcc-js/util": "2.50.1",
     "@observablehq/inspector": "3.2.4",
-    "@observablehq/parser": "6.0.0",
-    "@observablehq/runtime": "4.25.0",
-    "@observablehq/stdlib": "3.20.0",
+    "@observablehq/runtime": "4.27.1",
+    "@observablehq/stdlib": "3.22.2",
     "@rollup/plugin-alias": "3.1.9",
     "@rollup/plugin-commonjs": "22.0.2",
     "@rollup/plugin-node-resolve": "13.3.0",
@@ -248,6 +247,22 @@
         "command": "ojs.download",
         "title": "Download Notebook",
         "description": "Download notebook from observalehq.com"
+      },
+      {
+        "command": "ojs.cell.name",
+        "title": "Result Name",
+        "icon": {
+          "dark": "./resources/dark/string.svg",
+          "light": "./resources/light/string.svg"
+        }
+      },
+      {
+        "command": "ojs.cell.db",
+        "title": "Database Name",
+        "icon": {
+          "dark": "./resources/dark/server-process.svg",
+          "light": "./resources/light/server-process.svg"
+        }
       }
     ],
     "menus": {
@@ -308,6 +323,18 @@
           "when": "resourceLangId == ojs || resourceLangId == omd || resourceLangId == ojsnb",
           "command": "ojs.preview",
           "group": "navigation@998"
+        }
+      ],
+      "notebook/cell/title": [
+        {
+          "command": "ojs.cell.name",
+          "when": "notebookType == ojs-notebook && cellLangId == sql",
+          "group": "inline@400"
+        },
+        {
+          "command": "ojs.cell.db",
+          "when": "notebookType == ojs-notebook && cellLangId == sql",
+          "group": "inline@401"
         }
       ]
     },
