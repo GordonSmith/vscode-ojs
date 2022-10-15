@@ -90,7 +90,9 @@ export class Serializer implements NotebookSerializer {
             case "tex":
                 return `tex.block\`${encode(cell.document.getText())}\``;
             case "sql":
-                return `${this.node(cell)?.name} = db.sql\`${encode(cell.document.getText())}\`;`;
+                const sourceName = this.node(cell)?.data?.source?.name ?? "db";
+                const name = this.node(cell)?.name;
+                return `${name ? `${name} = ` : ""}${sourceName}.sql\`${encode(cell.document.getText())}\`;`;
             case "javascript":
                 return `{${cell.document.getText()}}`;
             default:
@@ -107,19 +109,6 @@ export class Serializer implements NotebookSerializer {
 
     ojsOutput(cell: NotebookCell, uri: Uri, otherCells: NotebookCell[]): OJSOutput {
         const folder = path.dirname(cell.document.uri.path);
-
-        // let globals = {};
-        // const cells = cell.notebook.getCells(new NotebookRange(0, cell.index));
-        // for (const otherCell of cells) {
-        //     otherCell.outputs.forEach(op => {
-        //         op.items.filter(item => item.mime === "application/hpcc.wu+json").forEach(item => {
-        //             try {
-        //                 globals = { ...globals, ...JSON.parse(item.data.toString()) };
-        //             } catch (e) {
-        //             }
-        //         });
-        //     });
-        // }
 
         return {
             notebookId: cell.notebook.metadata.id,
