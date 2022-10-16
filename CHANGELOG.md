@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.31](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.30...v0.4.31) (2022-10-16)
+
+
+### Features
+
+*  Add SQL support ([5ff7cd0](https://github.com/GordonSmith/vscode-ojs/commit/5ff7cd00e6b18a54d068334d576e0a001a1ab5b5))
+
 ### [0.4.30](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.29...v0.4.30) (2022-10-07)
 
 
