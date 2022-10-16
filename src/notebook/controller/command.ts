@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
+import fetch from "node-fetch";
 import { serializer } from "./serializer";
-
 import { reporter } from "../../telemetry/index";
 
 export let commands: Commands;
