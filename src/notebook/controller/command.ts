@@ -81,7 +81,7 @@ export class Commands {
             name: "",
             ...node?.data?.source,
         };
-        const name = await vscode.window.showInputBox({ value: node.data.source.name, title: "Database Name", placeHolder: "Database Name" });
+        const name = await vscode.window.showInputBox({ value: data.source.name, title: "Database Name", placeHolder: "Database Name" });
         if (name) {
             node.data.source.name = name;
         }
