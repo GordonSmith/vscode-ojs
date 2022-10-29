@@ -81,7 +81,7 @@ export const activate: ActivationFunction = context => {
     async function createRenderer(data: OJSOutput): Promise<Renderer> {
         if (!notebooks[data.notebookId]) {
             const runtime = new Runtime() as ohq.Runtime;
-            notebooks[data.notebookId] = compile({ files: data.files, nodes: [] } as unknown as ohq.Notebook, { baseUrl: data.folder })
+            notebooks[data.notebookId] = compile({ files: data.files, nodes: [] } as unknown as ohq.Notebook, { baseUrl: data.folder, importMode: "recursive" })
                 .then(define => {
                     return {
                         runtime,
