@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
 import { Commands } from "./command";
+import { isFile, notebook2Text } from "../util/document";
+import { serializer } from "../notebook/controller/serializer";
 
 let ojsEditor: Editor;
 export class Editor {
@@ -23,10 +25,20 @@ export class Editor {
 
     onOpenWatcher() {
         vscode.window.onDidChangeActiveTextEditor(te => {
-            switch (te?.document?.languageId) {
-                case "ojs":
-                case "omd":
-                    this._commands.refreshPreview(te?.document);
+            if (isFile(te?.document)) {
+                switch (te?.document?.languageId) {
+                    case "ojs":
+                    case "omd":
+                        this._commands.refreshPreview(te?.document);
+                        break;
+                }
+            }
+        });
+
+        vscode.window.onDidChangeActiveNotebookEditor(async ne => {
+            switch (ne?.notebook.notebookType) {
+                case "ojs-notebook":
+                    this._commands.refreshPreview(await notebook2Text(ne.notebook));
                     break;
             }
         });
@@ -35,17 +47,30 @@ export class Editor {
     onSaveWatcher() {
         const ojsConfig = vscode.workspace.getConfiguration("ojs");
         vscode.workspace.onDidSaveTextDocument(doc => {
-            switch (doc.languageId) {
-                case "ojs":
-                case "omd":
-                    if (ojsConfig.get<boolean>("refreshPreviewOnSave") === true) {
-                        if (vscode.window.activeTextEditor) {
+            if (vscode.window.activeTextEditor) {
+                switch (doc.languageId) {
+                    case "ojs":
+                    case "omd":
+                        if (ojsConfig.get<boolean>("refreshPreviewOnSave") === true) {
                             this._commands.refreshPreview(doc);
                         }
-                    }
-                    break;
+                        break;
+                }
             }
-
         }, null, this._ctx.subscriptions);
+
+        vscode.workspace.onDidSaveNotebookDocument(async notebook => {
+            if (vscode.window.activeTextEditor) {
+                switch (notebook.notebookType) {
+                    case "ojs-notebook":
+                        if (ojsConfig.get<boolean>("refreshPreviewOnSave") === true) {
+                            const doc = await notebook2Text(notebook);
+                            const text = serializer.lastSave(notebook);
+                            this._commands.refreshPreview(doc, text);
+                        }
+                        break;
+                }
+            }
+        });
     }
 }

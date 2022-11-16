@@ -144,7 +144,10 @@ viewof; cars;
 
             placeholder.innerText = "";
 
-            const ohqnb = languageId === "omd" ? omd2notebook(content) : ojs2notebook(content);
+            const ohqnb =
+                languageId === "omd" ? omd2notebook(content) :
+                    languageId === "ojs" ? ojs2notebook(content) :
+                        JSON.parse(content);
             const compiledNB = await compile(ohqnb, { baseUrl: folder }).catch(e => {
                 logger.error(e);
             });

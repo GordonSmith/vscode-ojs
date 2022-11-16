@@ -1,7 +1,7 @@
 import type { ohq } from "@hpcc-js/observablehq-compiler";
 
 import * as path from "path";
-import { NotebookSerializer, CancellationToken, NotebookData, NotebookCellData, NotebookCellKind, NotebookCell, Uri, NotebookCellOutput, NotebookCellOutputItem, NotebookRange } from "vscode";
+import { NotebookSerializer, CancellationToken, NotebookData, NotebookCellData, NotebookCellKind, NotebookCell, Uri, NotebookCellOutput, NotebookCellOutputItem, NotebookRange, NotebookDocument } from "vscode";
 import { v4 as uuidv4 } from "uuid";
 import { TextDecoder, TextEncoder } from "util";
 
@@ -34,6 +34,7 @@ function encode(str: string) {
 
 interface Meta {
     notebook: { [id: string]: ohq.Notebook },
+    notebookSave: { [id: string]: string },
     node: { [id: string | number]: ohq.Node }
 }
 
@@ -42,6 +43,7 @@ export class Serializer implements NotebookSerializer {
 
     protected _meta: Meta = {
         notebook: {},
+        notebookSave: {},
         node: {}
     };
 
@@ -187,6 +189,7 @@ export class Serializer implements NotebookSerializer {
         retVal.metadata = retVal.metadata ?? {};
         retVal.metadata.id = notebook.id;
         this._meta.notebook[notebook.id!] = notebook;
+        this._meta.notebookSave[notebook.id!] = contents;
         return retVal;
     }
 
@@ -234,6 +237,12 @@ export class Serializer implements NotebookSerializer {
             jsonNotebook.nodes.push(item);
         }
 
-        return new TextEncoder().encode(JSON.stringify(jsonNotebook, undefined, 4));
+        const contents = JSON.stringify(jsonNotebook, undefined, 4);
+        this._meta.notebookSave[data.metadata!.id] = contents;
+        return new TextEncoder().encode(contents);
+    }
+
+    lastSave(notebook: NotebookDocument) {
+        return this._meta.notebookSave[notebook.metadata!.id];
     }
 }
