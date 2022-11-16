@@ -115,7 +115,7 @@ export class Preview {
         this._panel.webview.postMessage({ command: "echo", content });
     }
 
-    evaluate(doc: vscode.TextDocument): Promise<Value[]> {
+    evaluate(doc: vscode.TextDocument, text?: string): Promise<Value[]> {
         this._doc = doc;
         const folder = this._panel.webview.asWebviewUri(vscode.Uri.file(path.dirname(doc.uri.fsPath))).toString();
         return new Promise((resolve, reject) => {
@@ -130,7 +130,7 @@ export class Preview {
                 command: "evaluate",
                 languageId: doc.languageId,
                 folder,
-                content: doc.getText(),
+                content: text ?? doc.getText(),
                 callbackID
             });
         });

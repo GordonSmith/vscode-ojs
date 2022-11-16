@@ -269,15 +269,15 @@
       "commandPalette": [
         {
           "command": "ojs.checkSyntax",
-          "when": "resourceLangId == ojs || resourceLangId == omd"
+          "when": "resourceLangId == ojs || resourceLangId == omd || notebookType == ojs-notebook"
         },
         {
           "command": "ojs.preview",
-          "when": "resourceLangId == ojs || resourceLangId == omd || resourceLangId == ojsnb"
+          "when": "resourceLangId == ojs || resourceLangId == omd || notebookType == ojs-notebook"
         },
         {
           "command": "ojs.export",
-          "when": "resourceLangId == ojs || resourceLangId == omd"
+          "when": "resourceLangId == ojs || resourceLangId == omd || notebookType == ojs-notebook"
         },
         {
           "command": "ojs.exportECL",
@@ -286,14 +286,14 @@
       ],
       "explorer/context": [
         {
-          "when": "resourceLangId == ojs || resourceLangId == omd || resourceLangId == ojsnb",
+          "when": "resourceLangId == ojs || resourceLangId == omd || notebookType == ojs-notebook",
           "command": "ojs.preview",
           "group": "navigation@998"
         }
       ],
       "editor/context": [
         {
-          "when": "resourceLangId == ojs || resourceLangId == omd || resourceLangId == ojsnb",
+          "when": "resourceLangId == ojs || resourceLangId == omd || notebookType == ojs-notebook",
           "command": "ojs.preview",
           "group": "navigation@960"
         },
@@ -315,12 +315,12 @@
       ],
       "editor/title": [
         {
-          "when": "resourceLangId == ojs || resourceLangId == omd",
+          "when": "resourceLangId == ojs || resourceLangId == omd || notebookType == ojs-notebook",
           "command": "ojs.export",
           "group": "navigation@997"
         },
         {
-          "when": "resourceLangId == ojs || resourceLangId == omd || resourceLangId == ojsnb",
+          "when": "resourceLangId == ojs || resourceLangId == omd || notebookType == ojs-notebook",
           "command": "ojs.preview",
           "group": "navigation@998"
         }
@@ -348,7 +348,7 @@
         "command": "ojs.preview",
         "key": "ctrl+k v",
         "mac": "cmd+k v",
-        "when": "resourceLangId == ojs || resourceLangId == omd || resourceLangId == ojsnb"
+        "when": "resourceLangId == ojs || resourceLangId == omd || notebookType == ojs-notebook"
       }
     ],
     "configuration": {

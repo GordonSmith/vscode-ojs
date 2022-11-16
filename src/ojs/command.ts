@@ -1,9 +1,10 @@
-import { ohq } from "@hpcc-js/observable-shim";
-import { ojs2notebook, omd2notebook } from "@hpcc-js/observablehq-compiler";
+import * as vscode from "vscode";
 import * as fs from "fs";
 import fetch from "node-fetch";
 import * as path from "path";
-import * as vscode from "vscode";
+import { ohq } from "@hpcc-js/observable-shim";
+import { ojs2notebook, omd2notebook } from "@hpcc-js/observablehq-compiler";
+import { serializer } from "../notebook/controller/serializer";
 import { Diagnostic } from "./diagnostic";
 import { Meta } from "./meta";
 import { Preview } from "./preview";
@@ -65,19 +66,9 @@ export class Commands {
         }
     }
 
-    async refreshPreview(doc?: vscode.TextDocument) {
-        if (doc) {
-            // this._diagnostic.setQuick(doc.uri, []);
-            const text = doc.getText();
-            if (Preview.currentPanel) {
-                // const version = doc.version;
-                Preview.currentPanel.evaluate(doc);
-                // if (doc.version === version) {
-                //     const meta = Meta.attach(doc);
-                //     meta.update(errors);
-                // }
-                // this._diagnostic.set(doc.uri, diagnostics(doc, errors));
-            }
+    async refreshPreview(doc?: vscode.TextDocument, text?: string) {
+        if (doc && Preview.currentPanel) {
+            Preview.currentPanel.evaluate(doc, text);
         }
     }
 
@@ -231,17 +222,39 @@ ${encode(node.value)}
     }
 
     async export() {
+        let htmlPath;
+        let notebook: ohq.Notebook | undefined;
+        if (vscode.window.activeNotebookEditor) {
+            const notebookDocument = vscode.window.activeNotebookEditor.notebook;
+            switch (notebookDocument.notebookType) {
+                case "ojs-notebook":
+                    htmlPath = notebookDocument.uri.path.replace(".ojsnb", ".html");
+                    const text = serializer.lastSave(notebookDocument);
+                    notebook = JSON.parse(text);
+                    break;
+            }
+        }
         if (vscode.window.activeTextEditor) {
             const textDocument = vscode.window.activeTextEditor.document;
-            const htmlPath = textDocument.languageId === "omd" ? textDocument.uri.path.replace(".omd", ".html") : textDocument.uri.path.replace(".ojs", ".html");
+            switch (textDocument.languageId) {
+                case "omd":
+                    htmlPath = textDocument.uri.path.replace(".omd", ".html");
+                    notebook = omd2notebook(textDocument.getText());
+                    break;
+                case "ojs":
+                    htmlPath = textDocument.uri.path.replace(".ojs", ".html");
+                    notebook = ojs2notebook(textDocument.getText());
+                    break;
+            }
+        }
+        if (htmlPath && notebook) {
             vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(htmlPath), saveLabel: "Export to HTML" }).then(resource => {
                 if (resource) {
-                    const text = textDocument.getText();
-                    const notebook = textDocument.languageId === "ojs" ? ojs2notebook(text) : omd2notebook(text);
-                    const html = this.exportTpl("", notebook);
+                    const html = this.exportTpl("", notebook!);
                     fs.writeFile(resource.fsPath, html, "utf8", () => { });
                 }
             });
+
         }
     }
 
