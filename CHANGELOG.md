@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.34](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.33...v0.4.34) (2022-11-16)
+
+
+### Features
+
+*  Add preview and export HTML support to notebook ([81b8392](https://github.com/GordonSmith/vscode-ojs/commit/81b83920303aedf68081e0b1bbfb06c589f00ba6))
+
 ### [0.4.33](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.30...v0.4.33) (2022-11-11)
 
 
