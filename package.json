@@ -50,6 +50,9 @@
     "update-major": "npx npm-check-updates -u",
     "update": "npx npm-check-updates -u -t minor"
   },
+  "dependencies": {
+    "vscode-languageclient": "8.0.2"
+  },
   "devDependencies": {
     "@hpcc-js/observable-md": "2.54.6",
     "@hpcc-js/observable-shim": "2.5.0",
@@ -71,8 +74,10 @@
     "@vscode/extension-telemetry": "0.6.2",
     "acorn-walk": "^8.2.0",
     "assert": "2.0.0",
+    "browserify-fs": "^1.0.0",
     "browserify-zlib": "0.2.0",
     "buffer": "6.0.3",
+    "crypto-browserify": "^3.12.0",
     "css-loader": "6.7.1",
     "eslint": "8.24.0",
     "mocha": "10.0.0",
@@ -90,11 +95,14 @@
     "style-loader": "3.3.1",
     "tslib": "2.4.0",
     "typescript": "4.8.4",
-    "uuid": "^9.0.0",
+    "uuid": "9.0.0",
     "vsce": "2.11.0",
+    "vscode-languageserver": "^7.0.0",
+    "vscode-languageserver-textdocument": "^1.0.4",
     "vscode-test": "1.6.1",
     "webpack": "5.74.0",
-    "webpack-cli": "4.10.0"
+    "webpack-cli": "4.10.0",
+    "webworkify": "^1.5.0"
   },
   "author": {
     "name": "Gordon Smith"
@@ -244,6 +252,16 @@
       },
       {
         "category": "OJS",
+        "command": "ojs.exportJS",
+        "title": "Export to JavaScript",
+        "description": "Export notebook as JavaScript Module.",
+        "icon": {
+          "dark": "./images/export-dark.svg",
+          "light": "./images/export.svg"
+        }
+      },
+      {
+        "category": "OJS",
         "command": "ojs.download",
         "title": "Download Notebook",
         "description": "Download notebook from observalehq.com"
@@ -282,6 +300,10 @@
         {
           "command": "ojs.exportECL",
           "when": "resourceLangId == ojs || resourceLangId == omd"
+        },
+        {
+          "command": "ojs.exportJS",
+          "when": "notebookType == ojs-notebook"
         }
       ],
       "explorer/context": [
@@ -310,6 +332,11 @@
         {
           "when": "resourceLangId == ojs || resourceLangId == omd",
           "command": "ojs.exportECL",
+          "group": "navigation@990"
+        },
+        {
+          "when": "notebookType == ojs-notebook",
+          "command": "ojs.exportJS",
           "group": "navigation@990"
         }
       ],
@@ -366,6 +393,23 @@
           "scope": "resource",
           "default": false,
           "description": "Show runtime values as diagnostic info."
+        },
+        "ojs.maxNumberOfProblems": {
+          "scope": "resource",
+          "type": "number",
+          "default": 100,
+          "description": "Controls the maximum number of problems produced by the server."
+        },
+        "ojs.trace.server": {
+          "scope": "window",
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the language server."
         }
       }
     },

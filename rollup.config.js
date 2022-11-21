@@ -10,11 +10,11 @@ const pkg = require("./package.json");
 const plugins = [
     alias({
         entries: [
-            { find: "@hpcc-js/common", replacement: "@hpcc-js/common" }
+            // { find: "@hpcc-js/common", replacement: "@hpcc-js/common" }
         ]
     }),
     nodeResolve({
-        moduleDirectories: ["./node_modules", "../hpcc-js/node_modules"],
+        // moduleDirectories: ["./node_modules", "../hpcc-js/node_modules"],
         preferBuiltins: true
     }),
     commonjs(),
@@ -26,6 +26,24 @@ const plugins = [
 ];
 
 export default [{
+    input: "lib-es6/extension",
+    external: ["vscode", "applicationinsights-native-metrics"],
+    output: [{
+        dir: "dist",
+        // file: "dist/[name].js",
+        format: "cjs",
+        sourcemap: true,
+        name: pkg.name,
+        inlineDynamicImports: false
+    }],
+    treeshake: {
+        moduleSideEffects: (id, external) => {
+            if (id.indexOf(".css") >= 0) return true;
+            return false;
+        }
+    },
+    plugins: plugins
+}, {
     input: "lib-es6/webview",
     output: [{
         file: "dist/webview.js",
@@ -47,6 +65,23 @@ export default [{
         format: "es",
         sourcemap: true,
         name: pkg.name
+    }],
+    treeshake: {
+        moduleSideEffects: (id, external) => {
+            if (id.indexOf(".css") >= 0) return true;
+            return false;
+        }
+    },
+    plugins: plugins
+}, {
+    input: "lib-es6/server/server",
+    external: ["vscode"],
+    output: [{
+        file: "dist/server.js",
+        format: "cjs",
+        sourcemap: true,
+        name: pkg.name
+
     }],
     treeshake: {
         moduleSideEffects: (id, external) => {

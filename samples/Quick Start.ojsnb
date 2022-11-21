@@ -47,7 +47,7 @@
         {
             "id": 6,
             "name": "",
-            "value": "noWarning = \"ObservableHQ flavoured JavaScript has been designed specifically to work well in cells!!!\"",
+            "value": "import {}\r\nnoWarning = \"ObservableHQ flavoured JavaScript has been designed specifically to work well in cells!!!\"",
             "mode": "js",
             "outputs": []
         },

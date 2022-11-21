@@ -3,7 +3,7 @@ import * as fs from "fs";
 import fetch from "node-fetch";
 import * as path from "path";
 import { ohq } from "@hpcc-js/observable-shim";
-import { ojs2notebook, omd2notebook } from "@hpcc-js/observablehq-compiler";
+import { ojs2notebook, omd2notebook, compile } from "@hpcc-js/observablehq-compiler";
 import { serializer } from "../notebook/controller/serializer";
 import { Diagnostic } from "./diagnostic";
 import { Meta } from "./meta";
@@ -33,6 +33,7 @@ export class Commands {
         ctx.subscriptions.push(vscode.commands.registerCommand("ojs.import", this.import, this));
         ctx.subscriptions.push(vscode.commands.registerCommand("ojs.export", this.export, this));
         ctx.subscriptions.push(vscode.commands.registerCommand("ojs.exportECL", this.exportECL, this));
+        ctx.subscriptions.push(vscode.commands.registerCommand("ojs.exportJS", this.exportJS, this));
     }
 
     static attach(ctx: vscode.ExtensionContext): Commands {
@@ -276,6 +277,30 @@ EXPORT ${attrID} := ${escapedTextParts.map(line => `'${line}`).join("\\n' + \n")
                     fs.writeFile(resource.fsPath, ecl, "utf8", () => { });
                 }
             });
+        }
+    }
+
+    async exportJS() {
+        let jsPath;
+        let notebook: ohq.Notebook | undefined;
+        if (vscode.window.activeNotebookEditor) {
+            const notebookDocument = vscode.window.activeNotebookEditor.notebook;
+            switch (notebookDocument.notebookType) {
+                case "ojs-notebook":
+                    jsPath = notebookDocument.uri.path.replace(".ojsnb", ".js");
+                    const text = serializer.lastSave(notebookDocument);
+                    notebook = JSON.parse(text);
+                    break;
+            }
+        }
+        if (jsPath && notebook) {
+            vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(jsPath), saveLabel: "Export" }).then(async resource => {
+                if (resource) {
+                    const tmp = await compile(notebook!);
+                    fs.writeFile(resource.fsPath, tmp.toString(), "utf8", () => { });
+                }
+            });
+
         }
     }
 }

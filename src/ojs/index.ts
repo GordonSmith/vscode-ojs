@@ -4,9 +4,12 @@ import { Diagnostic } from "./diagnostic";
 import { DocumentSymbolProvider } from "./documentSymbolProvider";
 import { Editor } from "./editor";
 import { HoverProvider } from "./hoverProvider";
+import { LanguageService } from "./languageService";
 import { Preview } from "./preview";
 
-export function activate(context: ExtensionContext) {
+export async function activate(context: ExtensionContext) {
+
+    LanguageService.attach(context);
     Diagnostic.attach(context);
     DocumentSymbolProvider.attach(context);
     HoverProvider.attach(context);
@@ -18,4 +21,8 @@ export function activate(context: ExtensionContext) {
             Preview.revive(webviewPanel, context);
         }
     });
+}
+
+export function deactivate() {
+    return LanguageService.detach();
 }

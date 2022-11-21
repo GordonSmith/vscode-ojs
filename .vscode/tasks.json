@@ -36,7 +36,6 @@
             "label": "build",
             "dependsOn": [
                 "compile watch",
-                "bundle-ext watch",
                 "bundle-web watch",
             ],
             "group": {

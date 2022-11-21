@@ -27,10 +27,10 @@ const makeConfig = (argv, { entry, target = "node", library = { type: "commonjs"
         rules: [{
             test: /\.css$/i,
             use: ["style-loader", "css-loader"],
-        }, {
-            test: /\.js$/,
-            use: ["source-map-loader"],
-            enforce: "pre"
+            // }, {
+            //     test: /\.js$/,
+            //     use: ["source-map-loader"],
+            //     enforce: "pre"
         }]
     },
 

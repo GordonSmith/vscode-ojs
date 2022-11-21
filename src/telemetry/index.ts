@@ -1,5 +1,8 @@
 import * as vscode from "vscode";
-import TelemetryReporter from "@vscode/extension-telemetry";
+import * as _TelemetryReporter from "@vscode/extension-telemetry";
+
+// @ts-ignore
+const TelemetryReporter = _TelemetryReporter.default?.default || _TelemetryReporter.default || _TelemetryReporter;
 
 class MyTelemetryReporter extends TelemetryReporter {
 
@@ -10,7 +13,7 @@ class MyTelemetryReporter extends TelemetryReporter {
 }
 
 // telemetry reporter
-export let reporter: TelemetryReporter;
+export let reporter: any;
 
 export function activate(context: vscode.ExtensionContext) {
     const extPackageJSON = context.extension.packageJSON;

@@ -3,10 +3,10 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "test.html",
+			"name": "test2.html",
 			"type": "msedge",
 			"request": "launch",
-			"url": "file:///${workspaceRoot}/test.html",
+			"url": "file:///${workspaceRoot}/test2.html",
 			"runtimeArgs": [
 				"--disable-web-security",
 				"--disable-features=IsolateOrigins,site-per-process"
@@ -25,8 +25,9 @@
 				"${workspaceRoot}\\samples"
 			],
 			"outFiles": [
-				"${workspaceRoot}/src/**/*.js",
-				"${workspaceRoot}/src/notebook/renderers/**/*.js"
+				"${workspaceRoot}/dist/**/*.js",
+				"${workspaceRoot}/lib-es6/**/*.js",
+				"${workspaceRoot}/src/**/*.ts",
 			],
 		},
 		{
@@ -40,8 +41,9 @@
 				"${workspaceRoot}\\samples"
 			],
 			"outFiles": [
-				"${workspaceRoot}/src/**/*.js",
-				"${workspaceRoot}/src/notebook/renderers/**/*.js"
+				"${workspaceRoot}/dist/**/*.js",
+				"${workspaceRoot}/lib-es6/**/*.js",
+				"${workspaceRoot}/src/**/*.ts",
 			],
 		},
 		{
@@ -51,7 +53,8 @@
 			"port": 6009,
 			"restart": true,
 			"outFiles": [
-				"${workspaceRoot}/server/out/**/*.js"
+				"${workspaceRoot}/dist/**/*.js",
+				"${workspaceRoot}/lib-es6/**/*.js"
 			]
 		},
 		{
@@ -65,7 +68,8 @@
 				"${workspaceRoot}/client/testFixture"
 			],
 			"outFiles": [
-				"${workspaceRoot}/client/out/test/**/*.js"
+				"${workspaceRoot}/dist/**/*.js",
+				"${workspaceRoot}/lib-es6/**/*.js"
 			]
 		}
 	],

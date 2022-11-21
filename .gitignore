@@ -2,6 +2,7 @@
 /grammar
 /lib*
 /node_modules
+/samples
 /types
 .vscode-test
 *.vsix
