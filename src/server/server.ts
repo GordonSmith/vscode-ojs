@@ -1,6 +1,44 @@
 import { createConnection, TextDocuments, Diagnostic, DiagnosticSeverity, ProposedFeatures, InitializeParams, DidChangeConfigurationNotification, CompletionItem, CompletionItemKind, TextDocumentPositionParams, TextDocumentSyncKind, InitializeResult } from "vscode-languageserver/node";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { ojs2notebook, omd2notebook } from "@hpcc-js/observablehq-compiler";
+import { compile, ohq, ojs2notebook, omd2notebook } from "@hpcc-js/observablehq-compiler";
+import path, { dirname, join } from "node:path";
+import { readFileSync } from "node:fs";
+
+import ts from "typescript";
+import { createDefaultMapFromNodeModules, createFSBackedSystem, createSystem, createVirtualCompilerHost, createVirtualTypeScriptEnvironment } from "@typescript/vfs";
+
+const getLib = (name: string) => {
+	const lib = dirname(require.resolve("typescript"));
+	return readFileSync(join(lib, name), "utf8");
+};
+
+const addLib = (name: string, map: Map<string, string>) => {
+	map.set("/" + name, getLib(name));
+};
+
+const createDefaultMap2015 = () => {
+	const fsMap = new Map<string, string>();
+	addLib("lib.es2015.d.ts", fsMap);
+	addLib("lib.es2015.collection.d.ts", fsMap);
+	addLib("lib.es2015.core.d.ts", fsMap);
+	addLib("lib.es2015.generator.d.ts", fsMap);
+	addLib("lib.es2015.iterable.d.ts", fsMap);
+	addLib("lib.es2015.promise.d.ts", fsMap);
+	addLib("lib.es2015.proxy.d.ts", fsMap);
+	addLib("lib.es2015.reflect.d.ts", fsMap);
+	addLib("lib.es2015.symbol.d.ts", fsMap);
+	addLib("lib.es2015.symbol.wellknown.d.ts", fsMap);
+	addLib("lib.es5.d.ts", fsMap);
+	return fsMap;
+};
+
+// const tsEnv = (async function () {
+// 	const fsMap = await createDefaultMapFromCDN({ target: ts.ScriptTarget.ES2021 }, ts.version, true, ts);
+// 	const system = createSystem(fsMap);
+// 	const tsEnv = createVirtualTypeScriptEnvironment(system, [], ts, { allowJs: true });
+// 	tsEnv.createFile("/index.js", " "); // This is where our code will go. Note: can’t be empty 😅
+// 	return tsEnv;
+// })();
 
 const connection = createConnection(ProposedFeatures.all);
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
@@ -110,6 +148,14 @@ documents.onDidChangeContent(change => {
 	validateTextDocument(change.document);
 });
 
+const compilerOptions: ts.CompilerOptions = { target: ts.ScriptTarget.ES2021 };
+const fsMap = createDefaultMapFromNodeModules(compilerOptions, ts);
+
+const system = createSystem(fsMap);
+const env = createVirtualTypeScriptEnvironment(system, [], ts, { allowJs: true, sourceMap: true });
+env.createFile("tmp.ts", " ");
+// env.createFile("tmp.ts.map", " ");
+
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// In this simple example we get the settings for every validate run.
 	const settings = await getDocumentSettings(textDocument.uri);
@@ -117,8 +163,10 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// The validator creates diagnostics for all uppercase words length 2 and more
 	const text = textDocument.getText();
 
-	const diagnostics: Diagnostic[] = [];
-	let notebook;
+	let diagnostics: Diagnostic[] = [];
+	diagnostics = [];
+
+	let notebook: ohq.Notebook | undefined;
 	try {
 		switch (textDocument.languageId) {
 			case "ojs":
@@ -131,19 +179,83 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 				throw new Error(`Unknown language:  ${textDocument.languageId}`);
 		}
 	} catch (e: any) {
-		if (e.mesage) {
+		if (e.message) {
 			const diagnostic: Diagnostic = {
 				severity: DiagnosticSeverity.Error,
 				range: {
 					start: textDocument.positionAt(e.pos),
 					end: textDocument.positionAt(e.raisedAt)
 				},
-				message: e?.mesage ?? "Unknown",
+				message: e?.message ?? "Unknown",
 				source: "ObservableJS"
 			};
 			diagnostics.push(diagnostic);
 		}
 	}
+
+	let js: string = " ";
+	let map = {
+		mappings: {}
+	};
+	if (notebook) {
+		try {
+			const prog = await compile(notebook);
+			js = prog.toString();
+			map = prog.toMap();
+		} catch (e: any) {
+			diagnostics.push({
+				message: e.message,
+				range: {
+					start: { line: 0, character: 0 },
+					end: { line: 0, character: 0 }
+				}
+			});
+		}
+	}
+
+	// const fsMap = createDefaultMapFromNodeModules({ target: ts.ScriptTarget.ES2015, allowJs: true });
+	// fsMap.set("index.js", js.toString());
+	// const system = createSystem(fsMap);
+	// const compilerOpts: CompilerOptions = { target: ts.ScriptTarget.ES2015, module: ts.ModuleKind.ES2015, esModuleInterop: true, allowJs: true };
+	// const env = createVirtualTypeScriptEnvironment(system, ["index.js"], ts, compilerOpts);/*, {
+	// 	before: [context => {
+	// 		return node => {
+	// 			return node;
+	// 		};
+	// 	}],
+	// 	after: [context => {
+	// 		return node => {
+	// 			return node;
+	// 		};
+	// 	}],
+	// 	afterDeclarations: [context => {
+	// 		return node => {
+	// 			return node;
+	// 		};s
+	// 	}]
+	// });*/
+
+	env.updateFile("tmp.ts", js);
+	// env.updateFile("tmp.ts.map", map);
+	const tscDiagnostics = env.languageService.getSyntacticDiagnostics("tmp.ts");
+
+	diagnostics = [...diagnostics, ...tscDiagnostics.map((row): Diagnostic => {
+		const start = textDocument.positionAt(row.start);
+		const node: ohq.Node | undefined = map.mappings[start.line];
+		const range = {
+			start: textDocument.positionAt(row.start - (node?.start ?? 0)),
+			end: textDocument.positionAt(row.start - (node?.start ?? 0) + row.length)
+		};
+		// for (let i = 0; i < notebook?.nodes.length ?? 0; ++i) {
+		// 	const node = notebook.nodes[i];
+		// 	if (node.start) { }
+		// }
+		return {
+			message: row.messageText as string,
+			range
+		};
+	})];
+
 	// Send the computed diagnostics to VSCode.
 	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
 }
@@ -154,25 +266,23 @@ connection.onDidChangeWatchedFiles(_change => {
 });
 
 // This handler provides the initial list of the completion items.
-connection.onCompletion(
-	(_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-		// The pass parameter contains the position of the text document in
-		// which code complete got requested. For the example we ignore this
-		// info and always provide the same completion items.
-		return [
-			{
-				label: "TypeScript",
-				kind: CompletionItemKind.Text,
-				data: 1
-			},
-			{
-				label: "JavaScript",
-				kind: CompletionItemKind.Text,
-				data: 2
-			}
-		];
-	}
-);
+connection.onCompletion((_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
+	// The pass parameter contains the position of the text document in
+	// which code complete got requested. For the example we ignore this
+	// info and always provide the same completion items.
+	return [
+		{
+			label: "TypeScript",
+			kind: CompletionItemKind.Text,
+			data: 1
+		},
+		{
+			label: "JavaScript",
+			kind: CompletionItemKind.Text,
+			data: 2
+		}
+	];
+});
 
 // This handler resolves additional information for the item selected in
 // the completion list.

@@ -23,7 +23,7 @@ export class Diagnostic {
     }
 
     setQuick(uri: vscode.Uri, diagnostics: vscode.Diagnostic[]) {
-        quickDiagnosticCollection.set(uri, diagnostics);
+        // quickDiagnosticCollection.set(uri, diagnostics);
     }
 
     posStr(r: vscode.Position): string {

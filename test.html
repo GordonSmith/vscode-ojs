@@ -2,42 +2,43 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <title></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@hpcc-js/common/font-awesome/css/font-awesome.min.css">
-    <style>
-        body {
-            padding: 0px;
-            margin: 8px;
-            background: white;
-            color: black;
-        }
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@hpcc-js/common/font-awesome/css/font-awesome.min.css">
+  <style>
+    body {
+      padding: 0px;
+      margin: 8px;
+      background: white;
+      color: black;
+    }
 
-        #placeholder {
-            position: absolute;
-            left: 8px;
-            top: 8px;
-            right: 8px;
-            bottom: 8px;
-            max-width: 480px;
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/@hpcc-js/observable-md/dist/index.full.js" type="text/javascript" charset="utf-8"></script>
-    <script>
-        var omdMod = window["@hpcc-js/observable-md"]
-    </script>
+    #placeholder {
+      position: absolute;
+      left: 8px;
+      top: 8px;
+      right: 8px;
+      bottom: 8px;
+      max-width: 480px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@hpcc-js/observable-md/dist/index.full.js" type="text/javascript" charset="utf-8"></script>
+  <script>
+    var omdMod = window["@hpcc-js/observable-md"]
+  </script>
 
 </head>
 
 <body onresize="doResize()">
-    <div id="placeholder">
-    </div>
-    <script>
-        var app = new omdMod.Observable()
-            .target("placeholder")
-            .showValues(true)
-            .mode("ojs")
-            .text(`md\`# A Taste of Observable
+  <iframe width="100%" height="469" frameborder="0" src="https://observablehq.com/embed/@observablehq/duckdb?cells=stars"></iframe>
+  <div id="placeholder">
+  </div>
+  <script>
+    var app = new omdMod.Observable()
+      .target("placeholder")
+      .showValues(true)
+      .mode("ojs")
+      .text(`md\`# A Taste of Observable
 
 Hello and welcome to Observable! 👋\`
 
@@ -274,19 +275,19 @@ import {usaMapCoordinates} from "@jashkenas/inputs"
 import {table} from "@tmcw/tables/2"
 
 import {vl} from "@vega/vega-lite-api"`)
-            ;
+      ;
 
-        doResize();
+    doResize();
 
-        function doResize() {
-            if (app) {
-                app
-                    .resize()
-                    .lazyRender()
-                    ;
-            }
-        }
-    </script>
+    function doResize() {
+      if (app) {
+        app
+          .resize()
+          .lazyRender()
+          ;
+      }
+    }
+  </script>
 </body>
 
 </html>

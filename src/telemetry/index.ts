@@ -1,8 +1,5 @@
 import * as vscode from "vscode";
-import * as _TelemetryReporter from "@vscode/extension-telemetry";
-
-// @ts-ignore
-const TelemetryReporter = _TelemetryReporter.default?.default || _TelemetryReporter.default || _TelemetryReporter;
+import TelemetryReporter from "@vscode/extension-telemetry";
 
 class MyTelemetryReporter extends TelemetryReporter {
 
