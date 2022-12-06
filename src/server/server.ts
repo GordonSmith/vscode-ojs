@@ -1,44 +1,7 @@
-import { createConnection, TextDocuments, Diagnostic, DiagnosticSeverity, ProposedFeatures, InitializeParams, DidChangeConfigurationNotification, CompletionItem, CompletionItemKind, TextDocumentPositionParams, TextDocumentSyncKind, InitializeResult } from "vscode-languageserver/node";
+import { createConnection, TextDocuments, Diagnostic, DiagnosticSeverity, ProposedFeatures, InitializeParams, DidChangeConfigurationNotification, CompletionItem, CompletionItemKind, TextDocumentPositionParams, TextDocumentSyncKind, InitializeResult, HoverParams } from "vscode-languageserver/node";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { compile, ohq, ojs2notebook, omd2notebook } from "@hpcc-js/observablehq-compiler";
-import path, { dirname, join } from "node:path";
-import { readFileSync } from "node:fs";
-
-import ts from "typescript";
-import { createDefaultMapFromNodeModules, createFSBackedSystem, createSystem, createVirtualCompilerHost, createVirtualTypeScriptEnvironment } from "@typescript/vfs";
-
-const getLib = (name: string) => {
-	const lib = dirname(require.resolve("typescript"));
-	return readFileSync(join(lib, name), "utf8");
-};
-
-const addLib = (name: string, map: Map<string, string>) => {
-	map.set("/" + name, getLib(name));
-};
-
-const createDefaultMap2015 = () => {
-	const fsMap = new Map<string, string>();
-	addLib("lib.es2015.d.ts", fsMap);
-	addLib("lib.es2015.collection.d.ts", fsMap);
-	addLib("lib.es2015.core.d.ts", fsMap);
-	addLib("lib.es2015.generator.d.ts", fsMap);
-	addLib("lib.es2015.iterable.d.ts", fsMap);
-	addLib("lib.es2015.promise.d.ts", fsMap);
-	addLib("lib.es2015.proxy.d.ts", fsMap);
-	addLib("lib.es2015.reflect.d.ts", fsMap);
-	addLib("lib.es2015.symbol.d.ts", fsMap);
-	addLib("lib.es2015.symbol.wellknown.d.ts", fsMap);
-	addLib("lib.es5.d.ts", fsMap);
-	return fsMap;
-};
-
-// const tsEnv = (async function () {
-// 	const fsMap = await createDefaultMapFromCDN({ target: ts.ScriptTarget.ES2021 }, ts.version, true, ts);
-// 	const system = createSystem(fsMap);
-// 	const tsEnv = createVirtualTypeScriptEnvironment(system, [], ts, { allowJs: true });
-// 	tsEnv.createFile("/index.js", " "); // This is where our code will go. Note: can’t be empty 😅
-// 	return tsEnv;
-// })();
+import { ACTIVE_FILE, env } from "./tsserver";
 
 const connection = createConnection(ProposedFeatures.all);
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
@@ -70,7 +33,8 @@ connection.onInitialize((params: InitializeParams) => {
 			// Tell the client that this server supports code completion.
 			completionProvider: {
 				resolveProvider: true
-			}
+			},
+			hoverProvider: true
 		}
 	};
 	if (hasWorkspaceFolderCapability) {
@@ -141,20 +105,6 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 documents.onDidClose(e => {
 	documentSettings.delete(e.document.uri);
 });
-
-// The content of a text document has changed. This event is emitted
-// when the text document first opened or when its content has changed.
-documents.onDidChangeContent(change => {
-	validateTextDocument(change.document);
-});
-
-const compilerOptions: ts.CompilerOptions = { target: ts.ScriptTarget.ES2021 };
-const fsMap = createDefaultMapFromNodeModules(compilerOptions, ts);
-
-const system = createSystem(fsMap);
-const env = createVirtualTypeScriptEnvironment(system, [], ts, { allowJs: true, sourceMap: true });
-env.createFile("tmp.ts", " ");
-// env.createFile("tmp.ts.map", " ");
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// In this simple example we get the settings for every validate run.
@@ -235,9 +185,10 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// 	}]
 	// });*/
 
-	env.updateFile("tmp.ts", js);
-	// env.updateFile("tmp.ts.map", map);
-	const tscDiagnostics = env.languageService.getSyntacticDiagnostics("tmp.ts");
+	//	env.updateFile(ACTIVE_FILE, js);
+	env.updateFile(ACTIVE_FILE, js);
+	// env.updateFile("active.map", map);
+	const tscDiagnostics = env.languageService.getSyntacticDiagnostics(ACTIVE_FILE);
 
 	diagnostics = [...diagnostics, ...tscDiagnostics.map((row): Diagnostic => {
 		const start = textDocument.positionAt(row.start);
@@ -259,6 +210,12 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// Send the computed diagnostics to VSCode.
 	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
 }
+
+// The content of a text document has changed. This event is emitted
+// when the text document first opened or when its content has changed.
+documents.onDidChangeContent(change => {
+	validateTextDocument(change.document);
+});
 
 connection.onDidChangeWatchedFiles(_change => {
 	// Monitored files have change in VSCode
@@ -298,6 +255,14 @@ connection.onCompletionResolve(
 		return item;
 	}
 );
+
+connection.onHover((params: HoverParams) => {
+	const defs = env.languageService.getDefinitionAtPosition(ACTIVE_FILE, 0);
+	const x = defs?.map(def => def.name).join("\n");
+	return x ? {
+		contents: x
+	} : null;
+});
 
 // Make the text document manager listen on the connection
 // for open, change and close text document events
