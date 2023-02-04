@@ -3,7 +3,7 @@
   "name": "js-notebook-extension-pack",
   "version": "1.0.6",
   "publisher": "GordonSmith",
-  "displayName": "JavsaScript Notebook Extension Pack",
+  "displayName": "JavaScript Notebook Extension Pack",
   "description": "Popular extensions for Observable JavaScript Notebooks in Visual Studio Code.",
   "icon": "LanguageJS_color_128x.png",
   "readme": "README.md",
