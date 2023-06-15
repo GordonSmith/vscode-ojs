@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.35](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.34...v0.4.35) (2023-06-15)
+
+
+### Bug Fixes
+
+* Typo in extension pack name ([ad99f92](https://github.com/GordonSmith/vscode-ojs/commit/ad99f9268ae7d143c302a43ffddd34b8b5e7e552))
+
 ### [0.4.34](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.33...v0.4.34) (2022-11-16)
 
 
