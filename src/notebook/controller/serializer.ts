@@ -67,7 +67,7 @@ export class Serializer implements NotebookSerializer {
 
     node(cell: NotebookCell): ohq.Node {
         return this._meta.node[cell.metadata?.id] ?? {
-            id: uuidv4(),
+            id: `tmp-${cell.index}`,
             mode: cell.document.languageId,
             value: cell.document.getText()
         };
@@ -197,6 +197,7 @@ export class Serializer implements NotebookSerializer {
         const jsonNotebook: ohq.Notebook = this._meta.notebook[data.metadata?.id];
         jsonNotebook.nodes = [];
 
+        let cellIndex = 0;
         for (const cell of data.cells) {
             let mode: string;
             const outputs: string[] = [];
@@ -225,15 +226,18 @@ export class Serializer implements NotebookSerializer {
                     } catch (e) { }
                 });
             });
-            const node: Partial<ohq.Node> = this._meta.node[cell.metadata?.id];
+            cell.metadata = cell.metadata ?? {};
+            cell.metadata.id = cell.metadata?.id ?? `tmp-${cellIndex++}`;
+            const node: Partial<ohq.Node> = this._meta.node[cell.metadata.id];
             const item: ohq.Node = {
-                id: cell.metadata?.id ?? uuidv4(),
+                id: cell.metadata?.id,
                 name: "",
                 ...node,
                 value: cell.value,
                 mode,
                 outputs
             };
+            this._meta.node[cell.metadata.id] = item;
             jsonNotebook.nodes.push(item);
         }
 
