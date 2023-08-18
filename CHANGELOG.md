@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.37](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.36...v0.4.37) (2023-08-18)
+
+
+### Bug Fixes
+
+*  Cell tracking issue, with unsaved notebooks ([6d24ac6](https://github.com/GordonSmith/vscode-ojs/commit/6d24ac62d4b74663ccae3ee30b1cf146c1f398e7)), closes [#59](https://github.com/GordonSmith/vscode-ojs/issues/59)
+
 ### [0.4.36](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.35...v0.4.36) (2023-06-15)
 
 ### [0.4.35](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.34...v0.4.35) (2023-06-15)
