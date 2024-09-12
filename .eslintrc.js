@@ -3,11 +3,12 @@ module.exports = {
     root: true,
     parser: "@typescript-eslint/parser",
     plugins: [
-        "@typescript-eslint",
+        "@typescript-eslint"
     ],
     extends: [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
+        "plugin:react-hooks/recommended"
     ],
     env: {
         "browser": true,
@@ -20,6 +21,7 @@ module.exports = {
         "debugConfig": "readonly",
         "Promise": "readonly"
     },
+    ignorePatterns: ["src/grammar/**/*"],
     rules: {
         "no-redeclare": "off",
         "no-empty": "off",
@@ -72,27 +74,9 @@ module.exports = {
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-empty-interface": "off",
         "@typescript-eslint/no-this-alias": "off",
-        "@typescript-eslint/ban-types": [
-            "error",
-            {
-                "types": {
-                    // add a custom message, AND tell the plugin how to fix it
-                    "String": {
-                        "message": "Use string instead",
-                        "fixWith": "string"
-                    },
-
-                    "{}": {
-                        "message": "Use object instead",
-                        "fixWith": "object"
-                    },
-
-                    "object": false
-                }
-            }
-        ],
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-namespace": "off",
-        "@typescript-eslint/no-var-require": "off"
+        "@typescript-eslint/no-var-require": "off",
+        "@typescript-eslint/no-unsafe-declaration-merging": "off",
     }
 };

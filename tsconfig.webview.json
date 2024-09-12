@@ -1,0 +1,20 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "module": "NodeNext",
+        "target": "ESNext",
+        "jsx": "react",
+        "jsxFactory": "React.createElement",
+        "jsxFragmentFactory": "React.Fragment",
+        "types": [],
+        "lib": [
+            "esnext",
+            "dom"
+        ]
+    },
+    "include": [
+        "src/webview.tsx",
+        "src/notebook/renderers/ojsRenderer.ts",
+        "src/notebook/renderers/wuRenderer.tsx"
+    ]
+}

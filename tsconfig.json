@@ -1,35 +1,32 @@
 {
     "compilerOptions": {
-        "baseUrl": ".",
-        "rootDir": "./src",
+        "rootDir": ".",
         "outDir": "lib-es6",
-        "target": "ES2021",
-        "module": "ES6",
-        "moduleResolution": "Node",
-        "declaration": true,
         "declarationDir": "./types",
-        "sourceMap": true,
-        "declarationMap": true,
-        "importHelpers": true,
-        "isolatedModules": true,
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
+        "module": "CommonJS",
+        "target": "ES2022",
+        "jsx": "react",
+        "jsxFactory": "vscpp",
+        "jsxFragmentFactory": "vscppf",
+        "declaration": true,
         "strict": true,
         "skipLibCheck": true,
+        "strictNullChecks": false,
         "noImplicitAny": false,
-        "strictPropertyInitialization": false,
-        "lib": [
-            "DOM",
-            "ES2021"
+        "types": [
+            "node"
         ],
         "paths": {
+            "antlr4": [
+                "./node_modules/antlr4/dist/antlr4.node.cjs"
+            ],
             "@hpcc-js/*": [
                 "./node_modules/@hpcc-js/*",
-                "../hpcc-js/packages/*"
+                "../Visualization/packages/*"
             ]
         }
     },
     "include": [
-        "./src/**/*.ts"
+        "src/extension.ts"
     ]
 }

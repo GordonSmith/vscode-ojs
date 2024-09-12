@@ -154,42 +154,44 @@ viewof; cars;
             const library = new Library();
             try {
                 const runtime = new Runtime(library);
-                compiledNB && compiledNB(runtime, (name, cellId) => {
-                    const div = document.createElement("div");
-                    placeholder.appendChild(div);
-                    const inspector = new Inspector(div);
-                    return {
-                        pending() {
-                            inspector.pending();
-                        },
+                if (compiledNB) {
+                    compiledNB(runtime, (name, cellId) => {
+                        const div = document.createElement("div");
+                        placeholder.appendChild(div);
+                        const inspector = new Inspector(div);
+                        return {
+                            pending() {
+                                inspector.pending();
+                            },
 
-                        fulfilled(value: any) {
-                            vscode.postMessage<ValueMessage>({
-                                command: "values",
-                                content: [{
-                                    uid: cellId,
-                                    error: false,
-                                    value: stringify(value)
-                                }],
-                                callbackID
-                            });
-                            inspector.fulfilled(value);
-                        },
+                            fulfilled(value: any) {
+                                vscode.postMessage<ValueMessage>({
+                                    command: "values",
+                                    content: [{
+                                        uid: cellId,
+                                        error: false,
+                                        value: stringify(value)
+                                    }],
+                                    callbackID
+                                });
+                                inspector.fulfilled(value);
+                            },
 
-                        rejected(error: any) {
-                            vscode.postMessage<ValueMessage>({
-                                command: "values",
-                                content: [{
-                                    uid: cellId,
-                                    error: true,
-                                    value: stringify(error)
-                                }],
-                                callbackID
-                            });
-                            inspector.rejected(error);
-                        }
-                    };
-                });
+                            rejected(error: any) {
+                                vscode.postMessage<ValueMessage>({
+                                    command: "values",
+                                    content: [{
+                                        uid: cellId,
+                                        error: true,
+                                        value: stringify(error)
+                                    }],
+                                    callbackID
+                                });
+                                inspector.rejected(error);
+                            }
+                        };
+                    });
+                }
             } catch (e: any) {
                 logger.error(e);
             }

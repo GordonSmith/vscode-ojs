@@ -14,7 +14,7 @@ export let reporter: TelemetryReporter;
 
 export function activate(context: vscode.ExtensionContext) {
     const extPackageJSON = context.extension.packageJSON;
-    reporter = new MyTelemetryReporter("GodonSmith.ojs", extPackageJSON.version, "0bd5634a-3457-44c2-aaf3-43b03a68eb45");
+    reporter = new MyTelemetryReporter("b785b2bb-e170-421b-8bd8-baaf895fe88b");
     context.subscriptions.push(reporter);
 
     reporter.sendTelemetryEvent("activate");

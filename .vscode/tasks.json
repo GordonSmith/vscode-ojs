@@ -5,8 +5,8 @@
     "tasks": [
         {
             "type": "npm",
-            "label": "compile watch",
-            "script": "compile-es6-watch",
+            "label": "gen-node-watch",
+            "script": "gen-node-watch",
             "problemMatcher": [
                 "$tsc-watch"
             ],
@@ -16,17 +16,19 @@
         },
         {
             "type": "npm",
-            "label": "bundle-ext watch",
-            "script": "bundle-ext-watch",
-            "problemMatcher": [],
+            "label": "gen-webview-watch",
+            "script": "gen-webview-watch",
+            "problemMatcher": [
+                "$tsc-watch"
+            ],
             "presentation": {
                 "group": "group-build"
             }
         },
         {
             "type": "npm",
-            "label": "bundle-web watch",
-            "script": "bundle-web-watch",
+            "label": "build-ts-watch",
+            "script": "build-ts-watch",
             "problemMatcher": [],
             "presentation": {
                 "group": "group-build"
@@ -35,9 +37,9 @@
         {
             "label": "build",
             "dependsOn": [
-                "compile watch",
-                "bundle-ext watch",
-                "bundle-web watch",
+                "gen-node-watch",
+                "gen-webview-watch",
+                "build-ts-watch"
             ],
             "group": {
                 "kind": "build",

@@ -4,27 +4,9 @@ import * as path from "path";
 import { NotebookSerializer, CancellationToken, NotebookData, NotebookCellData, NotebookCellKind, NotebookCell, Uri, NotebookCellOutput, NotebookCellOutputItem, NotebookRange, NotebookDocument } from "vscode";
 import { v4 as uuidv4 } from "uuid";
 import { TextDecoder, TextEncoder } from "util";
+import { OJSCell, OJSOutput, WUOutput } from "./ojsOutput";
 
 export const MIME = "application/gordonsmith.ojs+json";
-
-export interface WUOutput {
-    configuration: string;
-    wuid: string;
-    results: { [id: string]: object };
-}
-
-export interface OJSCell {
-    nodeId: string | number;
-    ojsSource: string;
-}
-
-export interface OJSOutput {
-    notebookId: string;
-    folder: string;
-    files: ohq.File[], // notebook: ohq.Notebook;
-    cell: OJSCell;
-    otherCells: OJSCell[];
-}
 
 function encode(str: string) {
     return str

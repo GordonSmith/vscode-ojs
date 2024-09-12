@@ -1,6 +1,6 @@
 import type { CellFunc, compileFunc, ohq } from "@hpcc-js/observablehq-compiler";
 import type { ActivationFunction } from "vscode-notebook-renderer";
-import type { OJSOutput } from "../controller/serializer";
+import type { OJSOutput } from "../controller/ojsOutput";
 
 import { compile } from "@hpcc-js/observablehq-compiler";
 import { Runtime } from "@observablehq/runtime";

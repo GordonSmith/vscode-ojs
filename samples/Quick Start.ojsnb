@@ -24,6 +24,13 @@
             "outputs": []
         },
         {
+            "id": "tmp-0",
+            "name": "",
+            "value": "someValue=42;",
+            "mode": "js",
+            "outputs": []
+        },
+        {
             "id": 3,
             "name": "",
             "value": "### JavaScript",
