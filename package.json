@@ -52,33 +52,36 @@
     "update": "npx -y npm-check-updates -u -t minor"
   },
   "devDependencies": {
-    "@hpcc-js/esbuild-plugins": "1.1.2",
+    "@hpcc-js/esbuild-plugins": "1.4.9",
     "@hpcc-js/observable-md": "2.54.18",
     "@hpcc-js/observable-shim": "2.6.0",
-    "@hpcc-js/observablehq-compiler": "1.3.0",
-    "@hpcc-js/util": "2.52.0",
+    "@hpcc-js/observablehq-compiler": "1.4.0",
+    "@hpcc-js/util": "2.53.1",
     "@observablehq/inspector": "5.0.1",
+    "@observablehq/notebook-kit": "1.0.1",
     "@observablehq/runtime": "5.9.9",
     "@observablehq/stdlib": "5.8.8",
-    "@types/mocha": "10.0.7",
-    "@types/node": "20.16.5",
-    "@types/vscode": "1.70.0",
+    "@types/mocha": "10.0.10",
+    "@types/node": "20.19.9",
+    "@types/vscode": "1.102.0",
     "@types/vscode-notebook-renderer": "1.72.3",
-    "@typescript-eslint/eslint-plugin": "8.4.0",
-    "@typescript-eslint/parser": "8.4.0",
-    "@vscode/extension-telemetry": "0.9.7",
-    "@vscode/vsce": "3.1.0",
+    "@types/xmldom": "^0.1.34",
+    "@typescript-eslint/eslint-plugin": "8.38.0",
+    "@typescript-eslint/parser": "8.38.0",
+    "@vscode/extension-telemetry": "0.9.9",
+    "@vscode/vsce": "3.6.0",
+    "@xmldom/xmldom": "^0.9.8",
     "acorn-walk": "8.3.4",
     "assert": "2.1.0",
     "browserify-zlib": "0.2.0",
     "buffer": "6.0.3",
-    "esbuild": "0.25.0",
+    "esbuild": "0.25.8",
     "esbuild-copy-static-files": "0.1.0",
     "esbuild-plugin-text-replace": "1.3.0",
     "esbuild-plugin-umd-wrapper": "3.0.0",
-    "eslint": "8.57.0",
+    "eslint": "8.57.1",
     "eslint-plugin-react-hooks": "4.6.2",
-    "mocha": "10.7.3",
+    "mocha": "10.8.2",
     "node-fetch": "3.3.2",
     "npm-run-all": "4.1.5",
     "os-browserify": "0.3.0",
@@ -86,9 +89,10 @@
     "rimraf": "5.0.10",
     "standard-version": "9.5.0",
     "stream-browserify": "3.0.0",
-    "tslib": "2.7.0",
-    "typescript": "5.6.2",
+    "tslib": "2.8.1",
+    "typescript": "5.8.3",
     "uuid": "9.0.1",
+    "vitest": "^3.2.4",
     "vscode-test": "1.6.1"
   },
   "author": {
@@ -105,7 +109,9 @@
   "activationEvents": [
     "onLanguage:ojs",
     "onNotebook:ojs-notebook",
+    "onNotebook:observable-kit-notebook",
     "onRenderer:ojs-notebook-renderer",
+    "onRenderer:observable-kit-renderer",
     "onLanguage:omd",
     "onWebviewPanel:OJSPreview",
     "onCommand:ojs.preview",
@@ -135,6 +141,17 @@
           "Observable Markdown (OMD)"
         ],
         "configuration": "./omd.configuration.json"
+      },
+      {
+        "id": "observable-kit-html",
+        "extensions": [
+          "okit.html",
+          "onb.html"
+        ],
+        "aliases": [
+          "Observable Notebook Kit"
+        ],
+        "configuration": "./ojs.configuration.json"
       }
     ],
     "grammars": [
@@ -142,6 +159,18 @@
         "language": "ojs",
         "scopeName": "source.ojs",
         "path": "./syntaxes/ojs.tmLanguage.json"
+      },
+      {
+        "language": "observable-kit-html",
+        "scopeName": "text.html.observable-kit",
+        "path": "./syntaxes/omd.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.html": "html",
+          "source.js": "javascript",
+          "source.css": "css",
+          "meta.embedded.block.javascript": "javascript",
+          "meta.embedded.block.markdown": "markdown"
+        }
       },
       {
         "language": "omd",
@@ -242,6 +271,36 @@
         "command": "ojs.download",
         "title": "Download Notebook",
         "description": "Download notebook from observalehq.com"
+      },
+      {
+        "category": "Observable Kit",
+        "command": "observable-kit.preview",
+        "title": "Preview with Notebook Kit",
+        "description": "Preview notebook using Observable Notebook Kit"
+      },
+      {
+        "category": "Observable Kit",
+        "command": "observable-kit.build",
+        "title": "Build Static Site",
+        "description": "Build static site using Notebook Kit"
+      },
+      {
+        "category": "Observable Kit",
+        "command": "observable-kit.createNotebook",
+        "title": "Create New Notebook",
+        "description": "Create a new Observable Notebook Kit notebook"
+      },
+      {
+        "category": "Observable Kit",
+        "command": "observable-kit.convertFromLegacy",
+        "title": "Convert from Legacy Format",
+        "description": "Convert .ojsnb file to Observable Notebook Kit format"
+      },
+      {
+        "category": "Observable Kit",
+        "command": "observable-kit.setupWorkspace",
+        "title": "Setup Workspace",
+        "description": "Setup Observable Notebook Kit in current workspace"
       },
       {
         "command": "ojs.cell.name",
@@ -374,6 +433,19 @@
             "filenamePattern": "*.ojsnb"
           }
         ]
+      },
+      {
+        "id": "observable-kit-notebook",
+        "type": "observable-kit-notebook",
+        "displayName": "Observable Notebook Kit",
+        "selector": [
+          {
+            "filenamePattern": "*.okit.html"
+          },
+          {
+            "filenamePattern": "*.onb.html"
+          }
+        ]
       }
     ],
     "notebookRenderer": [
@@ -385,7 +457,20 @@
           "application/gordonsmith.ojs+json"
         ],
         "requiresMessaging": "always"
+      },
+      {
+        "id": "observable-kit-renderer",
+        "displayName": "Observable Notebook Kit Renderer",
+        "entrypoint": "./dist/renderer.js",
+        "mimeTypes": [
+          "application/observable-kit+json"
+        ],
+        "requiresMessaging": "optional"
       }
     ]
+  },
+  "dependencies": {
+    "css-select": "^6.0.0",
+    "domutils": "^3.2.2"
   }
 }
