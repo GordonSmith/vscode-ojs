@@ -1,4 +1,4 @@
-import type { CellFunc, compileFunc, onb } from "@hpcc-js/observablehq-compiler";
+import type { CellFunc, compileFunc, ohq } from "@hpcc-js/observablehq-compiler";
 import type { ActivationFunction } from "vscode-notebook-renderer";
 import type { OJSOutput } from "../controller/ojsOutput";
 
@@ -7,9 +7,9 @@ import { Runtime } from "@observablehq/runtime";
 import { Inspector } from "@observablehq/inspector";
 
 interface Renderer {
-    runtime: onb.Runtime;
+    runtime: ohq.Runtime;
     define: compileFunc;
-    main: onb.Module;
+    main: ohq.Module;
 }
 
 interface OutputItem {
@@ -42,7 +42,7 @@ export const activate: ActivationFunction = context => {
                 value: text,
             });
             await new Promise<void>(resolve => {
-                cellFunc(renderer.runtime, renderer.main, (name?: string, id?: string | number): onb.Inspector => {
+                cellFunc(renderer.runtime, renderer.main, (name?: string, id?: string | number): ohq.Inspector => {
                     if (element) {
                         const div = document.createElement("div");
                         element.appendChild(div);
@@ -80,8 +80,8 @@ export const activate: ActivationFunction = context => {
 
     async function createRenderer(data: OJSOutput): Promise<Renderer> {
         if (!notebooks[data.notebookId]) {
-            const runtime = new Runtime() as onb.Runtime;
-            notebooks[data.notebookId] = compile({ files: data.files, nodes: [] } as unknown as onb.Notebook, { baseUrl: data.folder })
+            const runtime = new Runtime() as ohq.Runtime;
+            notebooks[data.notebookId] = compile({ files: data.files, nodes: [] } as unknown as ohq.Notebook, { baseUrl: data.folder })
                 .then(define => {
                     return {
                         runtime,

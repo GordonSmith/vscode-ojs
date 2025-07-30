@@ -284,12 +284,6 @@
       },
       {
         "category": "Observable Kit",
-        "command": "observable-kit.convertHtmlToNotebook",
-        "title": "Convert HTML to Observable Notebook",
-        "description": "Convert HTML file to Observable Notebook Kit format"
-      },
-      {
-        "category": "Observable Kit",
         "command": "observable-kit.openHtmlAsNotebook",
         "title": "Open HTML as Observable Notebook",
         "description": "Open HTML file as Observable Notebook (without renaming)"
@@ -299,20 +293,14 @@
         "command": "observable-kit.switchToNotebookView",
         "title": "Switch to Notebook View",
         "description": "Switch HTML file to notebook view",
-        "icon": {
-          "dark": "./resources/dark/dashy-view.svg",
-          "light": "./resources/light/dashy-view.svg"
-        }
+        "icon": "$(book)"
       },
       {
         "category": "Observable Kit",
         "command": "observable-kit.switchToTextView",
         "title": "Switch to Text View",
         "description": "Switch notebook back to HTML text view",
-        "icon": {
-          "dark": "./resources/dark/dashy-edit.svg",
-          "light": "./resources/light/dashy-edit.svg"
-        }
+        "icon": "$(edit)"
       },
       {
         "command": "ojs.cell.name",
@@ -350,10 +338,6 @@
           "when": "resourceLangId == ojs || resourceLangId == omd"
         },
         {
-          "command": "observable-kit.convertHtmlToNotebook",
-          "when": "resourceLangId == html"
-        },
-        {
           "command": "observable-kit.openHtmlAsNotebook",
           "when": "resourceLangId == html"
         },
@@ -371,11 +355,6 @@
           "when": "resourceLangId == ojs || resourceLangId == omd || notebookType == ojs-notebook",
           "command": "ojs.preview",
           "group": "navigation@998"
-        },
-        {
-          "when": "resourceLangId == html",
-          "command": "observable-kit.convertHtmlToNotebook",
-          "group": "observable@100"
         },
         {
           "when": "resourceLangId == html",

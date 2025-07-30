@@ -10,6 +10,9 @@ export class HTMLNotebookDetector {
     constructor(private context: vscode.ExtensionContext) {
         this.registerCommands();
         this.registerFileOpenHandler();
+
+        // Set context key immediately for current editor
+        this.updateContextForActiveEditor();
     }
 
     /**
@@ -29,6 +32,33 @@ export class HTMLNotebookDetector {
         const hasObservableScripts = scriptTypePattern.test(content);
 
         return hasObservableScripts;
+    }
+
+    /**
+     * Update context key for the currently active editor
+     */
+    private async updateContextForActiveEditor(): Promise<void> {
+        const activeEditor = vscode.window.activeTextEditor;
+        if (activeEditor) {
+            await this.handleDocumentOpen(activeEditor.document);
+        } else {
+            // No active editor, clear context
+            await this.setContext(false);
+        }
+    }
+
+    /**
+     * Set the context key with proper error handling
+     */
+    private async setContext(isObservableNotebook: boolean): Promise<void> {
+        try {
+            // Small delay to ensure VS Code has finished processing the document
+            await new Promise(resolve => setTimeout(resolve, 50));
+            await vscode.commands.executeCommand('setContext', 'observable-kit.isObservableNotebook', isObservableNotebook);
+            console.log(`Set observable-kit.isObservableNotebook context to: ${isObservableNotebook}`);
+        } catch (error) {
+            console.error('Failed to set context:', error);
+        }
     }
 
     /**
@@ -89,7 +119,7 @@ export class HTMLNotebookDetector {
 
                 // Show message about notebook opening
                 vscode.window.showInformationMessage(
-                    `Opened as Observable notebook. You can switch back to text view using the toolbar button.`
+                    `Opened as Observable notebook. Both text and notebook views are available.`
                 );
 
             } catch (error) {
@@ -119,16 +149,13 @@ export class HTMLNotebookDetector {
                 return;
             }
 
-            // Close current text editor
-            await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-
-            // Open directly as notebook
+            // Open as notebook in a new editor (keep existing text editor open)
             const document = await vscode.workspace.openNotebookDocument(uri);
             await vscode.window.showNotebookDocument(document);
 
             // Show info message
             vscode.window.showInformationMessage(
-                `Switched to notebook view. Use the text view button to switch back.`
+                `Opened notebook view. Both text and notebook views are now available.`
             );
 
         } catch (error) {
@@ -149,12 +176,14 @@ export class HTMLNotebookDetector {
 
             const notebookUri = activeNotebook.notebook.uri;
 
-            // Close current notebook editor
-            await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-
-            // Open as text document (same file, just different editor)
+            // Open as text document in a new editor (keep existing notebook editor open)
             const textDocument = await vscode.workspace.openTextDocument(notebookUri);
             await vscode.window.showTextDocument(textDocument);
+
+            // Show info message
+            vscode.window.showInformationMessage(
+                `Opened text view. Both notebook and text views are now available.`
+            );
 
         } catch (error) {
             console.error('Error switching to text view:', error);
@@ -168,33 +197,64 @@ export class HTMLNotebookDetector {
     private registerFileOpenHandler(): void {
         // Handle when files are opened via VS Code UI
         const openHandler = vscode.workspace.onDidOpenTextDocument(async (document) => {
-            await this.handleDocumentOpen(document);
+            // Only process HTML files to avoid unnecessary context updates
+            if (document.languageId === 'html') {
+                await this.handleDocumentOpen(document);
+            }
         });
 
         // Handle when editor selection changes (for already open documents)
         const changeHandler = vscode.window.onDidChangeActiveTextEditor(async (editor) => {
-            if (editor?.document) {
-                await this.handleDocumentOpen(editor.document);
+            if (editor) {
+                // Only update context if the active editor is an HTML file
+                if (editor.document.languageId === 'html') {
+                    await this.handleDocumentOpen(editor.document);
+                } else {
+                    // Clear context when switching away from HTML files
+                    await this.setContext(false);
+                }
+            } else {
+                // No active editor, clear context
+                await this.setContext(false);
             }
         });
 
-        this._disposables.push(openHandler, changeHandler);
+        // Handle notebook editor changes to clear HTML context when notebook is active
+        const notebookChangeHandler = vscode.window.onDidChangeActiveNotebookEditor(async (editor) => {
+            if (editor && editor.notebook.notebookType === 'onb-notebook-kit') {
+                // When a notebook is active, clear the HTML context to show the text view button
+                await this.setContext(false);
+            }
+        });
+
+        // Also handle the currently active editor when the extension starts
+        if (vscode.window.activeTextEditor) {
+            this.handleDocumentOpen(vscode.window.activeTextEditor.document);
+        }
+
+        this._disposables.push(openHandler, changeHandler, notebookChangeHandler);
     }
 
     private async handleDocumentOpen(document: vscode.TextDocument): Promise<void> {
-        // Only check HTML files
-        if (document.languageId === 'html' &&
-            document.uri.scheme === 'file') {
+        // Only process HTML files from the file system
+        if (document.languageId === 'html' && document.uri.scheme === 'file') {
+            try {
+                const content = document.getText();
+                const isObservableNotebook = this.isObservableNotebook(content);
 
-            const content = document.getText();
-            const isObservableNotebook = this.isObservableNotebook(content);
+                console.log(`Checking HTML file: ${document.uri.fsPath}, isObservableNotebook: ${isObservableNotebook}`);
 
-            // Set context key for VS Code UI
-            await vscode.commands.executeCommand('setContext', 'observable-kit.isObservableNotebook', isObservableNotebook);
-        } else {
-            // Clear context key for non-HTML files
-            await vscode.commands.executeCommand('setContext', 'observable-kit.isObservableNotebook', false);
+                // Set context key for VS Code UI
+                await this.setContext(isObservableNotebook);
+            } catch (error) {
+                console.error('Error checking Observable notebook:', error);
+                await this.setContext(false);
+            }
+        } else if (document.languageId !== 'html') {
+            // Only clear context for non-HTML files to avoid interfering with HTML processing
+            await this.setContext(false);
         }
+        // For HTML files that are not from file system (e.g., untitled), we don't change the context
     }    /**
      * Dispose of all watchers and handlers
      */
