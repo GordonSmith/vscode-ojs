@@ -1,10 +1,8 @@
 import * as vscode from "vscode";
 import { TextDecoder, TextEncoder } from "util";
 import { deserialize, serialize, type Notebook, type Cell } from "@observablehq/notebook-kit";
-import { DOMParser } from "@xmldom/xmldom";
+import { DOMParser, DOMImplementation } from "@xmldom/xmldom";
 import { selectOne, selectAll } from "css-select";
-
-
 
 // Adapter to make xmldom nodes compatible with css-select
 const xmldomAdapter = {
@@ -88,6 +86,10 @@ class DOMParserEx extends DOMParser {
 
         return doc;
     }
+}
+
+if (!globalThis.document) {
+    globalThis.document = new DOMImplementation().createHTMLDocument();
 }
 
 // Mapping between VS Code language IDs and Observable Kit modes
