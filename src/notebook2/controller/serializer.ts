@@ -89,7 +89,43 @@ class DOMParserEx extends DOMParser {
 }
 
 if (!globalThis.document) {
+    // @ts-expect-error
     globalThis.document = new DOMImplementation().createHTMLDocument();
+    const origCreateElement = document.createElement;
+    document.createElement = function (name: string) {
+        const element = origCreateElement.call(this, name);
+
+        // Add innerHTML property getter
+        Object.defineProperty(element, "innerHTML", {
+            get: function () {
+                // Return the serialized HTML content of all child nodes
+                let html = "";
+                for (let i = 0; i < this.childNodes.length; i++) {
+                    const child = this.childNodes[i];
+                    if (child.nodeType === 1) { // Element node
+                        html += child.toString();
+                    } else if (child.nodeType === 3) { // Text node
+                        html += child.nodeValue || "";
+                    }
+                }
+                return html;
+            },
+            configurable: true,
+            enumerable: true
+        });
+
+        // Add outerHTML property getter
+        Object.defineProperty(element, "outerHTML", {
+            get: function () {
+                // Return the serialized HTML of the element itself
+                return this.toString();
+            },
+            configurable: true,
+            enumerable: true
+        });
+
+        return element;
+    };
 }
 
 // Mapping between VS Code language IDs and Observable Kit modes
