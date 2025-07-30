@@ -1,4 +1,4 @@
-import { omd2notebook, ojs2notebook, ohq } from "@hpcc-js/observablehq-compiler";
+import { omd2notebook, ojs2notebook, onb } from "@hpcc-js/observablehq-compiler";
 import { hashSum } from "@hpcc-js/util";
 import * as vscode from "vscode";
 import type { Value } from "../webview";
@@ -15,7 +15,7 @@ export class Cell {
     readonly idRange: vscode.Range | undefined;
     readonly range: vscode.Range;
 
-    constructor(private _doc: vscode.TextDocument, private _node: ohq.Node) {
+    constructor(private _doc: vscode.TextDocument, private _node: onb.Node) {
         if (_node.id) {
             this.id = _node.id;
             this.idRange = range(this._doc, _node.start, _node.end);
@@ -95,7 +95,7 @@ export class Meta {
             this._cellMap = {};
             this._errors = [];
             try {
-                let parsed: ohq.Notebook;
+                let parsed: onb.Notebook;
                 switch (this._doc.languageId) {
                     case "ojsnb":
                         parsed = JSON.parse(this._doc.getText());

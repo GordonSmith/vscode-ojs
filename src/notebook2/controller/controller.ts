@@ -3,7 +3,7 @@ import { OBSERVABLE_KIT_MIME } from "./serializer";
 
 export class NotebookKitController {
     readonly controllerId = "observable-kit-kernel";
-    readonly notebookType = "observable-kit-notebook";
+    readonly notebookType = "onb-notebook-kit";
     readonly label = "Observable Notebook Kit";
     readonly supportedLanguages = ["javascript", "ojs", "markdown", "html", "css"];
 

@@ -1,0 +1,19 @@
+<!doctype html>
+<notebook>
+    <title>Test Observable Notebook</title>
+    <script id="intro" type="text/markdown">
+    # Test Notebook
+    
+    This is a test Observable notebook that should be detected and opened as a notebook.
+  </script>
+    <script id="hello" type="module">
+        // This is vanilla JavaScript
+        const message = "Hello from Observable!";
+        console.log(message);
+        display(message);
+    </script>
+    <script id="data" type="observablejs">
+    // This is Observable JavaScript
+    data = [1, 2, 3, 4, 5]
+  </script>
+</notebook>

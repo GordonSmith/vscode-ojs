@@ -10,7 +10,8 @@ export class Commands {
             vscode.commands.registerCommand('observable-kit.build', Commands.build),
             vscode.commands.registerCommand('observable-kit.createNotebook', Commands.createNotebook),
             vscode.commands.registerCommand('observable-kit.convertFromLegacy', Commands.convertFromLegacy),
-            vscode.commands.registerCommand('observable-kit.setupWorkspace', Commands.setupWorkspace)
+            vscode.commands.registerCommand('observable-kit.setupWorkspace', Commands.setupWorkspace),
+            vscode.commands.registerCommand('observable-kit.convertHtmlToNotebook', Commands.convertHtmlToNotebook)
         );
     }
 
@@ -113,7 +114,7 @@ export class Commands {
 
         const fileName = await vscode.window.showInputBox({
             prompt: 'Enter notebook name',
-            placeHolder: 'my-notebook.okit.html'
+            placeHolder: 'my-notebook.onb.html'
         });
 
         if (!fileName) {
@@ -122,15 +123,14 @@ export class Commands {
 
         // Ensure proper extension
         let notebookName = fileName;
-        if (!notebookName.endsWith('.okit.html') && !notebookName.endsWith('.onb.html')) {
-            notebookName = `${fileName}.okit.html`;
+        if (!notebookName.endsWith('.onb.html')) {
+            notebookName = `${fileName}.onb.html`;
         }
 
         const notebookPath = path.join(workspaceFolder.uri.fsPath, notebookName);
 
         // Extract base name for title
         const baseName = path.basename(fileName)
-            .replace('.okit.html', '')
             .replace('.onb.html', '')
             .replace('.html', '');
 
@@ -335,5 +335,91 @@ export class Commands {
 
         html += `</notebook>\n`;
         return html;
+    }
+
+    /**
+     * Convert HTML file to Observable Notebook format if it contains Observable notebook structure
+     */
+    static async convertHtmlToNotebook(uri?: vscode.Uri): Promise<void> {
+        const targetUri = uri || vscode.window.activeTextEditor?.document.uri;
+
+        if (!targetUri) {
+            vscode.window.showErrorMessage('No HTML file selected');
+            return;
+        }
+
+        if (!targetUri.path.endsWith('.html')) {
+            vscode.window.showErrorMessage('Selected file is not an HTML file');
+            return;
+        }
+
+        // Skip if already has Observable notebook extension
+        if (targetUri.path.endsWith('.onb.html')) {
+            vscode.window.showInformationMessage('File is already in Observable notebook format');
+            return;
+        }
+
+        try {
+            // Read the file content
+            const content = await vscode.workspace.fs.readFile(targetUri);
+            const htmlContent = Buffer.from(content).toString('utf8');
+
+            // Check if it's an Observable notebook
+            const isObservableNotebook = htmlContent.includes('<!doctype html>') &&
+                htmlContent.includes('<notebook') &&
+                (htmlContent.includes('type="text/markdown"') ||
+                    htmlContent.includes('type="module"') ||
+                    htmlContent.includes('type="observablejs"'));
+
+            if (!isObservableNotebook) {
+                vscode.window.showWarningMessage(
+                    'This HTML file does not appear to be an Observable notebook. ' +
+                    'Observable notebooks should have a <notebook> element with script elements containing notebook cells.'
+                );
+                return;
+            }
+
+            // Get new filename
+            const fileName = targetUri.path.split('/').pop() || 'file.html';
+            const baseName = fileName.replace('.html', '');
+            const currentDir = targetUri.path.substring(0, targetUri.path.lastIndexOf('/'));
+
+            const newFileName = await vscode.window.showInputBox({
+                prompt: 'Enter new filename for the Observable notebook',
+                value: `${baseName}.onb.html`,
+                placeHolder: 'my-notebook.onb.html'
+            });
+
+            if (!newFileName) {
+                return;
+            }
+
+            // Ensure proper extension
+            let finalFileName = newFileName;
+            // if (!finalFileName.endsWith('.onb.html')) {
+            //     finalFileName = `${newFileName}.onb.html`;
+            // }
+
+            const newUri = vscode.Uri.file(`${currentDir}/${finalFileName}`);
+
+            // Rename the file
+            await vscode.workspace.fs.rename(targetUri, newUri);
+
+            // Close current editor if open
+            const activeEditor = vscode.window.activeTextEditor;
+            if (activeEditor && activeEditor.document.uri.fsPath === targetUri.fsPath) {
+                await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+            }
+
+            // Open as notebook
+            const document = await vscode.workspace.openNotebookDocument(newUri);
+            await vscode.window.showNotebookDocument(document);
+
+            vscode.window.showInformationMessage(`File converted to ${finalFileName} and opened as Observable notebook!`);
+
+        } catch (error) {
+            console.error('Error converting HTML to notebook:', error);
+            vscode.window.showErrorMessage(`Failed to convert HTML file: ${error}`);
+        }
     }
 }

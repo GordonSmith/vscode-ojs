@@ -1,4 +1,4 @@
-import type { ohq } from "@hpcc-js/observablehq-compiler";
+import type { onb } from "@hpcc-js/observablehq-compiler";
 
 export interface WUOutput {
     configuration: string;
@@ -14,7 +14,7 @@ export interface OJSCell {
 export interface OJSOutput {
     notebookId: string;
     folder: string;
-    files: ohq.File[], // notebook: ohq.Notebook;
+    files: onb.File[], // notebook: onb.Notebook;
     cell: OJSCell;
     otherCells: OJSCell[];
 }

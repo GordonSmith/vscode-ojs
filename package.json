@@ -51,6 +51,7 @@
     "update-major": "npx -y npm-check-updates -u",
     "update": "npx -y npm-check-updates -u -t minor"
   },
+  "dependencies": {},
   "devDependencies": {
     "@hpcc-js/esbuild-plugins": "1.4.9",
     "@hpcc-js/observable-md": "2.54.18",
@@ -75,6 +76,7 @@
     "assert": "2.1.0",
     "browserify-zlib": "0.2.0",
     "buffer": "6.0.3",
+    "css-select": "6.0.0",
     "esbuild": "0.25.8",
     "esbuild-copy-static-files": "0.1.0",
     "esbuild-plugin-text-replace": "1.3.0",
@@ -109,10 +111,11 @@
   "activationEvents": [
     "onLanguage:ojs",
     "onNotebook:ojs-notebook",
-    "onNotebook:observable-kit-notebook",
+    "onNotebook:onb-notebook-kit",
     "onRenderer:ojs-notebook-renderer",
     "onRenderer:observable-kit-renderer",
     "onLanguage:omd",
+    "onLanguage:html",
     "onWebviewPanel:OJSPreview",
     "onCommand:ojs.preview",
     "onCommand:ojs.import",
@@ -141,17 +144,6 @@
           "Observable Markdown (OMD)"
         ],
         "configuration": "./omd.configuration.json"
-      },
-      {
-        "id": "observable-kit-html",
-        "extensions": [
-          "okit.html",
-          "onb.html"
-        ],
-        "aliases": [
-          "Observable Notebook Kit"
-        ],
-        "configuration": "./ojs.configuration.json"
       }
     ],
     "grammars": [
@@ -159,18 +151,6 @@
         "language": "ojs",
         "scopeName": "source.ojs",
         "path": "./syntaxes/ojs.tmLanguage.json"
-      },
-      {
-        "language": "observable-kit-html",
-        "scopeName": "text.html.observable-kit",
-        "path": "./syntaxes/omd.tmLanguage.json",
-        "embeddedLanguages": {
-          "meta.embedded.block.html": "html",
-          "source.js": "javascript",
-          "source.css": "css",
-          "meta.embedded.block.javascript": "javascript",
-          "meta.embedded.block.markdown": "markdown"
-        }
       },
       {
         "language": "omd",
@@ -303,6 +283,38 @@
         "description": "Setup Observable Notebook Kit in current workspace"
       },
       {
+        "category": "Observable Kit",
+        "command": "observable-kit.convertHtmlToNotebook",
+        "title": "Convert HTML to Observable Notebook",
+        "description": "Convert HTML file to Observable Notebook Kit format"
+      },
+      {
+        "category": "Observable Kit",
+        "command": "observable-kit.openHtmlAsNotebook",
+        "title": "Open HTML as Observable Notebook",
+        "description": "Open HTML file as Observable Notebook (without renaming)"
+      },
+      {
+        "category": "Observable Kit",
+        "command": "observable-kit.switchToNotebookView",
+        "title": "Switch to Notebook View",
+        "description": "Switch HTML file to notebook view",
+        "icon": {
+          "dark": "./resources/dark/dashy-view.svg",
+          "light": "./resources/light/dashy-view.svg"
+        }
+      },
+      {
+        "category": "Observable Kit",
+        "command": "observable-kit.switchToTextView",
+        "title": "Switch to Text View",
+        "description": "Switch notebook back to HTML text view",
+        "icon": {
+          "dark": "./resources/dark/dashy-edit.svg",
+          "light": "./resources/light/dashy-edit.svg"
+        }
+      },
+      {
         "command": "ojs.cell.name",
         "title": "Result Name",
         "icon": {
@@ -336,6 +348,22 @@
         {
           "command": "ojs.exportECL",
           "when": "resourceLangId == ojs || resourceLangId == omd"
+        },
+        {
+          "command": "observable-kit.convertHtmlToNotebook",
+          "when": "resourceLangId == html"
+        },
+        {
+          "command": "observable-kit.openHtmlAsNotebook",
+          "when": "resourceLangId == html"
+        },
+        {
+          "command": "observable-kit.switchToNotebookView",
+          "when": "resourceLangId == html"
+        },
+        {
+          "command": "observable-kit.switchToTextView",
+          "when": "notebookType == onb-notebook-kit"
         }
       ],
       "explorer/context": [
@@ -343,6 +371,16 @@
           "when": "resourceLangId == ojs || resourceLangId == omd || notebookType == ojs-notebook",
           "command": "ojs.preview",
           "group": "navigation@998"
+        },
+        {
+          "when": "resourceLangId == html",
+          "command": "observable-kit.convertHtmlToNotebook",
+          "group": "observable@100"
+        },
+        {
+          "when": "resourceLangId == html",
+          "command": "observable-kit.openHtmlAsNotebook",
+          "group": "observable@101"
         }
       ],
       "editor/context": [
@@ -377,6 +415,16 @@
           "when": "resourceLangId == ojs || resourceLangId == omd || notebookType == ojs-notebook",
           "command": "ojs.preview",
           "group": "navigation@998"
+        },
+        {
+          "when": "resourceLangId == html && observable-kit.isObservableNotebook",
+          "command": "observable-kit.switchToNotebookView",
+          "group": "navigation@999"
+        },
+        {
+          "when": "notebookType == onb-notebook-kit",
+          "command": "observable-kit.switchToTextView",
+          "group": "navigation@999"
         }
       ],
       "notebook/cell/title": [
@@ -420,6 +468,12 @@
           "scope": "resource",
           "default": false,
           "description": "Show runtime values as diagnostic info."
+        },
+        "ojs.autoDetectObservableNotebooks": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "Automatically detect Observable notebooks in HTML files and prompt to open as notebook."
         }
       }
     },
@@ -435,17 +489,15 @@
         ]
       },
       {
-        "id": "observable-kit-notebook",
-        "type": "observable-kit-notebook",
+        "id": "onb-notebook-kit",
+        "type": "onb-notebook-kit",
         "displayName": "Observable Notebook Kit",
         "selector": [
           {
-            "filenamePattern": "*.okit.html"
-          },
-          {
-            "filenamePattern": "*.onb.html"
+            "filenamePattern": "*.html"
           }
-        ]
+        ],
+        "priority": "option"
       }
     ],
     "notebookRenderer": [
@@ -468,9 +520,5 @@
         "requiresMessaging": "optional"
       }
     ]
-  },
-  "dependencies": {
-    "css-select": "^6.0.0",
-    "domutils": "^3.2.2"
   }
 }

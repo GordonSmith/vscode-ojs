@@ -13,10 +13,19 @@ Observable Notebook Kit 2.0 introduces a new HTML-based notebook format that sup
 
 ## File Extensions
 
-Observable Notebook Kit notebooks use specific HTML extensions for proper detection:
+Observable Notebook Kit notebooks use a specific HTML extension for VS Code integration:
 
-- `.okit.html` - Observable Kit HTML notebooks (recommended)
-- `.onb.html` - Alternative Observable notebook HTML format
+- `.onb.html` - Observable notebook extension for VS Code (automatically opens as notebook)
+
+**Important**: Regular `.html` files are opened in the text editor by default. The extension automatically detects if an HTML file contains Observable notebook structure and offers to open it or convert it.
+
+## Converting HTML Files
+
+If you have Observable notebook content in a regular `.html` file:
+
+1. **Automatic Detection**: When you open a `.html` file containing Observable notebook structure, you'll get a notification asking if you want to open it as a notebook
+2. **Temporary Opening**: Use "Observable Kit: Open HTML as Observable Notebook" to create a temporary `.onb.html` file and open as notebook
+3. **Permanent Conversion**: Use "Observable Kit: Convert HTML to Observable Notebook" to permanently rename the file to `.onb.html`
 
 ## File Format
 

@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import fetch from "node-fetch";
 import * as path from "path";
-import { ohq } from "@hpcc-js/observable-shim";
+import { onb } from "@hpcc-js/observable-shim";
 import { ojs2notebook, omd2notebook } from "@hpcc-js/observablehq-compiler";
 import { serializer } from "../notebook/controller/serializer";
 import { Diagnostic } from "./diagnostic";
@@ -184,7 +184,7 @@ ${encode(node.value)}
         }
     }
 
-    private exportTpl(title: string, notebook: ohq.Notebook): string {
+    private exportTpl(title: string, notebook: onb.Notebook): string {
         return `\
 <!doctype html>
 <html>
@@ -223,7 +223,7 @@ ${encode(node.value)}
 
     async export() {
         let htmlPath;
-        let notebook: ohq.Notebook | undefined;
+        let notebook: onb.Notebook | undefined;
         if (vscode.window.activeNotebookEditor) {
             const notebookDocument = vscode.window.activeNotebookEditor.notebook;
             switch (notebookDocument.notebookType) {

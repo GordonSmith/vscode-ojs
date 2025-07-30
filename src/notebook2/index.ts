@@ -7,7 +7,7 @@ export function activate(ctx: vscode.ExtensionContext) {
     // Register the notebook serializer for Observable Notebook Kit format
     ctx.subscriptions.push(
         vscode.workspace.registerNotebookSerializer(
-            "observable-kit-notebook",
+            "onb-notebook-kit",
             NotebookKitSerializer.attach(),
             {
                 transientOutputs: true,

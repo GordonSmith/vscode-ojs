@@ -1,132 +1,7 @@
 import * as vscode from "vscode";
 import { TextDecoder, TextEncoder } from "util";
 import { deserialize, serialize, type Notebook, type Cell } from "@observablehq/notebook-kit";
-import { DOMParser, DOMImplementation } from "@xmldom/xmldom";
-import { selectOne, selectAll } from "css-select";
-
-// Adapter to make xmldom nodes compatible with css-select
-const xmldomAdapter = {
-    isTag: (node: Node): node is Element => node.nodeType === 1, // ELEMENT_NODE
-
-    getAttributeValue: (elem: Element, name: string): string | undefined => {
-        return elem.getAttribute(name) || undefined;
-    },
-
-    getChildren: (node: Node): Node[] => {
-        return Array.from(node.childNodes || []);
-    },
-
-    getName: (elem: Element): string => {
-        return elem.nodeName?.toLowerCase() || '';
-    },
-
-    getParent: (node: Element): Node | null => {
-        return node.parentNode;
-    },
-
-    getSiblings: (node: Node): Node[] => {
-        if (!node.parentNode) return [node];
-        return Array.from(node.parentNode.childNodes || []);
-    },
-
-    getText: (node: Node): string => {
-        return node.textContent || '';
-    },
-
-    hasAttrib: (elem: Element, name: string): boolean => {
-        return elem.hasAttribute(name);
-    },
-
-    removeSubsets: (nodes: Node[]): Node[] => {
-        return nodes.filter((node, i) => {
-            return !nodes.some((other, j) => {
-                return i !== j && other.contains && other.contains(node);
-            });
-        });
-    },
-
-    equals: (a: Node, b: Node): boolean => {
-        return a === b;
-    }
-};
-
-class DOMParserEx extends DOMParser {
-    constructor() {
-        super();
-    }
-
-    parseFromString(data, contentType) {
-        const doc = super.parseFromString(data, contentType);
-        doc["querySelector"] = (selector: string) => {
-            try {
-                // Use css-select with our xmldom adapter to find the first matching element
-                // Start from the document element or the document itself
-                const rootElement = doc.documentElement || doc as any;
-                const result = selectOne(selector, rootElement, { adapter: xmldomAdapter });
-                return result || null;
-            } catch (error) {
-                console.error('Error in querySelector:', error);
-                return null;
-            }
-        };
-
-        doc["querySelectorAll"] = (selector: string) => {
-            try {
-                // Use css-select with our xmldom adapter to find all matching elements
-                // Start from the document element or the document itself
-                const rootElement = doc.documentElement || doc as any;
-                const results = selectAll(selector, rootElement, { adapter: xmldomAdapter });
-                // Return a NodeList-like array
-                return results;
-            } catch (error) {
-                console.error('Error in querySelectorAll:', error);
-                return [];
-            }
-        };
-
-        return doc;
-    }
-}
-
-if (!globalThis.document) {
-    // @ts-expect-error
-    globalThis.document = new DOMImplementation().createHTMLDocument();
-    const origCreateElement = document.createElement;
-    document.createElement = function (name: string) {
-        const element = origCreateElement.call(this, name);
-
-        // Add innerHTML property getter
-        Object.defineProperty(element, "innerHTML", {
-            get: function () {
-                // Return the serialized HTML content of all child nodes
-                let html = "";
-                for (let i = 0; i < this.childNodes.length; i++) {
-                    const child = this.childNodes[i];
-                    if (child.nodeType === 1) { // Element node
-                        html += child.toString();
-                    } else if (child.nodeType === 3) { // Text node
-                        html += child.nodeValue || "";
-                    }
-                }
-                return html;
-            },
-            configurable: true,
-            enumerable: true
-        });
-
-        // Add outerHTML property getter
-        Object.defineProperty(element, "outerHTML", {
-            get: function () {
-                // Return the serialized HTML of the element itself
-                return this.toString();
-            },
-            configurable: true,
-            enumerable: true
-        });
-
-        return element;
-    };
-}
+import { DOMParser } from "./dom-polyfill";
 
 // Mapping between VS Code language IDs and Observable Kit modes
 const VSCODE_TO_OBSERVABLE_MODE_MAP: Record<string, Cell["mode"]> = {
@@ -197,7 +72,7 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
 
     private deserializeObservableKitFormat(content: string): vscode.NotebookData {
         // Use the official Observable Kit deserialize function with xmldom parser
-        const parser = new DOMParserEx();
+        const parser = new DOMParser();
 
         const notebook: Notebook = deserialize(content, { parser: parser as any });
         const cells: vscode.NotebookCellData[] = [];

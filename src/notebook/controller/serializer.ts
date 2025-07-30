@@ -1,4 +1,4 @@
-import type { ohq } from "@hpcc-js/observablehq-compiler";
+import type { onb } from "@hpcc-js/observablehq-compiler";
 
 import * as path from "path";
 import { NotebookSerializer, CancellationToken, NotebookData, NotebookCellData, NotebookCellKind, NotebookCell, Uri, NotebookCellOutput, NotebookCellOutputItem, NotebookRange, NotebookDocument } from "vscode";
@@ -15,9 +15,9 @@ function encode(str: string) {
 }
 
 interface Meta {
-    notebook: { [id: string]: ohq.Notebook },
+    notebook: { [id: string]: onb.Notebook },
     notebookSave: { [id: string]: string },
-    node: { [id: string | number]: ohq.Node }
+    node: { [id: string | number]: onb.Node }
 }
 
 export let serializer: Serializer;
@@ -39,7 +39,7 @@ export class Serializer implements NotebookSerializer {
         return serializer;
     }
 
-    notebook(cell: NotebookCell): ohq.Notebook {
+    notebook(cell: NotebookCell): onb.Notebook {
         return this._meta.notebook[cell.notebook.metadata?.id] ?? {
             id: uuidv4(),
             files: [],
@@ -47,7 +47,7 @@ export class Serializer implements NotebookSerializer {
         };
     }
 
-    node(cell: NotebookCell): ohq.Node {
+    node(cell: NotebookCell): onb.Node {
         return this._meta.node[cell.metadata?.id] ?? {
             id: `tmp-${cell.index}`,
             mode: cell.document.languageId,
@@ -108,7 +108,7 @@ export class Serializer implements NotebookSerializer {
     async deserializeNotebook(content: Uint8Array, _token: CancellationToken): Promise<NotebookData> {
         const contents = new TextDecoder("utf-8").decode(content);
 
-        let notebook: ohq.Notebook;
+        let notebook: onb.Notebook;
         try {
             notebook = {
                 id: uuidv4(),
@@ -119,7 +119,7 @@ export class Serializer implements NotebookSerializer {
                 id: uuidv4(),
                 files: [],
                 nodes: []
-            } as unknown as ohq.Notebook;
+            } as unknown as onb.Notebook;
         }
 
         const cells = notebook.nodes?.map(node => {
@@ -176,7 +176,7 @@ export class Serializer implements NotebookSerializer {
     }
 
     async serializeNotebook(data: NotebookData, _token: CancellationToken): Promise<Uint8Array> {
-        const jsonNotebook: ohq.Notebook = this._meta.notebook[data.metadata?.id];
+        const jsonNotebook: onb.Notebook = this._meta.notebook[data.metadata?.id];
         jsonNotebook.nodes = [];
 
         let cellIndex = 0;
@@ -210,8 +210,8 @@ export class Serializer implements NotebookSerializer {
             });
             cell.metadata = cell.metadata ?? {};
             cell.metadata.id = cell.metadata?.id ?? `tmp-${cellIndex++}`;
-            const node: Partial<ohq.Node> = this._meta.node[cell.metadata.id];
-            const item: ohq.Node = {
+            const node: Partial<onb.Node> = this._meta.node[cell.metadata.id];
+            const item: onb.Node = {
                 id: cell.metadata?.id,
                 name: "",
                 ...node,
