@@ -1,0 +1,25 @@
+<!doctype html>
+<notebook>
+  <title>Area chart, missing data</title>
+  <script id="1" type="text/markdown">
+    # Area chart, missing data
+
+    The [area mark](/plot/marks/area), in blue, shows gaps for missing data—points where the value is NaN, undefined, or Infinite. A second area, in grey, has these data points filtered out altogether, resulting instead in linear interpolation for the gaps.
+  </script>
+  <script id="3" type="module" pinned="">
+    Plot.plot({
+      y: {grid: true, label: "Daily close ($)"},
+      marks: [
+        Plot.areaY(aapl, {filter: (d) => !isNaN(d.Close), x: "Date", y1: "Close", fill: "#ccc"}),
+        Plot.areaY(aapl, {x: "Date", y1: "Close", fill: "steelblue"}),
+        Plot.ruleY([0]),
+      ]
+    })
+  </script>
+  <script id="8" type="module" pinned="">
+    const aapl = FileAttachment("data/AAPL.csv")
+      .csv({typed: true})
+      .then((aapl) => aapl.map((d) => ({...d, Close: d.Date.getUTCMonth() < 3 ? NaN : d.Close}))) // simulate gaps
+      .then(display);
+  </script>
+</notebook>

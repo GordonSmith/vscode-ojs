@@ -1,0 +1,175 @@
+<!doctype html>
+<notebook theme="air">
+  <title>Inequality in American cities</title>
+  <script id="1" type="text/markdown">
+    # Inequality in American cities
+
+    Based on a graphic by [Emily Badger and Kevin Quealy](https://www.nytimes.com/2019/12/02/upshot/wealth-poverty-divide-american-cities.html), this chart shows the change from 1980 to 2015 of the ratio of 90th-percentile wages to 10th-percentile wages, along with population, in 195 metro areas. I prefer the static display to [animation](https://observablehq.com/@mbostock/inequality-in-american-cities/2).
+  </script>
+  <script id="603" type="module">
+    const arrowId = DOM.uid("arrow");
+    const gradientId = DOM.uid("gradient");
+    display(htl.svg`<svg width="180" height="33" style="display: block; font: 10px sans-serif;">
+    <defs>
+      <marker id="${arrowId.id}" markerHeight="10" markerWidth="10" refX="5" refY="2.5" orient="auto">
+        <path fill="${endColor}" d="M0,0v5l7,-2.5Z"></path>
+      </marker>
+      <linearGradient id="${gradientId.id}" gradientUnits="userSpaceOnUse" x1="33" x2="149">
+        <stop stop-color="${startColor}" stop-opacity="0.5"></stop>
+        <stop stop-color="${endColor}" offset="100%"></stop>
+      </linearGradient>
+    </defs>
+    <path fill="none" stroke="${gradientId}" marker-end="${arrowId}" d="${arc(33, 16.5, 149, 16.5)}"></path>
+    <circle cx="33" cy="16.5" r="2.5"></circle>
+    <text x="4" y="16.5" dy="0.36em" text-anchor="start">1980</text>
+    <text x="176" y="16.5" dy="0.36em" text-anchor="end">2015</text>
+    </svg>`);
+  </script>
+  <script id="20" type="module" pinned="">
+    const width = 928;
+    const height = 640;
+    const marginTop = 24;
+    const marginRight = 10;
+    const marginBottom = 34;
+    const marginLeft = 40;
+    const arrowId = DOM.uid("arrow");
+    const gradientIds = data.map(() => DOM.uid("gradient"));
+    const endColor = d3.schemeCategory10[3];
+    const startColor = d3.schemeCategory10[1];
+
+    const x = d3.scaleLog()
+        .domain(padLog(d3.extent(data.flatMap((d) => [d.POP_1980, d.POP_2015])), 0.1))
+        .rangeRound([marginLeft, width - marginRight]);
+
+    const y = d3.scaleLinear()
+        .domain(padLinear(d3.extent(data.flatMap((d) => [d.R90_10_1980, d.R90_10_2015])), 0.1))
+        .rangeRound([height - marginBottom, marginTop]);
+
+    function arc(x1, y1, x2, y2) {
+      const r = Math.hypot(x1 - x2, y1 - y2) * 2;
+      return `M${x1},${y1} A${r},${r} 0,0,1 ${x2},${y2}`;
+    }
+
+    function padLinear([x0, x1], k) {
+      const dx = (x1 - x0) * k / 2;
+      return [x0 - dx, x1 + dx];
+    }
+
+    function padLog(x, k) {
+      return padLinear(x.map(Math.log), k).map(Math.exp);
+    }
+
+    const svg = d3.create("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("viewBox", [0, 0, width, height])
+        .attr("style", "max-width: 100%; height: auto;");
+
+    svg.append("defs")
+      .append("marker")
+        .attr("id", arrowId.id)
+        .attr("markerHeight", 10)
+        .attr("markerWidth", 10)
+        .attr("refX", 5)
+        .attr("refY", 2.5)
+        .attr("orient", "auto")
+      .append("path")
+        .attr("fill", endColor)
+        .attr("d", "M0,0v5l7,-2.5Z");
+
+    svg.append("defs")
+      .selectAll()
+      .data(data)
+      .join("linearGradient")
+        .attr("id", (d, i) => gradientIds[i].id)
+        .attr("gradientUnits", "userSpaceOnUse")
+        .attr("x1", (d) => x(d.POP_1980))
+        .attr("x2", (d) => x(d.POP_2015))
+        .attr("y1", (d) => y(d.R90_10_1980))
+        .attr("y2", (d) => y(d.R90_10_2015))
+        .call((g) => g.append("stop").attr("stop-color", startColor).attr("stop-opacity", 0.5))
+        .call((g) => g.append("stop").attr("offset", "100%").attr("stop-color", endColor));
+
+    svg.append("g")
+        .attr("stroke", "currentColor")
+        .attr("stroke-opacity", 0.1)
+        .call((g) => g.append("g")
+          .selectAll("line")
+          .data(x.ticks())
+          .join("line")
+            .attr("x1", (d) => 0.5 + x(d))
+            .attr("x2", (d) => 0.5 + x(d))
+            .attr("y1", marginTop)
+            .attr("y2", height - marginBottom))
+        .call((g) => g.append("g")
+          .selectAll("line")
+          .data(y.ticks())
+          .join("line")
+            .attr("y1", (d) => 0.5 + y(d))
+            .attr("y2", (d) => 0.5 + y(d))
+            .attr("x1", marginLeft)
+            .attr("x2", width - marginRight));
+
+    svg.append("g")
+        .attr("transform", `translate(0,${height - marginBottom})`)
+        .call(d3.axisBottom(x).ticks(width / 80, ".1s"))
+        .call((g) => g.select(".domain").remove())
+        .call((g) => g.append("text")
+            .attr("x", width)
+            .attr("y", marginBottom - 4)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "end")
+            .text("Population →"));
+
+    svg.append("g")
+        .attr("transform", `translate(${marginLeft},0)`)
+        .call(d3.axisLeft(y))
+        .call((g) => g.select(".domain").remove())
+        .call((g) => g.append("text")
+            .attr("x", -marginLeft)
+            .attr("y", 10)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "start")
+            .text("↑ Inequality"));
+
+    svg.append("g")
+        .attr("fill", "none")
+      .selectAll()
+      .data(data)
+      .join("path")
+        .attr("stroke", (d, i) => gradientIds[i])
+        .attr("marker-end", arrowId)
+        .attr("d", (d) => arc(x(d.POP_1980), y(d.R90_10_1980), x(d.POP_2015), y(d.R90_10_2015)));
+
+    svg.append("g")
+        .attr("fill", "currentColor")
+      .selectAll()
+      .data(data)
+      .join("circle")
+        .attr("r", 1.75)
+        .attr("cx", (d) => x(d.POP_1980))
+        .attr("cy", (d) => y(d.R90_10_1980));
+
+    svg.append("g")
+        .attr("fill", "currentColor")
+        .attr("text-anchor", "middle")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 10)
+        .attr("stroke", "white")
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-width", 4)
+        .attr("paint-order", "stroke fill")
+      .selectAll()
+      .data(data.filter((d) => d.highlight))
+      .join("text")
+        .attr("dy", (d) => d.R90_10_1980 > d.R90_10_2015 ? "1.2em" : "-0.5em")
+        .attr("x", (d) => x(d.POP_2015))
+        .attr("y", (d) => y(d.R90_10_2015))
+        .text((d) => d.nyt_display);
+
+    display(svg.node());
+  </script>
+  <script id="5" type="module" pinned="">
+    const data = FileAttachment("data/metros.csv").csv({typed: true}).then(display);
+  </script>
+</notebook>

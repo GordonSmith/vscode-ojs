@@ -1,0 +1,116 @@
+<!doctype html>
+<notebook>
+  <title>Bivariate choropleth</title>
+  <script id="3" type="text/markdown">
+    # Bivariate choropleth
+
+    Diabetes and obesity prevalence by county, 2020. Colors: [Joshua Stevens](http://www.joshuastevens.net/cartography/make-a-bivariate-choropleth-map/). Data: [CDC](https://gis.cdc.gov/grasp/diabetes/diabetesatlas-surveillance.html). For details on the data and the method, read our [tutorial](https://observablehq.com/@observablehq/plot-bivariate-choropleth-explained). See also the [D3 version](/@d3/bivariate-choropleth).
+  </script>
+  <script id="13" type="module" pinned="">
+    Plot.plot({
+      width: 975,
+      height: 610,
+      projection: "identity",
+      color,
+      marks: [
+        Plot.geo(
+          counties,
+          Plot.centroid({
+            stroke: "white",
+            strokeWidth: 0.125,
+            fill: (d) => bivariateClass(index.get(d.id)),
+            title: (d) => {
+              const name = `${d.properties.name}, ${states.get(d.id.slice(0, 2)).name}`;
+              const value = index.get(d.id);
+              if (!value || (isNaN(value.diabetes) && isNaN(value.obesity)))
+                return `${name}\nno data`;
+              const [dc, oc] = bivariateClass(value);
+              return `${name}\n${
+                isNaN(value.diabetes) ? "No Data" : value.diabetes
+              }% Diabetes${label(dc)}\n${
+                isNaN(value.obesity) ? "No Data" : value.obesity
+              }% Obesity${label(oc)}`;
+            },
+            tip: true
+          })
+        ),
+        Plot.geo(statemesh, {stroke: "white"}),
+        () => svg`<g transform="translate(835,410)">${Plot.plot({
+          color,
+          axis: null,
+          margin: 0,
+          inset: 18,
+          width: 106,
+          height: 106,
+          style: "overflow: visible;",
+          marks: [
+            Plot.dot(d3.cross([0, 1, 2], [0, 1, 2]), {
+              x: ([a, b]) => b - a,
+              y: ([a, b]) => b + a,
+              symbol: "square",
+              rotate: 45,
+              r: 14,
+              fill: (d) => d,
+              title: ([a, b]) => `Diabetes${label(a)}\nObesity${label(b)}`,
+              tip: true
+            }),
+            Plot.text(["Obesity →"], {
+              frameAnchor: "right",
+              fontWeight: "bold",
+              rotate: -45,
+              dy: 10
+            }),
+            Plot.text(["← Diabetes"], {
+              frameAnchor: "left",
+              fontWeight: "bold",
+              rotate: 45,
+              dy: 10
+            })
+          ]
+        })}`
+      ]
+    })
+  </script>
+  <script id="677" type="module" pinned="">
+    const labels = ["low", "", "high"];
+    const label = (i) => labels[i] ? ` (${labels[i]})` : "";
+    const index = new Map(data.map(({county, ...rest}) => [county, rest]));
+  </script>
+  <script id="831" type="module" pinned="">
+    const data = FileAttachment("data/diabetes-obesity.csv")
+      .csv()
+      .then((rows) => rows.map((d) => {
+        d.obesity = +d.obesity; // type as numeric
+        d.diabetes = +d.diabetes;
+        return d;
+      }))
+      .then(display);
+  </script>
+  <script id="39" type="module" pinned="">
+    const d = d3.scaleQuantile(data.map((d) => d.diabetes), [0, 1, 2]).quantiles();
+    const o = d3.scaleQuantile(data.map((d) => d.obesity), [0, 1, 2]).quantiles();
+    function bivariateClass(value) {
+      const {diabetes: a, obesity: b} = value;
+      return [
+        isNaN(a) ? a : +(a > d[0]) + (a > d[1]),
+        isNaN(b) ? b : +(b > o[0]) + (b > o[1])
+      ];
+    }
+  </script>
+  <script id="991" type="module" pinned="">
+    const color = Plot.plot({
+      color: {
+        domain: d3.range(9),
+        range: ["#e8e8e8", "#ace4e4", "#5ac8c8", "#dfb0d6", "#a5add3", "#5698b9", "#be64ac", "#8c62aa", "#3b4994"],
+        transform: ([a, b]) => 3 * a + b,
+        unknown: "#ccc" // See Valdez-Cordova, Alaska
+      }
+    }).scale("color");
+  </script>
+  <script id="28" type="module" pinned="">
+    const us = await FileAttachment("data/us-counties-albers-10m.json").json().then(display);
+    const counties = topojson.feature(us, us.objects.counties);
+    const states = new Map(us.objects.states.geometries.map((d) => [d.id, d.properties]));
+    const statemesh = topojson.mesh(us, us.objects.states, (a, b) => a !== b);
+  </script>
+</notebook>

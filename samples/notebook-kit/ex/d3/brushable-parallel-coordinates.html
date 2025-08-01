@@ -1,0 +1,116 @@
+<!doctype html>
+<notebook theme="air">
+  <title>Brushable parallel coordinates</title>
+  <script id="1" type="text/markdown">
+    # Brushable parallel coordinates
+
+    A parallel coordinates (or _parcoords_) plot visualizes multivariate data as lines traversing parallel axes. This approach facilitates comparison across variables, and identification of relationships and patterns. Try brushing to filter the data. Compare with the [non-interactive version](./parallel-coordinates).
+  </script>
+  <script id="96" type="module">
+    const keyz = view(Inputs.select(keys, {label: "Color"}));
+  </script>
+  <script id="320" type="module">
+    Plot.legend({color: {domain: color.domain(), interpolate: color.interpolator(), label: keyz}})
+  </script>
+  <script id="323" type="module">
+    svg.node()
+  </script>
+  <script id="214" type="module">
+    Inputs.table(selection, {height: 200}) // brush an axis below to see this update!
+  </script>
+  <script id="281" type="module" pinned="">
+    // Specify the chart’s dimensions.
+    const width = 928;
+    const height = keys.length * 120;
+    const marginTop = 20;
+    const marginRight = 10;
+    const marginBottom = 20;
+    const marginLeft = 10;
+
+    // Expose the current selection as a mutable.
+    const selection = Mutable([]);
+
+    // Create an horizontal (x) scale for each key.
+    const x = new Map(Array.from(keys, (k) => [k, d3.scaleLinear(d3.extent(data, (d) => d[k]), [marginLeft, width - marginRight])]));
+
+    // Create the vertical (y) scale.
+    const y = d3.scalePoint(keys, [marginTop, height - marginBottom]);
+
+    // Create the color scale.
+    const color = d3.scaleSequential(x.get(keyz).domain(), (t) => d3.interpolateBrBG(1 - t));
+
+    // Create the SVG container.
+    const svg = d3.create("svg")
+        .attr("viewBox", [0, 0, width, height])
+        .attr("width", width)
+        .attr("height", height)
+        .attr("style", "max-width: 100%; height: auto;");
+
+    // Append the lines.
+    const line = d3.line()
+      .defined(([, value]) => value != null)
+      .x(([key, value]) => x.get(key)(value))
+      .y(([key]) => y(key));
+
+    const path = svg.append("g")
+        .attr("fill", "none")
+        .attr("stroke-width", 1.5)
+        .attr("stroke-opacity", 0.4)
+      .selectAll("path")
+      .data(data.slice().sort((a, b) => d3.ascending(a[keyz], b[keyz])))
+      .join("path")
+        .attr("stroke", (d) => color(d[keyz]))
+        .attr("d", (d) => line(d3.cross(keys, [d], (key, d) => [key, d[key]])))
+      .call((path) => path.append("title").text((d) => d.name));
+
+    // Append the axis for each key.
+    const axes = svg.append("g")
+      .selectAll("g")
+      .data(keys)
+      .join("g")
+        .attr("transform", (d) => `translate(0,${y(d)})`)
+        .each(function(d) { d3.select(this).call(d3.axisBottom(x.get(d))); })
+        .call((g) => g.append("text")
+          .attr("x", marginLeft)
+          .attr("y", -6)
+          .attr("text-anchor", "start")
+          .attr("fill", "currentColor")
+          .text((d) => d))
+        .call((g) => g.selectAll("text")
+          .clone(true).lower()
+          .attr("fill", "none")
+          .attr("stroke-width", 5)
+          .attr("stroke-linejoin", "round")
+          .attr("stroke", "white"));
+
+    // Create the brush behavior.
+    const deselectedColor = "#ddd";
+    const brushHeight = 50;
+    const brush = d3.brushX()
+        .extent([[marginLeft, -(brushHeight / 2)], [width - marginRight, brushHeight / 2]])
+        .on("start brush end", brushed);
+
+    axes.call(brush);
+
+    const selections = new Map();
+
+    function brushed({selection: s}, key) {
+      if (s === null) selections.delete(key);
+      else selections.set(key, s.map(x.get(key).invert));
+      const selected = [];
+      path.each(function(d) {
+        const active = Array.from(selections).every(([key, [min, max]]) => d[key] >= min && d[key] <= max);
+        d3.select(this).style("stroke", active ? color(d[keyz]) : deselectedColor);
+        if (active) {
+          d3.select(this).raise();
+          selected.push(d);
+        }
+      });
+      selection.value = selected;
+    }
+  </script>
+  <script id="10" type="module" pinned="">
+    const data = FileAttachment("data/cars.csv").csv({typed: true}).then(display);
+    const keys = data.then((data) => data.columns.slice(1, -1)); // drop ordinal dimensions
+  </script>
+</notebook>

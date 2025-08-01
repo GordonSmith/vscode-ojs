@@ -1,0 +1,15 @@
+<!doctype html>
+<notebook>
+  <title>Blurred contours</title>
+  <script id="1" type="text/markdown">
+    # Blurred contours
+
+     Use the contour mark’s [blur](https://observablehq.com/plot/marks/contour) option for smoother isolines.
+  </script>
+  <script id="8" type="module" pinned="">
+    Plot.contour(ca55, {x: "LONGITUDE", y: "LATITUDE", fill: "MAG_IGRF90", blur: 4}).plot({color: {type: "diverging"}})
+  </script>
+  <script id="4" type="module" pinned="">
+    const ca55 = FileAttachment("data/ca55-south.csv").csv({typed: true}).then(display);
+  </script>
+</notebook>

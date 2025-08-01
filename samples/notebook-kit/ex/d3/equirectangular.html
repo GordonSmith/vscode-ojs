@@ -1,0 +1,39 @@
+<!doctype html>
+<notebook theme="air">
+  <title>Equirectangular</title>
+  <script id="2" type="text/markdown">
+    # Equirectangular
+  </script>
+  <script id="1" type="module" pinned="">
+    const projection = d3.geoEquirectangular();
+    const height = autoheight(projection, width);
+    const outline = {type: "Sphere"};
+    const graticule = d3.geoGraticule10();
+    const land = topojson.feature(world, world.objects.land);
+    const canvas = display(document.createElement("canvas"));
+    canvas.width = width * devicePixelRatio;
+    canvas.height = height * devicePixelRatio;
+    canvas.style.width = `${width}px`;
+    const context = canvas.getContext("2d");
+    context.scale(devicePixelRatio, devicePixelRatio);
+    const path = d3.geoPath(projection, context);
+    context.save();
+    context.beginPath(), path(outline), context.clip(), context.fillStyle = "#fff", context.fillRect(0, 0, width, height);
+    context.beginPath(), path(graticule), context.strokeStyle = "#ccc", context.stroke();
+    context.beginPath(), path(land), context.fillStyle = "#000", context.fill();
+    context.restore();
+    context.beginPath(), path(outline), context.strokeStyle = "#000", context.stroke();
+  </script>
+  <script id="13" type="module" pinned="">
+    function autoheight(projection, width, outline = {type: "Sphere"}) {
+      const [[x0, y0], [x1, y1]] = d3.geoPath(projection.fitWidth(width, outline)).bounds(outline);
+      const height = Math.ceil(y1 - y0);
+      const l = Math.min(Math.ceil(x1 - x0), height);
+      projection.scale(projection.scale() * (l - 1) / l);
+      return height;
+    }
+  </script>
+  <script id="8" type="module" pinned="">
+    const world = FileAttachment("data/land-50m.json").json().then(display);
+  </script>
+</notebook>

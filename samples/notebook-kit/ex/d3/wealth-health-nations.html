@@ -1,0 +1,175 @@
+<!doctype html>
+<notebook>
+  <title>The wealth &amp; health of nations</title>
+  <script id="1" type="text/markdown">
+    # The wealth & health of nations
+
+    This is a recreation of a [Gapminder visualization](http://gapminder.org/world/) made famous by [Hans Rosling](https://www.ted.com/talks/hans_rosling_the_best_stats_you_ve_ever_seen). It shows per-capita income (*x*), life expectancy (*y*) and population (*area*) of 180 nations over the last 209 years, colored by region. Data prior to 1950 is sparse, so this chart uses [bisection](https://en.wikipedia.org/wiki/Binary_search_algorithm) and [linear interpolation](https://en.wikipedia.org/wiki/Linear_interpolation) to fill in missing data points.
+  </script>
+  <script id="2" type="module">
+    const interval = d3.utcMonth; // interval between animation frames
+
+    const dates = interval.range(
+      d3.min(data, (d) => {
+        return d3.min([
+          d.income[0],
+          d.population[0],
+          d.lifeExpectancy[0]
+        ], ([date]) => date);
+      }),
+      d3.min(data, (d) => {
+        return d3.max([
+          d.income[d.income.length - 1],
+          d.population[d.population.length - 1],
+          d.lifeExpectancy[d.lifeExpectancy.length - 1]
+        ], ([date]) => date);
+      })
+    );
+
+    const date = view(Scrubber(dates, {format: (d) => d.getUTCFullYear(), loop: false}));
+  </script>
+  <script id="6" type="module" pinned="">
+    const height = 560;
+    const marginTop = 20;
+    const marginRight = 20;
+    const marginBottom = 35;
+    const marginLeft = 40;
+
+    const x = d3.scaleLog([200, 1e5], [marginLeft, width - marginRight]);
+    const y = d3.scaleLinear([14, 86], [height - marginBottom, marginTop]);
+    const radius = d3.scaleSqrt([0, 5e8], [0, width / 24]);
+    const color = d3.scaleOrdinal(data.map((d) => d.region), d3.schemeCategory10).unknown("black");
+
+    const bisectFirst = d3.bisector(([x]) => x).left;
+
+    const svg = d3.create("svg")
+        .attr("viewBox", [0, 0, width, height]);
+
+    svg.append("g")
+        .call(xAxis);
+
+    svg.append("g")
+        .call(yAxis);
+
+    svg.append("g")
+        .call(grid);
+
+    const circle = svg.append("g")
+        .attr("stroke", "black")
+      .selectAll("circle")
+      .data(dataAt(1800), (d) => d.name)
+      .join("circle")
+        .sort((a, b) => d3.descending(a.population, b.population))
+        .attr("cx", (d) => x(d.income))
+        .attr("cy", (d) => y(d.lifeExpectancy))
+        .attr("r", (d) => radius(d.population))
+        .attr("fill", (d) => color(d.region))
+        .call((circle) => circle.append("title")
+          .text((d) => [d.name, d.region].join("\n")));
+
+    display(Plot.legend({color: {domain: color.domain(), range: color.range()}}));
+
+    display(svg.node());
+
+    function update(date) {
+      circle.data(dataAt(date), (d) => d.name)
+          .sort((a, b) => d3.descending(a.population, b.population))
+          .attr("cx", (d) => x(d.income))
+          .attr("cy", (d) => y(d.lifeExpectancy))
+          .attr("r", (d) => radius(d.population));
+    }
+
+    function xAxis(g) {
+      g
+        .attr("transform", `translate(0,${height - marginBottom})`)
+        .call(d3.axisBottom(x).ticks(width / 80, ","))
+        .call((g) => g.select(".domain").remove())
+        .call((g) => g.append("text")
+            .attr("x", width)
+            .attr("y", marginBottom - 4)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "end")
+            .text("Income per capita (dollars) →"));
+    }
+
+    function yAxis(g) {
+      g
+        .attr("transform", `translate(${marginLeft},0)`)
+        .call(d3.axisLeft(y))
+        .call((g) => g.select(".domain").remove())
+        .call((g) => g.append("text")
+            .attr("x", -marginLeft)
+            .attr("y", 10)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "start")
+            .text("↑ Life expectancy (years)"));
+    }
+
+    function grid(g) {
+      g
+        .attr("stroke", "currentColor")
+        .attr("stroke-opacity", 0.1)
+        .call((g) => g.append("g")
+          .selectAll("line")
+          .data(x.ticks())
+          .join("line")
+            .attr("x1", (d) => 0.5 + x(d))
+            .attr("x2", (d) => 0.5 + x(d))
+            .attr("y1", marginTop)
+            .attr("y2", height - marginBottom))
+        .call((g) => g.append("g")
+          .selectAll("line")
+          .data(y.ticks())
+          .join("line")
+            .attr("y1", (d) => 0.5 + y(d))
+            .attr("y2", (d) => 0.5 + y(d))
+            .attr("x1", marginLeft)
+            .attr("x2", width - marginRight));
+    }
+
+    // Return the interpolated data for the specified date.
+    function dataAt(date) {
+      return data.map((d) => ({
+        name: d.name,
+        region: d.region,
+        income: valueAt(d.income, date),
+        population: valueAt(d.population, date),
+        lifeExpectancy: valueAt(d.lifeExpectancy, date)
+      }));
+    }
+
+    // Return the interpolated value for the specified date.
+    function valueAt(values, date) {
+      const i = bisectFirst(values, date, 0, values.length - 1);
+      const a = values[i];
+      if (i > 0) {
+        const b = values[i - 1];
+        const t = (date - a[0]) / (b[0] - a[0]);
+        return a[1] * (1 - t) + b[1] * t;
+      }
+      return a[1];
+    }
+  </script>
+  <script id="7" type="module" pinned="">
+    update(date); // side effect to trigger the animation
+  </script>
+  <script id="4" type="module" pinned="">
+    const data = FileAttachment("data/nations.json")
+      .json()
+      .then((data) => data.map(({name, region, income, population, lifeExpectancy}) => ({
+        name,
+        region,
+        income: parseSeries(income),
+        population: parseSeries(population),
+        lifeExpectancy: parseSeries(lifeExpectancy)
+      })))
+      .then(display);
+
+    function parseSeries(series) {
+      return series.map(([year, value]) => [new Date(Date.UTC(year, 0, 1)), value]);
+    }
+  </script>
+  <script id="3" type="module" pinned="">
+    import {Scrubber} from "./scrubber.js";
+  </script>
+</notebook>

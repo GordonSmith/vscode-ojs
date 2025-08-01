@@ -492,7 +492,7 @@
       {
         "id": "observable-kit-renderer",
         "displayName": "Observable Notebook Kit Renderer",
-        "entrypoint": "./dist/renderer.js",
+        "entrypoint": "./dist/observable-kit-renderer.js",
         "mimeTypes": [
           "application/observable-kit+json"
         ],
