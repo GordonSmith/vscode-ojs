@@ -1,12 +1,12 @@
 <!doctype html>
-<notebook theme="air">
+<notebook theme="air" xmlns="http://www.w3.org/1999/xhtml">
   <title>Projection transitions</title>
-  <script id="1" type="application/vnd.observable.javascript">
-    md`# Projection transitions
+  <script id="1" type="text/markdown">
+    # Projection transitions
 
-    This notebook interpolates smoothly between projections; this is easiest when both projections are well-defined over the given viewport (here, the world).`
+    This notebook interpolates smoothly between projections; this is easiest when both projections are well-defined over the given viewport (here, the world).
   </script>
-  <script id="6" type="application/vnd.observable.javascript">
+  <script id="2" type="application/vnd.observable.javascript">
     viewof projection = {
       const input = projectionInput({
         value: new URLSearchParams(location.search).get("projection"),
@@ -21,7 +21,7 @@
       return input;
     }
   </script>
-  <script id="10" type="application/vnd.observable.javascript" pinned="">
+  <script id="3" type="application/vnd.observable.javascript" pinned="">
     viewof context = {
       const context = DOM.context2d(width, height);
       context.canvas.style.display = "block";
@@ -30,7 +30,7 @@
       return context.canvas;
     }
   </script>
-  <script id="109" type="application/vnd.observable.javascript" pinned="">
+  <script id="4" type="application/vnd.observable.javascript" pinned="">
     function render(projection) {
       const path = d3.geoPath(projection, context);
       context.clearRect(0, 0, width, height);
@@ -42,7 +42,7 @@
       context.beginPath(), path(outline), context.strokeStyle = "#000", context.stroke();
     }
   </script>
-  <script id="38" type="application/vnd.observable.javascript" pinned="">
+  <script id="5" type="application/vnd.observable.javascript" pinned="">
     update = {
       const r0 = mutable previousProjection;
       const r1 = projection;
@@ -56,10 +56,10 @@
       }
     }
   </script>
-  <script id="90" type="application/vnd.observable.javascript" pinned="">
+  <script id="6" type="application/vnd.observable.javascript" pinned="">
     mutable previousProjection = d3.geoEquirectangularRaw
   </script>
-  <script id="68" type="application/vnd.observable.javascript" pinned="">
+  <script id="7" type="application/vnd.observable.javascript" pinned="">
     function interpolateProjection(raw0, raw1) {
       const {scale: scale0, translate: translate0} = fit(raw0);
       const {scale: scale1, translate: translate1} = fit(raw1);
@@ -69,50 +69,50 @@
         .precision(0.1);
     }
   </script>
-  <script id="343" type="application/vnd.observable.javascript" pinned="">
+  <script id="8" type="application/vnd.observable.javascript" pinned="">
     function lerp1(x0, x1, t) {
       return (1 - t) * x0 + t * x1;
     }
   </script>
-  <script id="342" type="application/vnd.observable.javascript" pinned="">
+  <script id="9" type="application/vnd.observable.javascript" pinned="">
     function lerp2([x0, y0], [x1, y1], t) {
       return [(1 - t) * x0 + t * x1, (1 - t) * y0 + t * y1];
     }
   </script>
-  <script id="292" type="application/vnd.observable.javascript" pinned="">
+  <script id="10" type="application/vnd.observable.javascript" pinned="">
     function fit(raw) {
       const p = d3.geoProjection(raw).fitExtent([[0.5, 0.5], [width - 0.5, height - 0.5]], outline);
       return {scale: p.scale(), translate: p.translate()};
     }
   </script>
-  <script id="113" type="application/vnd.observable.javascript" pinned="">
+  <script id="11" type="application/vnd.observable.javascript" pinned="">
     ease = d3.easeCubicInOut
   </script>
-  <script id="28" type="application/vnd.observable.javascript" pinned="">
+  <script id="12" type="application/vnd.observable.javascript" pinned="">
     width = 954
   </script>
-  <script id="24" type="application/vnd.observable.javascript" pinned="">
+  <script id="13" type="application/vnd.observable.javascript" pinned="">
     height = 600
   </script>
-  <script id="21" type="application/vnd.observable.javascript" pinned="">
+  <script id="14" type="application/vnd.observable.javascript" pinned="">
     outline = ({type: "Sphere"})
   </script>
-  <script id="19" type="application/vnd.observable.javascript" pinned="">
+  <script id="15" type="application/vnd.observable.javascript" pinned="">
     graticule = d3.geoGraticule10()
   </script>
-  <script id="18" type="application/vnd.observable.javascript" pinned="">
+  <script id="16" type="application/vnd.observable.javascript" pinned="">
     land = topojson.feature(world, world.objects.land)
   </script>
-  <script id="15" type="application/vnd.observable.javascript" pinned="">
+  <script id="17" type="application/vnd.observable.javascript" pinned="">
     world = FileAttachment("data/land-110m.json").json()
   </script>
-  <script id="13" type="application/vnd.observable.javascript" pinned="">
+  <script id="18" type="application/vnd.observable.javascript" pinned="">
     topojson = require("topojson-client@3")
   </script>
-  <script id="12" type="application/vnd.observable.javascript" pinned="">
+  <script id="19" type="application/vnd.observable.javascript" pinned="">
     d3 = require("d3-geo@2", "d3-geo-projection@3", "d3-ease@2")
   </script>
-  <script id="169" type="application/vnd.observable.javascript" pinned="">
+  <script id="20" type="application/vnd.observable.javascript" pinned="">
     projections = [
       {name: "Aitoff", value: d3.geoAitoffRaw},
       {name: "American polyconic", value: d3.geoPolyconicRaw},
@@ -181,7 +181,7 @@
       {name: "Winkel tripel", value: d3.geoWinkel3Raw}
     ]
   </script>
-  <script id="5" type="application/vnd.observable.javascript" pinned="">
+  <script id="21" type="application/vnd.observable.javascript" pinned="">
     function projectionInput({name = "", value} = {}) {
       const form = html`<form><select name=i>${projections.map((p) => {
         return Object.assign(html`<option>`, {

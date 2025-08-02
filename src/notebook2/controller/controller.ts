@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { OBSERVABLE_KIT_MIME, VSCODE_TO_OBSERVABLE_MODE_MAP } from "./serializer";
-import { parseJavaScript, transpile } from "@observablehq/notebook-kit"
+import { maybeParseJavaScript, transpile } from "@observablehq/notebook-kit"
 
 export class NotebookKitController {
     readonly controllerId = "observable-kit-kernel";
@@ -79,9 +79,10 @@ export class NotebookKitController {
     ): Promise<vscode.NotebookCellOutput | undefined> {
         const cellText = cell.document.getText();
         const tjs = transpile(cellText, cell.metadata.mode);
+        const parsed = maybeParseJavaScript(tjs.body);
         const outputData = {
             metadata: cell.metadata,
-            value: tjs
+            parsed
         };
         return new vscode.NotebookCellOutput([
             vscode.NotebookCellOutputItem.json(outputData, OBSERVABLE_KIT_MIME)
