@@ -1,5 +1,34 @@
 import type { ActivationFunction } from "vscode-notebook-renderer";
-import { runtime, define, main } from "@observablehq/notebook-kit/runtime";
+import type { DefineState, Definition } from "@observablehq/notebook-kit/runtime";
+import { define } from "@observablehq/notebook-kit/runtime";
+
+const stateById = new Map<string, DefineState>();
+
+function add(vscodeCellID: string, definition: Definition, placeholderDiv: HTMLDivElement): void {
+    let state = stateById.get(vscodeCellID);
+    if (state) {
+        state.variables.forEach((v) => v.delete());
+        state.variables = [];
+    } else {
+        state = { root: placeholderDiv, expanded: [], variables: [] };
+        stateById.set(vscodeCellID, state);
+    }
+    define(state, definition);
+}
+
+function remove(vscodeCellID: string): void {
+    const state = stateById.get(vscodeCellID)!;
+    state.root.remove();
+    state.variables.forEach((v) => v.delete());
+    stateById.delete(vscodeCellID);
+}
+
+function removeAll(): void {
+    const keys = Array.from(stateById.keys());
+    for (const key of keys) {
+        remove(key);
+    }
+}
 
 import "@observablehq/notebook-kit/index.css";
 
@@ -69,14 +98,18 @@ export const activate: ActivationFunction = context => {
                     container.id = `cell-${cellId}`;
                     element.appendChild(container);
                 }
-                data.value.body = evil(data.value.body);
-                const scope: Map<string, any> = main._scope;
-                const existing = scope.get(`cell ${cellId}`);
-                if (existing) {
-                    existing.define(data.value.inputs, data.value.body);
-                } else {
-                    define({ root: container, expanded: [], variables: [] }, { id: cellId, ...data.value });
+                try {
+                    if (data.value.body.indexOf("function()") >= 0) {
+                        data.value.body = data.value.body.replace("function()", '() =>');
+                    } else if (data.value.body.indexOf(`function ${data.value.output}(`) >= 0) {
+                        data.value.body = data.value.body.replace(`function ${data.value.output}(`, `(`);
+                        data.value.body = data.value.body.replace(`){`, `) => {`);
+                    }
+                    data.value.body = evil(data.value.body);
+                } catch (error) {
+                    data.value.body = () => `Error: ${error.message}`;
                 }
+                add(outputItem.id, { id: cellId, ...data.value }, container);
                 console.log('Observable Kit renderer processed cell:', cellId);
             } catch (error) {
                 console.error('Error in Observable Kit renderer:', error);
@@ -88,8 +121,12 @@ export const activate: ActivationFunction = context => {
         },
 
         async disposeOutputItem(id?: string) {
-            console.log("id", id);
-            //const existing = scope.get(`cell ${cellId}`);
+            console.log('Observable Kit renderer processed cell:', id);
+            if (id) {
+                remove(id);
+            } else {
+                removeAll();
+            }
         }
     };
 };

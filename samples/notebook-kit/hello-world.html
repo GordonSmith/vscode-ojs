@@ -15,110 +15,44 @@
   </script>
   <script id="2" type="module" pinned="">
     // Vanilla JavaScript with Observable functions
-    const message = "Hello, Observable Notebook Kit 2sdfvsdfsdf.0!";
+    const message = "Hello, Observable Notebook Kit 2.0!";
     display(message + "!!!");
   </script>
-  <script id="3" type="module" pinned="">
-    // Specify the dimensions of the chart.
-    const width = 928;
-    const height = 600;
-    const marginTop = 20;
-    const marginRight = 30;
-    const marginBottom = 30;
-    const marginLeft = 40;
-
-    // Create the horizontal and vertical scales.
-    const x = d3.scaleLinear()
-      .domain(d3.extent(faithful, (d) => d.waiting)).nice()
-      .rangeRound([marginLeft, width - marginRight]);
-
-    const y = d3.scaleLinear()
-      .domain(d3.extent(faithful, (d) => d.eruptions)).nice()
-      .rangeRound([height - marginBottom, marginTop]);
-
-    // Compute the density contours.
-    const contours = d3.contourDensity()
-      .x((d) => x(d.waiting))
-      .y((d) => y(d.eruptions))
-      .size([width, height])
-      .bandwidth(30)
-      .thresholds(30)
-      (faithful);
-
-    // Create the SVG container.
-    const svg = d3.create("svg")
-      .attr("width", width)
-      .attr("height", height)
-      .attr("viewBox", [0, 0, width, height])
-      .attr("style", "max-width: 100%; height: auto;");
-
-    // Append the axes.
-    svg.append("g")
-      .attr("transform", `translate(0,${height - marginBottom})`)
-      .call(d3.axisBottom(x).tickSizeOuter(0))
-      .call((g) => g.select(".domain").remove())
-      .call((g) => g.select(".tick:last-of-type text").clone()
-        .attr("y", -3)
-        .attr("dy", null)
-        .attr("font-weight", "bold")
-        .text("Idle (min.)"));
-
-    svg.append("g")
-      .attr("transform", `translate(${marginLeft},0)`)
-      .call(d3.axisLeft(y).tickSizeOuter(0))
-      .call((g) => g.select(".domain").remove())
-      .call((g) => g.select(".tick:last-of-type text").clone()
-        .attr("x", 3)
-        .attr("text-anchor", "start")
-        .attr("font-weight", "bold")
-        .text("Erupting (min.)"));
-
-    // Append the contours.
-    svg.append("g")
-      .attr("fill", "none")
-      .attr("stroke", "steelblue")
-      .attr("stroke-linejoin", "round")
-      .selectAll()
-      .data(contours)
-      .join("path")
-      .attr("stroke-width", (d, i) => i % 5 ? 0.25 : 1)
-      .attr("d", d3.geoPath());
-
-    // Append dots.
-    svg.append("g")
-      .attr("stroke", "white")
-      .selectAll()
-      .data(faithful)
-      .join("circle")
-      .attr("cx", (d) => x(d.waiting))
-      .attr("cy", (d) => y(d.eruptions))
-      .attr("r", 2);
-
-    display(svg.node());
+  <script id="3" type="application/vnd.observable.javascript" pinned="">
+    viewof foo2 = Inputs.range([0, 100], {step: 1, label: "Foo"})
   </script>
-  <script id="4" type="module" pinned="">
-    const faithful = FileAttachment("data/faithful.tsv").tsv({ typed: true }).then(display);
+  <script id="1" type="application/vnd.observable.javascript" pinned="">
+    viewof x = DOM.range()
+  </script>
+  <script id="4" type="application/vnd.observable.javascript" pinned="">
+    foo3 = 42
+  </script>
+  <script id="5" type="application/vnd.observable.javascript" pinned="">
+    40 + 2
+  </script>
+  <script id="6" type="module" pinned="">
+    const foo = view(Inputs.range([0, 100], { step: 1, label: "Foo" }));
+  </script>
+  <script id="7" type="module" pinned="">
+    const faithful = FileAttachment("faithful.tsv").tsv({ typed: true }).then(display);
 
   </script>
-  <script id="5" type="text/markdown">
+  <script id="8" type="text/markdown">
     # Hello, world!
   </script>
-  <script id="6" type="application/sql">
+  <script id="9" type="application/sql">
     SELECT * FROM customers
   </script>
-  <script id="7" type="application/x-tex">
+  <script id="10" type="application/x-tex">
     \int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
   </script>
-  <script id="8" type="text/html">
+  <script id="11" type="text/html">
     <h1>Hello, <i>world</i>!</h1>
   </script>
-  <script id="9" type="text/vnd.graphviz">
+  <script id="12" type="text/vnd.graphviz">
     digraph G {
       A -> B -> C;
       A -> C;
     }
-  </script>
-  <script id="10" type="application/vnd.observable.javascript">
-    foo = 42
   </script>
 </notebook>
