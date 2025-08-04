@@ -1,0 +1,25 @@
+Survived,Sex,Age,Class,value
+Perished,Male,Adult,Crew,670
+Perished,Male,Adult,Third Class,387
+Perished,Male,Adult,Second Class,154
+Perished,Male,Adult,First Class,118
+Perished,Male,Child,Third Class,35
+Perished,Female,Adult,Crew,3
+Perished,Female,Adult,Third Class,89
+Perished,Female,Adult,Second Class,13
+Perished,Female,Adult,First Class,4
+Perished,Female,Child,Third Class,17
+Survived,Male,Adult,Crew,192
+Survived,Male,Adult,Third Class,75
+Survived,Male,Adult,Second Class,14
+Survived,Male,Adult,First Class,57
+Survived,Male,Child,Third Class,13
+Survived,Male,Child,Second Class,11
+Survived,Male,Child,First Class,5
+Survived,Female,Adult,Crew,20
+Survived,Female,Adult,Third Class,76
+Survived,Female,Adult,Second Class,80
+Survived,Female,Adult,First Class,140
+Survived,Female,Child,Third Class,14
+Survived,Female,Child,Second Class,13
+Survived,Female,Child,First Class,1

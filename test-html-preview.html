@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Preview Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #fff;
+        }
+
+        button {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #ff5252;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🎉 HTML Preview Test</h1>
+
+        <div class="feature">
+            <h3>✨ Feature 1: Interactive Elements</h3>
+            <p>This HTML file demonstrates the embedded webview preview functionality.</p>
+            <button onclick="alert('Hello from HTML Preview!')">Click me!</button>
+        </div>
+
+        <div class="feature">
+            <h3>🎨 Feature 2: Styling</h3>
+            <p>The preview supports CSS styling and modern web features.</p>
+        </div>
+
+        <div class="feature">
+            <h3>🔧 Feature 3: JavaScript</h3>
+            <p>JavaScript should work in the preview webview.</p>
+            <script>
+                console.log('JavaScript is working in HTML Preview!');
+                document.addEventListener('DOMContentLoaded', function () {
+                    const features = document.querySelectorAll('.feature');
+                    features.forEach((feature, index) => {
+                        feature.style.animationDelay = `${index * 0.2}s`;
+                        feature.style.animation = 'fadeInUp 0.6s ease forwards';
+                    });
+                });
+            </script>
+        </div>
+
+        <div class="feature">
+            <h3>📝 Current Time</h3>
+            <p id="current-time">Loading...</p>
+            <script>
+                function updateTime() {
+                    document.getElementById('current-time').textContent = new Date().toLocaleString();
+                }
+                updateTime();
+                setInterval(updateTime, 1000);
+            </script>
+        </div>
+    </div>
+
+    <style>
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</body>
+
+</html>

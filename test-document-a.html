@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document A - Sync Test</title>
+</head>
+
+<body>
+    <h1>Document A</h1>
+    <p>This is the first test document for testing preview synchronization.</p>
+    <p>Try switching between this file and Document B to see the preview update automatically.</p>
+
+    <script type="observable">
+        // This Observable script should show as Document A demo
+        const message = "Hello from Document A!";
+        console.log(message);
+    </script>
+
+    <div style="background: #e7f3ff; padding: 15px; border-radius: 5px; margin: 15px 0;">
+        <strong>Test Instructions:</strong>
+        <ol>
+            <li>Open this file and run "Observable Kit: Preview"</li>
+            <li>Open "test-document-b.html" in another tab</li>
+            <li>Switch between the tabs - the preview should update automatically!</li>
+            <li>Try typing in this document - the preview should update after 500ms</li>
+        </ol>
+    </div>
+</body>
+
+</html>

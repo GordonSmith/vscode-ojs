@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Advanced Disposal Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .test-container {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .test-step {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .success {
+            border-left-color: #4ecdc4;
+        }
+
+        .warning {
+            border-left-color: #feca57;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .console-button {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .step-counter {
+            display: inline-block;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="test-container">
+        <h1>🔬 Advanced Webview Disposal Test</h1>
+        <p>This comprehensive test checks if the webview disposal and recovery fixes are working correctly.</p>
+
+        <div class="info-panel">
+            <h2>🎯 Test Objective</h2>
+            <p>Verify that the webview can be disposed and recreated multiple times without errors, and that the "is disposed" error has been resolved.</p>
+        </div>
+
+        <h2>📋 Test Protocol</h2>
+
+        <div class="test-step">
+            <span class="step-counter">1</span>
+            <strong>Initial Preview:</strong> Open this file in the Observable preview panel
+        </div>
+
+        <div class="test-step">
+            <span class="step-counter">2</span>
+            <strong>First Disposal:</strong> Close the preview panel using the X button
+        </div>
+
+        <div class="test-step">
+            <span class="step-counter">3</span>
+            <strong>First Recovery:</strong> Reopen preview (Ctrl+Shift+P → "Observable Kit: Preview")
+        </div>
+
+        <div class="test-step">
+            <span class="step-counter">4</span>
+            <strong>Rapid Cycling:</strong> Repeat close/open cycle 5-10 times rapidly
+        </div>
+
+        <div class="test-step">
+            <span class="step-counter">5</span>
+            <strong>Functionality Test:</strong> Click buttons below to verify functionality
+        </div>
+
+        <div class="test-step">
+            <span class="step-counter">6</span>
+            <strong>Console Check:</strong> Verify no "disposed" errors in Developer Console
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <h3>🧪 Interactive Tests</h3>
+
+            <button onclick="testBasicAlert()" title="Test basic alert functionality">
+                🚨 Basic Alert Test
+            </button>
+
+            <button onclick="testComplexAlert()" title="Test complex alert with metadata">
+                📊 Complex Alert Test
+            </button>
+
+            <button class="console-button" onclick="testConsoleLog()" title="Test console logging">
+                🖥️ Console Log Test
+            </button>
+
+            <button class="console-button" onclick="testErrorHandling()" title="Test error handling">
+                ⚠️ Error Handling Test
+            </button>
+        </div>
+
+        <div class="info-panel">
+            <h3>✅ Success Indicators</h3>
+            <ul>
+                <li>All buttons work after multiple dispose/reopen cycles</li>
+                <li>No "disposed" errors in console</li>
+                <li>Preview opens reliably every time</li>
+                <li>Content renders correctly after each reopen</li>
+                <li>No memory leaks or performance degradation</li>
+            </ul>
+        </div>
+
+        <div class="info-panel">
+            <h3>❌ Failure Indicators</h3>
+            <ul>
+                <li>Buttons stop working after disposal</li>
+                <li>"Disposed" errors appear in console</li>
+                <li>Preview fails to open after multiple cycles</li>
+                <li>Content doesn't render properly</li>
+                <li>VS Code becomes unresponsive</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; font-size: 14px; opacity: 0.8;">
+            <p>🕒 Test Session: <span id="session-time"></span></p>
+            <p>🔄 Page Loads: <span id="load-counter">1</span></p>
+            <p>📁 File: advanced-disposal-test.html</p>
+        </div>
+    </div>
+
+    <script>
+        let loadCount = parseInt(localStorage.getItem('disposalTestLoads') || '0') + 1;
+        localStorage.setItem('disposalTestLoads', loadCount.toString());
+        document.getElementById('load-counter').textContent = loadCount;
+        document.getElementById('session-time').textContent = new Date().toLocaleString();
+
+        function testBasicAlert() {
+            try {
+                alert('🎉 Basic Alert Test Successful!\n\nThis confirms the webview is functional after disposal/recovery cycles.\n\nLoad #' + loadCount);
+                console.log('✅ Basic alert test passed - Load #' + loadCount);
+            } catch (error) {
+                console.error('❌ Basic alert test failed:', error);
+                alert('❌ Basic Alert Test Failed!\n\nError: ' + error.message);
+            }
+        }
+
+        function testComplexAlert() {
+            try {
+                const metadata = {
+                    testType: 'Complex Alert',
+                    loadNumber: loadCount,
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator.userAgent.substring(0, 50) + '...',
+                    disposalTestVersion: '2.0'
+                };
+
+                alert('🔬 Complex Alert Test Successful!\n\n' +
+                    'Test Type: ' + metadata.testType + '\n' +
+                    'Load Number: ' + metadata.loadNumber + '\n' +
+                    'Timestamp: ' + metadata.timestamp + '\n' +
+                    'Browser: ' + metadata.userAgent + '\n' +
+                    'Test Version: ' + metadata.disposalTestVersion);
+
+                console.log('✅ Complex alert test passed:', metadata);
+            } catch (error) {
+                console.error('❌ Complex alert test failed:', error);
+                alert('❌ Complex Alert Test Failed!\n\nError: ' + error.message);
+            }
+        }
+
+        function testConsoleLog() {
+            try {
+                const testData = {
+                    message: '🖥️ Console Log Test from Disposal Recovery Test',
+                    loadNumber: loadCount,
+                    timestamp: new Date().toISOString(),
+                    memoryUsage: performance.memory ? {
+                        used: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + 'MB',
+                        total: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024) + 'MB'
+                    } : 'Memory info not available',
+                    testStatus: 'PASSED'
+                };
+
+                console.log(testData.message, testData);
+                console.table([testData]);
+                alert('✅ Console Log Test Completed!\n\nCheck the Developer Console for detailed output.');
+            } catch (error) {
+                console.error('❌ Console log test failed:', error);
+                alert('❌ Console Log Test Failed!\n\nError: ' + error.message);
+            }
+        }
+
+        function testErrorHandling() {
+            try {
+                console.log('🧪 Testing error handling...');
+
+                // Test that we can handle errors gracefully
+                try {
+                    // This should not cause any disposal issues
+                    throw new Error('Intentional test error');
+                } catch (intentionalError) {
+                    console.log('✅ Caught intentional error as expected:', intentionalError.message);
+                }
+
+                console.log('✅ Error handling test completed successfully');
+                alert('✅ Error Handling Test Passed!\n\nThe webview properly handles errors without disposal issues.');
+            } catch (error) {
+                console.error('❌ Error handling test failed:', error);
+                alert('❌ Error Handling Test Failed!\n\nError: ' + error.message);
+            }
+        }
+
+        // Initialize test environment
+        console.log('🔬 Advanced Disposal Test initialized');
+        console.log('📊 Load count:', loadCount);
+        console.log('🕒 Session time:', new Date().toISOString());
+
+        // Test that basic DOM manipulation works
+        setTimeout(() => {
+            try {
+                const element = document.getElementById('load-counter');
+                if (element) {
+                    element.style.fontWeight = 'bold';
+                    element.style.color = '#4ecdc4';
+                    console.log('✅ DOM manipulation test passed');
+                }
+            } catch (error) {
+                console.error('❌ DOM manipulation test failed:', error);
+            }
+        }, 1000);
+    </script>
+</body>
+
+</html>

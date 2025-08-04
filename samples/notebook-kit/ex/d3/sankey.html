@@ -1,0 +1,117 @@
+<!doctype html>
+<notebook theme="air">
+  <title>Sankey diagram</title>
+  <script id="1" type="text/markdown">
+    # Sankey diagram
+
+    This [Sankey diagram](https://github.com/d3/d3-sankey) visualizes the flow of energy: *supplies* are on the left, and *demands* are on the right. Links show how varying amounts of energy are converted or transmitted before being consumed or lost. Data: [Department of Energy & Climate Change](http://www.decc.gov.uk/en/content/cms/tackling/2050/calculator_on/calculator_on.aspx) via [Tom Counsell](https://tamc.github.io/Sankey/)
+  </script>
+  <script id="4" type="module">
+    const edgeColor = view(Inputs.select(new Map([
+      ["input", "input"],
+      ["output", "output"],
+      ["input-output", "path"],
+      ["none", "none"]
+    ]), {label: "Edge color", value: "path"}));
+    const align = view(Inputs.select(new Map([
+      ["left-aligned", "left"],
+      ["right-aligned", "right"],
+      ["centered", "center"],
+      ["justified", "justify"]
+    ]), {label: "Node alignment", value: "justify"}))
+  </script>
+  <script id="2" type="module" pinned="">
+    import * as Sankey from "npm:d3-sankey@0.12";
+
+    const width = 960;
+    const height = 600;
+
+    const sankey = Sankey.sankey()
+        .nodeId((d) => d.name)
+        .nodeAlign(Sankey[`sankey${align[0].toUpperCase()}${align.slice(1)}`])
+        .nodeWidth(15)
+        .nodePadding(10)
+        .extent([[1, 5], [width - 1, height - 5]]);
+
+    const {nodes, links} = sankey({
+      nodes: data.nodes.map((d) => structuredClone(d)),
+      links: data.links.map((d) => structuredClone(d))
+    });
+
+    const _format = d3.format(",.0f");
+    const format = data.units ? (d) => `${_format(d)} ${data.units}` : _format;
+
+    const _color = d3.scaleOrdinal(d3.schemeCategory10);
+    const color = (d) => _color(d.category === undefined ? d.name : d.category);
+
+    const svg = d3.create("svg")
+        .attr("viewBox", [0, 0, width, height]);
+
+    svg.append("g")
+        .attr("stroke", "#000")
+      .selectAll("rect")
+      .data(nodes)
+      .join("rect")
+        .attr("x", (d) => d.x0)
+        .attr("y", (d) => d.y0)
+        .attr("height", (d) => d.y1 - d.y0)
+        .attr("width", (d) => d.x1 - d.x0)
+        .attr("fill", color)
+      .append("title")
+        .text((d) => `${d.name}\n${format(d.value)}`);
+
+    const link = svg.append("g")
+        .attr("fill", "none")
+        .attr("stroke-opacity", 0.5)
+      .selectAll("g")
+      .data(links)
+      .join("g")
+        .style("mix-blend-mode", "multiply");
+
+    if (edgeColor === "path") {
+      const gradient = link.append("linearGradient")
+          .attr("id", (d, i) => (d.uid = `link-${i}`))
+          .attr("gradientUnits", "userSpaceOnUse")
+          .attr("x1", (d) => d.source.x1)
+          .attr("x2", (d) => d.target.x0);
+
+      gradient.append("stop")
+          .attr("offset", "0%")
+          .attr("stop-color", (d) => color(d.source));
+
+      gradient.append("stop")
+          .attr("offset", "100%")
+          .attr("stop-color", (d) => color(d.target));
+    }
+
+    link.append("path")
+        .attr("d", Sankey.sankeyLinkHorizontal())
+        .attr("stroke", (d) => edgeColor === "none" ? "#aaa"
+            : edgeColor === "path" ? `url(#${d.uid})`
+            : edgeColor === "input" ? color(d.source)
+            : color(d.target))
+        .attr("stroke-width", (d) => Math.max(1, d.width));
+
+    link.append("title")
+        .text((d) => `${d.source.name} → ${d.target.name}\n${format(d.value)}`);
+
+    svg.append("g")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 10)
+      .selectAll("text")
+      .data(nodes)
+      .join("text")
+        .attr("x", (d) => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
+        .attr("y", (d) => (d.y1 + d.y0) / 2)
+        .attr("dy", "0.35em")
+        .attr("text-anchor", (d) => d.x0 < width / 2 ? "start" : "end")
+        .text((d) => d.name);
+
+    display(svg.node());
+  </script>
+  <script id="3" type="module" pinned="">
+    const links = await FileAttachment("data/energy.csv").csv({typed: true});
+    const nodes = Array.from(new Set(links.flatMap((l) => [l.source, l.target])), (name) => ({name, category: name.replace(/ .*/, "")}));
+    const data = display({nodes, links, units: "TWh"});
+  </script>
+</notebook>

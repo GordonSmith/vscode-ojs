@@ -1,0 +1,27 @@
+<!doctype html>
+<notebook>
+  <title>arealineY custom mark</title>
+  <script id="1" type="text/markdown">
+    # arealineY custom mark
+
+    Plot allows the creation of custom [composite marks](https://observablehq.com/plot/features/marks#marks-marks), such as this one comprising a rule, area, and line:
+  </script>
+  <script id="3" type="module" pinned="">
+    function arealineY(data, {color, fillOpacity = 0.1, ...options} = {}) {
+      return Plot.marks(
+        Plot.ruleY([0]),
+        Plot.areaY(data, {fill: color, fillOpacity, ...options}),
+        Plot.lineY(data, {stroke: color, ...options})
+      );
+    }
+  </script>
+  <script id="15" type="text/markdown">
+    You can use this composite mark like any built-in mark:
+  </script>
+  <script id="8" type="module" pinned="">
+    arealineY(aapl, {x: "Date", y: "Close", color: "steelblue"}).plot()
+  </script>
+  <script id="16" type="module" pinned="">
+    const aapl = FileAttachment("data/AAPL.csv").csv({typed: true}).then(display);
+  </script>
+</notebook>

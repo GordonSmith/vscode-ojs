@@ -1,0 +1,75 @@
+<!doctype html>
+<notebook>
+  <title>Pie chart update</title>
+  <script id="1" type="text/markdown">
+    # Pie chart update
+
+    This variation of a [donut chart](https://observablehq.com/@d3/donut-chart/2) demonstrates how to update values with an animated transition. Clicking on the radio buttons changes the displayed metric.
+  </script>
+  <script id="2" type="module">
+    const input = Inputs.radio(
+      new Map([["Apples", "apples"], ["Oranges", "oranges"]]),
+      {label: "Series", value: "apples"}
+    );
+    const series = view(input);
+    const interval = d3.interval(() => {
+      input.value = (input.value === "apples" ? "oranges" : "apples");
+      input.dispatchEvent(new Event("input", {bubbles: true}));
+    }, 2000);
+    const clear = () => interval.stop();
+    input.addEventListener("change", clear, {once: true});
+    invalidation.then(() => (clear(), input.removeEventListener("change", clear)));
+  </script>
+  <script id="4" type="module" pinned="">
+    const height = Math.min(500, width / 2);
+    const outerRadius = height / 2 - 10;
+    const innerRadius = outerRadius * 0.75;
+    const color = d3.scaleOrdinal(d3.schemeObservable10);
+
+    const svg = d3.create("svg")
+        .attr("viewBox", [-width / 2, -height / 2, width, height]);
+
+    const arc = d3.arc()
+        .innerRadius(innerRadius)
+        .outerRadius(outerRadius);
+
+    const pie = d3.pie()
+        .sort(null)
+        .value((d) => d["apples"]);
+
+    const path = svg.datum(data).selectAll("path")
+        .data(pie)
+      .join("path")
+        .attr("fill", (d, i) => color(i))
+        .attr("d", arc)
+        .each(function(d) { this._current = d; }); // store the initial angles
+
+    display(svg.node());
+
+    function update(value) {
+      pie.value((d) => d[value]); // change the value function
+      path.data(pie); // compute the new angles
+      path.transition().duration(750).attrTween("d", arcTween); // redraw the arcs
+    }
+
+    // Store the displayed angles in _current.
+    // Then, interpolate from _current to the new angles.
+    // During the transition, _current is updated in-place by d3.interpolate.
+    function arcTween(a) {
+      const i = d3.interpolate(this._current, a);
+      this._current = i(0);
+      return (t) => arc(i(t));
+    }
+  </script>
+  <script id="6" type="module" pinned="">
+    update(series); // side effect to animate the chart
+  </script>
+  <script id="5" type="module" pinned="">
+    const data = display(d3.csvParse(`apples,oranges
+    53245,200
+    28479,200
+    19697,200
+    24037,200
+    40245,200`, d3.autoType));
+  </script>
+</notebook>

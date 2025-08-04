@@ -1,0 +1,70 @@
+<!doctype html>
+<notebook theme="air">
+  <title>Tidy tree</title>
+  <script id="1" type="text/markdown">
+    # Tidy tree
+
+    D3’s [tree layout](https://d3js.org/d3-hierarchy/tree) implements the [Reingold–Tilford "tidy" algorithm](http://reingold.co/tidier-drawings.pdf), improved by [Buchheim *et al.*](http://dirk.jivas.de/papers/buchheim02improving.pdf), for constructing hierarchical node-link diagrams. Tidy trees are typically more compact than [cluster dendrograms](./cluster), which place all leaves at the same level. See also the [radial variant](./radial-tree).
+  </script>
+  <script id="10" type="module" pinned="">
+    const width = 960;
+
+    const root = d3.hierarchy(data);
+    root.dx = 10;
+    root.dy = width / (root.height + 1);
+
+    d3.tree().nodeSize([root.dx, root.dy])(root);
+
+    let x0 = Infinity;
+    let x1 = -x0;
+    root.each((d) => {
+      if (d.x > x1) x1 = d.x;
+      if (d.x < x0) x0 = d.x;
+    });
+
+    const svg = d3.create("svg")
+        .attr("viewBox", [0, 0, width, x1 - x0 + root.dx * 2]);
+
+    const g = svg.append("g")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 10)
+        .attr("transform", `translate(${root.dy / 3},${root.dx - x0})`);
+
+    const link = g.append("g")
+      .attr("fill", "none")
+      .attr("stroke", "#555")
+      .attr("stroke-opacity", 0.4)
+      .attr("stroke-width", 1.5)
+    .selectAll("path")
+      .data(root.links())
+      .join("path")
+        .attr("d", d3.linkHorizontal()
+            .x((d) => d.y)
+            .y((d) => d.x));
+
+    const node = g.append("g")
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-width", 3)
+      .selectAll("g")
+      .data(root.descendants())
+      .join("g")
+        .attr("transform", (d) => `translate(${d.y},${d.x})`);
+
+    node.append("circle")
+        .attr("fill", (d) => d.children ? "#555" : "#999")
+        .attr("r", 2.5);
+
+    node.append("text")
+        .attr("dy", "0.31em")
+        .attr("x", (d) => d.children ? -6 : 6)
+        .attr("text-anchor", (d) => d.children ? "end" : "start")
+        .text((d) => d.data.name)
+      .clone(true).lower()
+        .attr("stroke", "white");
+
+    display(svg.node());
+  </script>
+  <script id="3" type="module" pinned="">
+    const data = FileAttachment("data/flare.json").json().then(display);
+  </script>
+</notebook>

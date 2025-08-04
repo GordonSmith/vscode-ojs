@@ -1,0 +1,105 @@
+<!doctype html>
+<notebook theme="air">
+  <title>Antimeridian cutting</title>
+  <script id="6" type="text/markdown">
+    # Antimeridian cutting
+  </script>
+  <script id="8" type="module">
+    map(land, {width, invalidation})
+  </script>
+  <script id="40" type="text/markdown">
+    A central challenge of projecting geography is that the globe is spherical while the display is planar. Projecting the globe onto the screen thus requires cutting the globe at least once. Most commonly, world maps are horizontally centered at the [prime meridian](https://en.wikipedia.org/wiki/Prime_Meridian) and cut the globe along ±180° longitude, which is called the *antimeridian*.
+  </script>
+  <script id="41" type="text/markdown">
+    But what happens to shapes that cross the antimeridian, such as the Eastern tip of Russia? When projecting Russia using a normal [cylindrical projection](https://en.wikipedia.org/wiki/Equirectangular_projection), for example, the Western part of Russia appears on the right edge, while the Eastern part appears on the left edge. A naïve projection of lines that cross the antimeridian would also cross the map, leading to distracting visual artifacts!
+  </script>
+  <script id="61" type="text/markdown">
+    To avoid this problem, most freely-available shapefiles are already cut along the antimeridian. This enables geographic software to ignore the topological complexity of a spherical globe. Unfortunately, by relying on pre-cut input, much geographic software cannot handle different aspects and rotations.
+  </script>
+  <script id="42" type="text/markdown">
+    D3 takes a different approach: geometry is represented in spherical coordinates and then cut along the antimeridian during projection. This allows D3 to support arbitrary spherical rotations during projection without visual artifacts. Use your mouse to rotate the world above and see a new aspect.
+  </script>
+  <script id="32" type="module" pinned="">
+    function map(land, {
+      width = 960,
+      height = 500,
+      devicePixelRatio: dpr = devicePixelRatio,
+      invalidation // optional promise to stop animation
+    } = {}) {
+      const canvas = document.createElement("canvas");
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+
+      const context = canvas.getContext("2d");
+
+      const projection = d3.geoConicEqualArea()
+          .scale(150 * dpr)
+          .center([0, 33])
+          .translate([width * dpr / 2, height * dpr / 2])
+          .precision(0.3);
+
+      const path = d3.geoPath()
+          .projection(projection)
+          .context(context);
+
+      let frame;
+      let x0, y0;
+      let lambda0, phi0;
+
+      canvas.onpointermove = (event) => {
+        if (!event.isPrimary) return;
+        const [x, y] = d3.pointer(event);
+        render([
+          lambda0 + (x - x0) / (width * dpr) * 360,
+          phi0 - (y - y0) / (height * dpr) * 360
+        ]);
+      };
+
+      canvas.ontouchstart = (event) => {
+        event.preventDefault();
+      };
+
+      canvas.onpointerenter = (event) => {
+        if (!event.isPrimary) return;
+        cancelAnimationFrame(frame);
+        ([x0, y0] = d3.pointer(event));
+        ([lambda0, phi0] = projection.rotate());
+      };
+
+      canvas.onpointerleave = (event) => {
+        if (!event.isPrimary) return;
+        frame = requestAnimationFrame(tick);
+      };
+
+      function tick() {
+        const [lambda, phi] = projection.rotate();
+        render([lambda + 0.1, phi + 0.1]);
+        return frame = requestAnimationFrame(tick);
+      }
+
+      function render(rotate) {
+        projection.rotate(rotate);
+        context.clearRect(0, 0, width * dpr, height * dpr);
+        context.beginPath();
+        path(land);
+        context.fill();
+        context.beginPath();
+        path({type: "Sphere"});
+        context.lineWidth = dpr;
+        context.stroke();
+      }
+
+      tick();
+
+      if (invalidation) invalidation.then(() => cancelAnimationFrame(frame));
+
+      return canvas;
+    }
+  </script>
+  <script id="12" type="module" pinned="">
+    const world = await FileAttachment("data/land-110m.json").json().then(display);
+    const land = topojson.feature(world, world.objects.land);
+  </script>
+</notebook>
