@@ -1,0 +1,28 @@
+<!doctype html>
+<notebook>
+  <title>Area chart with gradient</title>
+  <script id="1" type="text/markdown">
+    # Area chart with gradient
+
+    A custom [function mark](https://observablehq.com/plot/features/marks) returns a svg gradient (generated with [Hypertext Literal](https://github.com/observablehq/htl)), that can be referenced as a [funciri](https://developer.mozilla.org/en-US/docs/Web/SVG/Content_type#funciri) color in the [area](https://observablehq.com/plot/marks/area) mark.
+  </script>
+  <script id="5" type="module" pinned="">
+    Plot.plot({
+      y: {grid: true},
+      marks: [
+        () => htl.svg`<defs>
+          <linearGradient id="gradient" gradientTransform="rotate(90)">
+            <stop offset="20%" stop-color="steelblue" stop-opacity="0.5" />
+            <stop offset="100%" stop-color="brown" stop-opacity="0" />
+          </linearGradient>
+        </defs>`,
+        Plot.areaY(aapl, {x: "Date", y: "Close", fill: "url(#gradient)"}),
+        Plot.lineY(aapl, {x: "Date", y: "Close", stroke: "steelblue"}),
+        Plot.ruleY([0])
+      ]
+    })
+  </script>
+  <script id="6" type="module" pinned="">
+    const aapl = FileAttachment("data/AAPL.csv").csv({typed: true}).then(display);
+  </script>
+</notebook>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Observable Preview Test</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .info {
+            background: #e7f3ff;
+            border-left: 4px solid #007acc;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🎉 Simple Observable Preview Test</h1>
+
+    <div class="info">
+        <strong>What to expect:</strong> The Observable script tags below should be converted to simple "Hello World" demonstrations with alert buttons.
+    </div>
+
+    <h2>Observable Script Example 1</h2>
+    <p>This script should show a simple Hello World demonstration:</p>
+
+    <!-- Observable script that should be simplified -->
+    <script type="observable">
+        // This complex Observable code should be simplified to Hello World
+        const data = [
+            {name: "Alice", age: 30, city: "New York"},
+            {name: "Bob", age: 25, city: "San Francisco"},
+            {name: "Charlie", age: 35, city: "Chicago"}
+        ];
+        
+        const chart = Plot.plot({
+            marks: [
+                Plot.barY(data, {x: "name", y: "age", fill: "steelblue"}),
+                Plot.ruleY([0])
+            ],
+            x: {label: "Name"},
+            y: {label: "Age"},
+            title: "Ages by Person"
+        });
+        
+        yield chart;
+    </script>
+
+    <h2>Observable Script Example 2</h2>
+    <p>Another Observable script with interactive elements:</p>
+
+    <!-- Another Observable script -->
+    <script type="observable">
+        md`# Complex Observable Notebook
+        This is a complex Observable cell with markdown and data visualization.
+        
+        The chart below shows data filtered by the slider value:
+        `;
+        
+        viewof slider = Inputs.range([0, 100], {
+            step: 1, 
+            value: 50, 
+            label: "Filter threshold"
+        });
+        
+        filteredData = data.filter(d => d.age >= slider);
+        
+        Plot.plot({
+            marks: [Plot.dot(filteredData, {x: "age", y: "name"})],
+            title: `Filtered data (age >= ${slider})`
+        });
+    </script>
+
+    <h2>Observable Code Block</h2>
+    <p>Observable code in a pre element should also be converted:</p>
+
+    <!-- Observable code block -->
+    <pre class="observable-code">
+        // This Observable code in a pre tag should also be simplified
+        import {FileAttachment} from "@observablehq/stdlib";
+        
+        const data = await FileAttachment("data.csv").csv({typed: true});
+        
+        const result = data
+            .filter(d => d.value > 10)
+            .map(d => ({
+                ...d,
+                doubled: d.value * 2,
+                category: d.value > 50 ? "high" : "low"
+            }));
+        
+        display(result);
+    </pre>
+
+    <div class="info">
+        <strong>Expected result:</strong> Each Observable code section above should be replaced with a simple "Hello World" display that includes:
+        <ul>
+            <li>A heading saying "Hello World from Observable!"</li>
+            <li>A button that shows an alert when clicked</li>
+            <li>Simple, clean styling</li>
+        </ul>
+    </div>
+
+    <h2>Regular JavaScript (should remain unchanged)</h2>
+    <script>
+        console.log('This regular JavaScript should remain unchanged');
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const div = document.createElement('div');
+            div.style.cssText = 'background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; margin: 10px 0; border-radius: 4px;';
+            div.innerHTML = '<strong>✅ Regular JavaScript Executed:</strong> This script tag was not modified by the transpiler.';
+            document.body.appendChild(div);
+        });
+    </script>
+</body>
+
+</html>

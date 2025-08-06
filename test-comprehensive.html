@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Preview Test</title>
+</head>
+
+<body>
+    <h1>Comprehensive Observable Preview Test</h1>
+
+    <p>This file tests all aspects of the simple preview system:</p>
+
+    <h2>1. Observable Script Test</h2>
+    <p>The script below should be converted to a "Hello World" demo:</p>
+
+    <script type="observable">
+        // This Observable script should be transpiled
+        const data = [
+            {name: "Alice", value: 30},
+            {name: "Bob", value: 45},  
+            {name: "Charlie", value: 25}
+        ];
+        
+        const chart = Plot.plot({
+            marks: [Plot.barY(data, {x: "name", y: "value"})]
+        });
+        
+        yield chart;
+    </script>
+
+    <h2>2. Observable Code Block Test</h2>
+    <p>The pre element below should also be transpiled:</p>
+
+    <pre class="observable-code">
+        md`# My Observable Notebook`;
+        
+        viewof slider = Inputs.range([0, 100], {
+            step: 1,
+            value: 50,
+            label: "Adjust value"
+        });
+        
+        filteredData = data.filter(d => d.value >= slider);
+        display(filteredData);
+    </pre>
+
+    <h2>3. Regular Content</h2>
+    <p>This regular HTML content should remain unchanged and appear in the preview.</p>
+
+    <div style="background: #e7f3ff; padding: 15px; border-radius: 5px; margin: 15px 0;">
+        <strong>Expected Result:</strong>
+        <ul>
+            <li>✅ A "Hello World" preview section should appear at the top</li>
+            <li>✅ Observable scripts should be converted to demo sections</li>
+            <li>✅ Observable code blocks should show formatted code with demo buttons</li>
+            <li>✅ Regular HTML content should remain visible</li>
+            <li>✅ All content should be styled and interactive</li>
+        </ul>
+    </div>
+
+    <p>End of test content.</p>
+</body>
+
+</html>

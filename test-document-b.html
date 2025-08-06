@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document B - Sync Test</title>
+</head>
+
+<body>
+    <h1>Document B</h1>
+    <p>This is the second test document for testing preview synchronization.</p>
+    <p>The preview should automatically switch to show this document when you activate this tab.</p>
+
+    <script type="observable">
+        // This Observable script should show as Document B demo
+        const data = [10, 20, 30];
+        const message = "Hello from Document B!";
+        console.log(message, data);
+    </script>
+
+    <pre class="observable-code">
+        // Observable code block in Document B
+        viewof slider = Inputs.range([0, 100], {value: 42});
+        
+        md`The slider value is: ${slider}`;
+    </pre>
+
+    <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin: 15px 0;">
+        <strong>Sync Features Tested:</strong>
+        <ul>
+            <li>✅ Automatic switching when you change active tabs</li>
+            <li>✅ Real-time updates when you type (with 500ms debounce)</li>
+            <li>✅ Updates on save</li>
+            <li>✅ Different content for each document</li>
+            <li>✅ Observable script transpilation per document</li>
+        </ul>
+    </div>
+</body>
+
+</html>

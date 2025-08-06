@@ -1,0 +1,62 @@
+<!doctype html>
+<notebook theme="air">
+  <title>Untitled Notebook</title>
+  <script id="1" type="text/markdown">
+    # Welcome to Observable Notebook Kit
+
+    This notebook demonstrates the new HTML-based Observable Notebook Kit format with vanilla JavaScript support.
+
+    ## Key Features
+
+    - **Vanilla JavaScript**: No need to learn Observable JavaScript dialect
+    - **Standard imports**: Use npm, JSR, and local imports
+    - **Git-friendly**: HTML format with clear diffs
+    - **Static site generation**: Build to static sites with Notebook Kit CLI
+  </script>
+  <script id="2" type="module">
+    // Vanilla JavaScript with Observable functions
+    const message = "Hello, Observable Notebook Kit 2.0!";
+    display(message);
+  </script>
+  <script id="3" type="module">
+    // Create sample data
+    const data = Array.from({ length: 10 }, (_, i) => ({
+        x: i,
+        y: Math.random() * 99,
+        category: i % 2 === 0 ? 'Even' : 'Odd'
+    }));
+
+    display(data);
+  </script>
+  <script id="4" type="module">
+    // Interactive input demonstration
+    const slider = view({
+        type: 'range',
+        min: 1,
+        max: 100,
+        value: 50
+    });
+
+    display(`Slider value: ${slider}`);
+  </script>
+  <script id="5" type="module">
+    // Legacy Observable JavaScript syntax (backwards compatibility)
+    legacyValue = "This cell uses Observable JavaScript syntax"
+  </script>
+  <script id="6" type="text/html">
+    <div style="padding: 20px; border: 2px solid #0066cc; border-radius: 8px; background: #f0f8ff;">
+      <h3>HTML Cell</h3>
+      <p>This is a raw HTML cell in the Observable Notebook Kit format.</p>
+    </div>
+  </script>
+  <script id="7" type="module">
+    .notebook-kit-style {
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </script>
+</notebook>

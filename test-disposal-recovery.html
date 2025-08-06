@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Disposal Recovery Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔄 Disposal Recovery Test</h1>
+        <p>This file tests the webview disposal and recovery functionality.</p>
+
+        <h2>Test Instructions:</h2>
+        <ol>
+            <li>Open this file in the preview</li>
+            <li>Close the preview panel multiple times</li>
+            <li>Reopen the preview using the command palette</li>
+            <li>Verify it works every time</li>
+        </ol>
+
+        <div style="margin: 20px 0; padding: 15px; background: rgba(255, 255, 255, 0.2); border-radius: 5px;">
+            <h3>✅ Expected Behavior:</h3>
+            <ul>
+                <li>Preview should open successfully every time</li>
+                <li>No error messages in console</li>
+                <li>Content should display properly</li>
+                <li>Simple preview functionality should work</li>
+            </ul>
+        </div>
+
+        <button onclick="alert('🎉 Disposal recovery test successful! Preview is working after multiple disposals.')" style="background: #ff6b6b; color: white; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-size: 16px;">
+            Test Alert
+        </button>
+
+        <p style="margin-top: 20px; font-size: 14px; opacity: 0.8;">
+            <strong>Timestamp:</strong> <span id="timestamp"></span>
+        </p>
+    </div>
+
+    <script>
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+        console.log('🧪 Disposal Recovery Test loaded at:', new Date().toISOString());
+    </script>
+</body>
+
+</html>

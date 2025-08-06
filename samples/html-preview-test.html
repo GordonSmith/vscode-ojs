@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple HTML Preview Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #f5f7fa;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>🚀 HTML Preview Feature Test</h1>
+        <p>This HTML file tests the new HTML preview button functionality.</p>
+
+        <h2>✅ What should work:</h2>
+        <ul>
+            <li>Click the preview icon in the editor title bar</li>
+            <li>See this page rendered in a webview panel</li>
+            <li>Interactive JavaScript elements</li>
+            <li>Automatic refresh when you save the file</li>
+        </ul>
+
+        <div class="status" id="js-status">JavaScript: Loading...</div>
+
+        <p>
+            <button class="btn" onclick="testInteractivity()">Test Interactivity</button>
+            <button class="btn" onclick="updateTimestamp()">Update Time</button>
+        </p>
+
+        <div id="output"></div>
+    </div>
+
+    <script>
+        // Test JavaScript functionality
+        document.getElementById('js-status').textContent = 'JavaScript: ✅ Working!';
+
+        function testInteractivity() {
+            const output = document.getElementById('output');
+            const time = new Date().toLocaleTimeString();
+            output.innerHTML = `<div class="status">Button clicked at ${time}</div>`;
+        }
+
+        function updateTimestamp() {
+            const output = document.getElementById('output');
+            output.innerHTML = `<div class="status">Last updated: ${new Date().toLocaleString()}</div>`;
+        }
+
+        // Auto-update on page load
+        window.addEventListener('load', function () {
+            updateTimestamp();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,96 @@
+<!doctype html>
+<notebook theme="air">
+  <title>Scatterplot</title>
+  <script id="1" type="text/markdown">
+    # Scatterplot
+
+    This chart shows the inverse relationship between engine power (*y*-axis) and fuel efficiency (*x*-axis) in 32 cars from the 1970s.
+  </script>
+  <script id="10" type="module" pinned="">
+    const height = 600;
+    const marginTop = 25;
+    const marginRight = 20;
+    const marginBottom = 35;
+    const marginLeft = 40;
+
+    const x = d3.scaleLinear()
+        .domain(d3.extent(data, (d) => d.Miles_per_Gallon)).nice()
+        .range([marginLeft, width - marginRight]);
+
+    const y = d3.scaleLinear()
+        .domain(d3.extent(data, (d) => d.Horsepower)).nice()
+        .range([height - marginBottom, marginTop]);
+
+    const svg = d3.create("svg")
+        .attr("viewBox", [0, 0, width, height]);
+
+    svg.append("g")
+        .attr("transform", `translate(0,${height - marginBottom})`)
+        .call(d3.axisBottom(x).ticks(width / 80))
+        .call((g) => g.select(".domain").remove())
+        .call((g) => g.append("text")
+            .attr("x", width)
+            .attr("y", marginBottom - 4)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "end")
+            .text("Miles per gallon →"));
+
+    svg.append("g")
+        .attr("transform", `translate(${marginLeft},0)`)
+        .call(d3.axisLeft(y))
+        .call((g) => g.select(".domain").remove())
+        .call((g) => g.append("text")
+            .attr("x", -marginLeft)
+            .attr("y", 10)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "start")
+            .text("↑ Horsepower"));
+
+    svg.append("g")
+        .attr("stroke", "currentColor")
+        .attr("stroke-opacity", 0.1)
+        .call((g) => g.append("g")
+          .selectAll("line")
+          .data(x.ticks())
+          .join("line")
+            .attr("x1", (d) => 0.5 + x(d))
+            .attr("x2", (d) => 0.5 + x(d))
+            .attr("y1", marginTop)
+            .attr("y2", height - marginBottom))
+        .call((g) => g.append("g")
+          .selectAll("line")
+          .data(y.ticks())
+          .join("line")
+            .attr("y1", (d) => 0.5 + y(d))
+            .attr("y2", (d) => 0.5 + y(d))
+            .attr("x1", marginLeft)
+            .attr("x2", width - marginRight));
+
+    svg.append("g")
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 1.5)
+        .attr("fill", "none")
+      .selectAll("circle")
+      .data(data.filter((d) => d.Miles_per_Gallon && d.Horsepower))
+      .join("circle")
+        .attr("cx", (d) => x(d.Miles_per_Gallon))
+        .attr("cy", (d) => y(d.Horsepower))
+        .attr("r", 3);
+
+    svg.append("g")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 10)
+      .selectAll("text")
+      .data(d3.sort(data, (d) => d.Miles_per_Gallon * d.Horsepower).slice(-30))
+      .join("text")
+        .attr("dy", "0.35em")
+        .attr("x", (d) => x(d.Miles_per_Gallon) + 7)
+        .attr("y", (d) => y(d.Horsepower))
+        .text((d) => d.Name);
+
+    display(svg.node());
+  </script>
+  <script id="3" type="module" pinned="">
+    const data = FileAttachment("data/cars.csv").csv({typed: true}).then(display);
+  </script>
+</notebook>

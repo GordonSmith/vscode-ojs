@@ -1,0 +1,153 @@
+<!doctype html>
+<notebook theme="air">
+  <title>Parabolic arcs</title>
+  <script id="1" type="text/markdown">
+    # Parabolic arcs
+
+    Based on work by [Derek Watkins](https://gist.github.com/dwtkns/4973620) and [Patrick Surrey](https://gist.github.com/patricksurry/5735048).
+  </script>
+  <script id="2" type="module" pinned="">
+    const height = 600;
+    const r = Math.min(width, height) / 2.5;
+    const cx = width / 2;
+    const cy = height / 2;
+
+    const projection = d3.geoOrthographic()
+        .translate([cx, cy])
+        .clipAngle(90)
+        .scale(r);
+
+    const path = d3.geoPath(projection)
+        .pointRadius(2.5);
+
+    const svg = d3.select(display(html`<svg width=${width} height=${height} style="overflow: visible;" fill="none">
+      <defs>
+        <radialGradient id="ocean_fill" cx="75%" cy="25%">
+          <stop offset="5%" stop-color="#fff" />
+          <stop offset="100%" stop-color="#aaa" />
+        </radialGradient>
+        <radialGradient id="globe_highlight" cx="75%" cy="25%">
+          <stop offset="5%" stop-color="#ffd" stop-opacity="0.6" />
+          <stop offset="100%" stop-color="#ba9" stop-opacity="0.2" />
+        </radialGradient>
+        <radialGradient id="globe_shading" cx="55%" cy="45%">
+          <stop offset="30%" stop-color="#fff" stop-opacity="0" />
+          <stop offset="100%" stop-color="#556" stop-opacity="0.3" />
+        </radialGradient>
+        <radialGradient id="drop_shadow" cx="50%" cy="50%">
+          <stop offset="20%" stop-color="#000" stop-opacity="0.5" />
+          <stop offset="100%" stop-color="#000" stop-opacity="0" />
+        </radialGradient>
+      </defs>
+      <g pointer-events="none">
+        <ellipse cx=${cx} cy=${cy + r * 0.95} rx=${r * 0.90} ry=${r * 0.25} fill="url(#drop_shadow)" />
+        <circle cx=${cx} cy=${cy} r=${r} fill="url(#ocean_fill)" />
+        <path id="feature" fill="#999" />
+        <circle cx=${cx} cy=${cy} r=${r} fill="url(#globe_highlight)" />
+        <circle cx=${cx} cy=${cy} r=${r} fill="url(#globe_shading)" />
+      </g>
+      <g id="points" fill="black" fill-opacity="0.6" />
+      <g id="arcs" stroke="gray" stroke-opacity="0.05" stroke-width="3" />
+      <g id="flyers" stroke="darkred" />
+    </svg>`))
+        .call(drag(projection).on("drag", render));
+
+    const feature = svg.select("#feature").datum(land);
+    const point = svg.select("#points").selectAll().data(places).join("path");
+    const arc = svg.select("#arcs").selectAll().data(links).join("path");
+    const flyer = svg.select("#flyers").selectAll().data(links).join("path");
+
+    render();
+
+    function render() {
+      feature.attr("d", path);
+      point.attr("d", path);
+      arc.attr("d", renderArc);
+      flyer.attr("d", renderFlyer).attr("stroke-opacity", fadeArc);
+    }
+
+    function renderArc({source, target}) {
+      return path({type: "LineString", coordinates: [source, target]});
+    }
+
+    function renderFlyer({source, target}) {
+      const center = projection.invert([cx, cy]);
+      const interpolate = d3.geoInterpolate(source, target);
+      return `M${d3.ticks(0, 1, 40).map((t) => { // sample evenly in [0, 1]
+        const h = 1.5 * t * (1 - t); // height follows parabolic curve
+        const p = interpolate(t); // spherical coordinates
+        const [x1, y1] = projection(p); // ground coordinates
+        return [x1 + (x1 - cx) * h, y1 + (y1 - cy) * h];
+      }).filter((p) => p).join("L")}`;
+    }
+
+    function fadeArc({source, target}) {
+      const center = projection.invert([cx, cy]);
+      const sourceDistance = d3.geoDistance(source, center);
+      const targetDistance = d3.geoDistance(target, center);
+      return Math.PI / 2 - Math.max(sourceDistance, targetDistance) + 0.2;
+    }
+  </script>
+  <script id="9" type="module" pinned="">
+    const world = FileAttachment("data/land-110m.json").json();
+    const places = FileAttachment("data/capitals.json").json().then((places) => places.features);
+    const links = places.then((places) => places.map((p) => p.geometry.coordinates).flatMap((a, i, points) => points.slice(i + 1).map((b) => ({source: a, target: b}))));
+    const land = world.then((world) => topojson.feature(world, world.objects.land));
+  </script>
+  <script id="19" type="module" pinned="">
+    import versor from "npm:versor";
+
+    function drag(projection) {
+      let v0, q0, r0, a0, l;
+
+      function pointer(event, that) {
+        const t = d3.pointers(event, that);
+
+        if (t.length !== l) {
+          l = t.length;
+          if (l > 1) a0 = Math.atan2(t[1][1] - t[0][1], t[1][0] - t[0][0]);
+          dragstarted.apply(that, [event, that]);
+        }
+
+        // For multitouch, average positions and compute rotation.
+        if (l > 1) {
+          const x = d3.mean(t, (p) => p[0]);
+          const y = d3.mean(t, (p) => p[1]);
+          const a = Math.atan2(t[1][1] - t[0][1], t[1][0] - t[0][0]);
+          return [x, y, a];
+        }
+
+        return t[0];
+      }
+
+      function dragstarted({x, y}) {
+        v0 = versor.cartesian(projection.invert([x, y]));
+        q0 = versor(r0 = projection.rotate());
+      }
+
+      function dragged(event) {
+        const v1 = versor.cartesian(projection.rotate(r0).invert([event.x, event.y]));
+        const delta = versor.delta(v0, v1);
+        let q1 = versor.multiply(q0, delta);
+
+        // For multitouch, compose with a rotation around the axis.
+        const p = pointer(event, this);
+        if (p[2]) {
+          const d = (p[2] - a0) / 2;
+          const s = -Math.sin(d);
+          const c = Math.sign(Math.cos(d));
+          q1 = versor.multiply([Math.sqrt(1 - s * s), 0, 0, c * s], q1);
+        }
+
+        projection.rotate(versor.rotation(q1));
+
+        // In vicinity of the antipode (unstable) of q0, restart.
+        if (delta[0] < 0.7) dragstarted.apply(this, [event, this]);
+      }
+
+      return d3.drag()
+          .on("start.drag", dragstarted)
+          .on("drag.drag", dragged);
+    }
+  </script>
+</notebook>

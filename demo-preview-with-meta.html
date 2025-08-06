@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Script Demo</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="preview-container"></div>
+
+    <script type="module">
+        // Simulate loading the preview script with meta info
+
+        // Meta information that would be passed from VS Code extension
+        const previewMeta = {
+            title: 'Demo Observable Notebook',
+            filename: 'demo.onb.html',
+            timestamp: Date.now(),
+            documentUri: 'file:///path/to/demo.onb.html',
+            version: '2.0.0'
+        };
+
+        // Simple preview class (normally this would be imported from preview.ts)
+        class SimplePreview {
+            constructor(containerId, meta = {}) {
+                this.meta = {
+                    title: 'Simple Observable Preview',
+                    filename: 'untitled.html',
+                    timestamp: Date.now(),
+                    version: '1.0.0',
+                    ...meta
+                };
+
+                this.container = document.getElementById(containerId) || this.createContainer(containerId);
+                this.initialize();
+            }
+
+            createContainer(id) {
+                const container = document.createElement('div');
+                container.id = id;
+                container.style.cssText = `
+                    font-family: system-ui, -apple-system, sans-serif;
+                    max-width: 800px;
+                    margin: 20px auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                `;
+                document.body.appendChild(container);
+                return container;
+            }
+
+            initialize() {
+                this.render();
+                this.setupInteractions();
+            }
+
+            render() {
+                this.container.innerHTML = `
+                    <div style="border: 2px solid #007acc; border-radius: 8px; padding: 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+                        <h1 style="color: #007acc; margin-top: 0; text-align: center;">
+                            ${this.meta.title}
+                        </h1>
+                        
+                        <div style="background: white; padding: 15px; border-radius: 6px; margin: 15px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <h2 style="color: #333; margin-top: 0;">Hello World! 👋</h2>
+                            <p style="color: #666;">
+                                This is a simplified Observable preview loaded with meta information from VS Code.
+                            </p>
+                            
+                            <div style="margin: 15px 0;">
+                                <button id="hello-alert" style="
+                                    background: #ff6b6b;
+                                    color: white;
+                                    border: none;
+                                    padding: 10px 20px;
+                                    border-radius: 5px;
+                                    cursor: pointer;
+                                    font-size: 16px;
+                                    margin-right: 10px;
+                                ">
+                                    Show Alert
+                                </button>
+                                
+                                <button id="console-log" style="
+                                    background: #4ecdc4;
+                                    color: white;
+                                    border: none;
+                                    padding: 10px 20px;
+                                    border-radius: 5px;
+                                    cursor: pointer;
+                                    font-size: 16px;
+                                    margin-right: 10px;
+                                ">
+                                    Log to Console
+                                </button>
+                                
+                                <button id="update-meta" style="
+                                    background: #f39c12;
+                                    color: white;
+                                    border: none;
+                                    padding: 10px 20px;
+                                    border-radius: 5px;
+                                    cursor: pointer;
+                                    font-size: 16px;
+                                ">
+                                    Update Meta
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 4px solid #007acc;">
+                            <h3 style="color: #007acc; margin-top: 0;">Meta Information</h3>
+                            <ul style="color: #666; margin: 0; padding-left: 20px;">
+                                <li><strong>File:</strong> ${this.meta.filename}</li>
+                                <li><strong>Version:</strong> ${this.meta.version}</li>
+                                <li><strong>Loaded:</strong> ${new Date(this.meta.timestamp).toLocaleString()}</li>
+                                ${this.meta.documentUri ? `<li><strong>URI:</strong> <code style="background: #e9ecef; padding: 2px 4px; border-radius: 3px;">${this.meta.documentUri}</code></li>` : ''}
+                            </ul>
+                        </div>
+                        
+                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 6px; margin-top: 15px;">
+                            <h3 style="color: #856404; margin-top: 0;">🚀 Preview Features</h3>
+                            <p style="color: #856404; margin-bottom: 0;">
+                                This simple preview demonstrates:
+                                <br>• Loading with meta information from VS Code extension
+                                <br>• Simple alert and console interactions  
+                                <br>• Dynamic meta information updates
+                                <br>• Clean, responsive interface
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            setupInteractions() {
+                // Alert button
+                const alertButton = this.container.querySelector('#hello-alert');
+                if (alertButton) {
+                    alertButton.addEventListener('click', () => {
+                        alert(`Hello from ${this.meta.filename}!\\n\\nThis preview was loaded with meta information:\\n- Title: ${this.meta.title}\\n- Version: ${this.meta.version}\\n- Loaded at: ${new Date(this.meta.timestamp).toLocaleString()}`);
+                    });
+                }
+
+                // Console log button
+                const consoleButton = this.container.querySelector('#console-log');
+                if (consoleButton) {
+                    consoleButton.addEventListener('click', () => {
+                        console.log('🎉 Hello from Simple Observable Preview!', {
+                            meta: this.meta,
+                            timestamp: new Date().toISOString(),
+                            message: 'This preview was loaded with VS Code meta information'
+                        });
+
+                        this.addMessage('Message logged to console! Check the developer tools.', 'success');
+                    });
+                }
+
+                // Update meta button
+                const updateButton = this.container.querySelector('#update-meta');
+                if (updateButton) {
+                    updateButton.addEventListener('click', () => {
+                        this.updateMeta({
+                            timestamp: Date.now(),
+                            title: 'Updated ' + this.meta.title,
+                            version: (parseFloat(this.meta.version) + 0.1).toFixed(1)
+                        });
+
+                        this.addMessage('Meta information updated! Notice the changes above.', 'info');
+                    });
+                }
+            }
+
+            updateMeta(newMeta) {
+                this.meta = { ...this.meta, ...newMeta };
+                this.render();
+                this.setupInteractions();
+            }
+
+            addMessage(message, type = 'info') {
+                const colors = {
+                    info: '#007acc',
+                    success: '#28a745',
+                    warning: '#ffc107',
+                    error: '#dc3545'
+                };
+
+                const messageDiv = document.createElement('div');
+                messageDiv.style.cssText = `
+                    background: white;
+                    border-left: 4px solid ${colors[type]};
+                    padding: 10px 15px;
+                    margin: 10px 0;
+                    border-radius: 4px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                    animation: slideIn 0.3s ease;
+                `;
+                messageDiv.innerHTML = `
+                    <strong style="color: ${colors[type]};">${type.toUpperCase()}:</strong>
+                    <span style="color: #333; margin-left: 8px;">${message}</span>
+                `;
+
+                this.container.appendChild(messageDiv);
+
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.style.animation = 'slideOut 0.3s ease';
+                        setTimeout(() => messageDiv.remove(), 300);
+                    }
+                }, 5000);
+            }
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes slideOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-10px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize the preview with meta information
+        const preview = new SimplePreview('preview-container', previewMeta);
+
+        // Make it globally available
+        window.observablePreview = preview;
+
+        // Simulate VS Code extension communication
+        setTimeout(() => {
+            preview.addMessage('Preview loaded successfully with meta information from VS Code extension!', 'success');
+        }, 1000);
+
+        console.log('🎉 Preview initialized with meta:', previewMeta);
+    </script>
+</body>
+
+</html>

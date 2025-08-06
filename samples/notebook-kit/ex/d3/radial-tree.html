@@ -1,0 +1,80 @@
+<!doctype html>
+<notebook theme="air">
+  <title>Radial tidy tree</title>
+  <script id="1" type="text/markdown">
+    # Radial tidy tree
+
+    D3’s [tree layout](https://d3js.org/d3-hierarchy/tree) implements the [Reingold–Tilford "tidy" algorithm](http://reingold.co/tidier-drawings.pdf), improved by [Buchheim *et al.*](http://dirk.jivas.de/papers/buchheim02improving.pdf), for constructing hierarchical node-link diagrams. Tidy trees are typically more compact than [cluster dendrograms](./radial-cluster), which place all leaves at the same level. See also the [Cartesian variant](./tree).
+  </script>
+  <script id="10" type="module" pinned="">
+    const width = 960;
+    const radius = width / 2;
+
+    const tree = d3.tree()
+        .size([2 * Math.PI, radius])
+        .separation((a, b) => (a.parent == b.parent ? 1 : 2) / a.depth);
+
+    const root = tree(d3.hierarchy(data)
+        .sort((a, b) => d3.ascending(a.data.name, b.data.name)));
+
+    const svg = d3.create("svg");
+
+    svg.append("g")
+        .attr("fill", "none")
+        .attr("stroke", "#555")
+        .attr("stroke-opacity", 0.4)
+        .attr("stroke-width", 1.5)
+      .selectAll("path")
+      .data(root.links())
+      .join("path")
+        .attr("d", d3.linkRadial()
+            .angle((d) => d.x)
+            .radius((d) => d.y));
+
+    svg.append("g")
+      .selectAll("circle")
+      .data(root.descendants())
+      .join("circle")
+        .attr("transform", (d) => `
+          rotate(${d.x * 180 / Math.PI - 90})
+          translate(${d.y},0)
+        `)
+        .attr("fill", (d) => d.children ? "#555" : "#999")
+        .attr("r", 2.5);
+
+    svg.append("g")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 10)
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-width", 3)
+      .selectAll("text")
+      .data(root.descendants())
+      .join("text")
+        .attr("transform", (d) => `
+          rotate(${d.x * 180 / Math.PI - 90})
+          translate(${d.y},0)
+          rotate(${d.x >= Math.PI ? 180 : 0})
+        `)
+        .attr("dy", "0.31em")
+        .attr("x", (d) => d.x < Math.PI === !d.children ? 6 : -6)
+        .attr("text-anchor", (d) => d.x < Math.PI === !d.children ? "start" : "end")
+        .text((d) => d.data.name)
+      .clone(true).lower()
+        .attr("stroke", "white");
+
+    display(svg.node());
+
+    svg.call(autoBox);
+  </script>
+  <script id="167" type="module" pinned="">
+    function autoBox(svg) {
+      svg.attr("viewBox", function() {
+        const {x, y, width, height} = this.getBBox();
+        return [x, y, width, height];
+      });
+    }
+  </script>
+  <script id="166" type="module" pinned="">
+    const data = FileAttachment("data/flare.json").json().then(display);
+  </script>
+</notebook>

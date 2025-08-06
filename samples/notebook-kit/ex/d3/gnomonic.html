@@ -1,0 +1,30 @@
+<!doctype html>
+<notebook theme="air">
+  <title>Gnomonic</title>
+  <script id="2" type="text/markdown">
+    # Gnomonic
+  </script>
+  <script id="1" type="module" pinned="">
+    const height = Math.max(640, width);
+    const projection = d3.geoGnomonic().scale(width / 6).translate([width / 2, height / 2]).clipAngle(80);
+    const outline = {type: "Sphere"};
+    const graticule = d3.geoGraticule10();
+    const land = topojson.feature(world, world.objects.land);
+    const canvas = display(document.createElement("canvas"));
+    canvas.width = width * devicePixelRatio;
+    canvas.height = height * devicePixelRatio;
+    canvas.style.width = `${width}px`;
+    const context = canvas.getContext("2d");
+    context.scale(devicePixelRatio, devicePixelRatio);
+    const path = d3.geoPath(projection, context);
+    context.save();
+    context.beginPath(), path(outline), context.clip(), context.fillStyle = "#fff", context.fillRect(0, 0, width, height);
+    context.beginPath(), path(graticule), context.strokeStyle = "#ccc", context.stroke();
+    context.beginPath(), path(land), context.fillStyle = "#000", context.fill();
+    context.restore();
+    context.beginPath(), path(outline), context.strokeStyle = "#000", context.stroke();
+  </script>
+  <script id="8" type="module" pinned="">
+    const world = FileAttachment("data/land-50m.json").json().then(display);
+  </script>
+</notebook>

@@ -3,7 +3,7 @@
         "rootDir": ".",
         "outDir": "lib-es6",
         "declarationDir": "./types",
-        "module": "CommonJS",
+        "module": "nodenext",
         "target": "ES2022",
         "jsx": "react",
         "jsxFactory": "vscpp",
