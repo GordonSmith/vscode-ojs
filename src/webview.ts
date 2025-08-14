@@ -1,9 +1,10 @@
-/* eslint-disable no-inner-declarations */
-import { Library, Runtime, Inspector } from "@observablehq/runtime";
+import { Runtime } from "@observablehq/runtime";
+import { Library } from "@observablehq/stdlib";
+import { Inspector } from "@observablehq/inspector";
 import { compile, omd2notebook, ojs2notebook } from "@hpcc-js/observablehq-compiler";
 import { hashSum, scopedLogger } from "@hpcc-js/util";
 
-import "@hpcc-js/observablehq-compiler/dist/index.css";
+import "@hpcc-js/observablehq-compiler/src/index.css";
 
 const logger = scopedLogger("src/webview.ts");
 

@@ -1,21 +1,13 @@
 import * as vscode from "vscode";
-import TelemetryReporter from "@vscode/extension-telemetry";
-
-class MyTelemetryReporter extends TelemetryReporter {
-
-    dispose(): Promise<any> {
-        reporter.sendTelemetryEvent("MyTelemetryReporter.dispose");
-        return super.dispose();
-    }
-}
+import { TelemetryReporter } from "@vscode/extension-telemetry";
 
 // telemetry reporter
 export let reporter: TelemetryReporter;
 
 export function activate(context: vscode.ExtensionContext) {
-    const extPackageJSON = context.extension.packageJSON;
-    reporter = new MyTelemetryReporter("b785b2bb-e170-421b-8bd8-baaf895fe88b");
-    context.subscriptions.push(reporter);
+    // Instantiate telemetry reporter with connection string
+    reporter = new TelemetryReporter("b785b2bb-e170-421b-8bd8-baaf895fe88b");
+    context.subscriptions.push({ dispose: () => reporter.dispose() });
 
     reporter.sendTelemetryEvent("activate");
 }
@@ -23,5 +15,5 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate(): void {
     reporter.sendTelemetryEvent("deactivate");
 
-    reporter.dispose();
+    void reporter.dispose();
 }
