@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.38](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.37...v0.4.38) (2025-08-14)
+
+
+### Features
+
+*  Add support for obsrvable-kit notebooks ([57344b9](https://github.com/GordonSmith/vscode-ojs/commit/57344b93ce8fc2302468d111815b6e47569df911))
+*  Bump versions ([1733ccc](https://github.com/GordonSmith/vscode-ojs/commit/1733cccb1d4ca10004769fdb62087088fc0c6815))
+* add workflow to close stale issues and PRs ([8aac4bd](https://github.com/GordonSmith/vscode-ojs/commit/8aac4bddc4b249addda82172d7e19c8486d808a4))
+
 ### [0.4.37](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.36...v0.4.37) (2023-08-18)
 
 
