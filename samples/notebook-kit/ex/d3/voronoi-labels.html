@@ -1,0 +1,75 @@
+<!doctype html>
+<notebook theme="air">
+  <title>Voronoi labels</title>
+  <script id="1" type="text/markdown">
+    # Voronoi labels
+
+    Here a [Voronoi diagram](https://d3js.org/d3-delaunay/voronoi) is used to label a [scatterplot](./scatterplot). The area of each Voronoi cell determines whether the associated label is visible: larger cells tend to have room to accommodate labels. The vector between the point and the cell's centroid (orange) determines the label orientation: top, right, bottom or left.
+  </script>
+  <script id="140" type="module">
+    const randomize = view(Inputs.button("Randomize"));
+  </script>
+  <script id="6" type="module" pinned="">
+    const delaunay = d3.Delaunay.from(data);
+    const voronoi = delaunay.voronoi([-1, -1, width + 1, height + 1]);
+
+    const labels = [
+      (text) => text.attr("text-anchor", "middle").attr("y", -6), // top
+      (text) => text.attr("text-anchor", "start").attr("dy", "0.35em").attr("x", 6), // right
+      (text) => text.attr("text-anchor", "middle").attr("dy", "0.71em").attr("y", 6), // bottom
+      (text) => text.attr("text-anchor", "end").attr("dy", "0.35em").attr("x", -6) // left
+    ];
+
+    const svg = d3.create("svg")
+        .attr("viewBox", [0, 0, width, height])
+        .attr("width", width)
+        .attr("height", height)
+        .attr("style", "max-width: 100%; height: auto;");
+
+    const cells = data.map((d, i) => [d, voronoi.cellPolygon(i)]);
+
+    svg.append("g")
+        .attr("stroke", "orange")
+      .selectAll("path")
+      .data(cells)
+      .join("path")
+        .attr("d", ([d, cell]) => `M${d3.polygonCentroid(cell)}L${d}`);
+
+    svg.append("path")
+        .attr("fill", "none")
+        .attr("stroke", "#ccc")
+        .attr("d", voronoi.render());
+
+    svg.append("path")
+        .attr("d", delaunay.renderPoints(null, 2));
+
+    svg.append("g")
+        .style("font", "10px sans-serif")
+      .selectAll("text")
+      .data(cells)
+      .join("text")
+        .each(function([[x, y], cell]) {
+          const [cx, cy] = d3.polygonCentroid(cell);
+          const angle = (Math.round(Math.atan2(cy - y, cx - x) / Math.PI * 2) + 5) % 4;
+          d3.select(this).call(labels[angle]);
+        })
+        .attr("transform", ([d]) => `translate(${d})`)
+        .attr("display", ([, cell]) => -d3.polygonArea(cell) > 1000 ? null : "none")
+        .text((d, i) => i);
+
+    display(svg.node());
+  </script>
+  <script id="11" type="module" pinned="">
+    const width = 960;
+    const height = 600;
+
+    randomize; // re-run when the button is clicked
+
+    const rx = d3.randomNormal(width / 2, 80);
+    const ry = d3.randomNormal(height / 2, 80);
+    const rxy = () => ([rx(), ry()]);
+    const data = d3.range(200).map(rxy).filter(([x, y]) => 0 <= x && x <= width && 0 <= y && y <= height);
+
+    display(data);
+  </script>
+</notebook>

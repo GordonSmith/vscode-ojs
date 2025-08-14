@@ -1,0 +1,95 @@
+<!doctype html>
+<notebook>
+  <title>Scatterplot tour</title>
+  <script id="2" type="text/markdown">
+    # Scatterplot tour
+
+    This notebook implements an animated tour of a scatterplot using zoom transitions. The tour zooms in on each cluster's [bounding box](./zoom-to-bounding-box) in succession before zooming back out to the overview. To improve rendering performance, the circles are drawn as zero-length strokes with round caps.
+  </script>
+  <script id="3" type="module">
+    const input = Inputs.radio(new Map(transforms), {value: transforms[0][1]});
+    const transform = view(input);
+    const interval = setInterval(() => {
+      input.value = transforms[(transforms.findIndex(([, t]) => t === input.value) + 1) % transforms.length][1];
+      input.dispatchEvent(new Event("input", {bubbles: true}));
+    }, 2500);
+    input.addEventListener("input", (event) => (event.isTrusted && clearInterval(interval)));
+    invalidation.then(() => clearInterval(interval));
+  </script>
+  <script id="1" type="module" pinned="">
+    const color = d3.scaleOrdinal()
+        .domain(data.map((d) => d[2]))
+        .range(d3.schemeCategory10);
+
+    const zoom = d3.zoom()
+        .on("zoom", zoomed);
+
+    const svg = d3.create("svg")
+        .attr("viewBox", [0, 0, width, height]);
+
+    const g = svg.append("g")
+        .attr("fill", "none")
+        .attr("stroke-linecap", "round");
+
+    g.selectAll("path")
+      .data(data)
+      .join("path")
+        .attr("d", (d) => `M${x(d[0])},${y(d[1])}h0`)
+        .attr("stroke", (d) => color(d[2]));
+
+    const gx = svg.append("g")
+          .attr("transform", `translate(0,${height})`);
+
+    const xAxis = (g, x) => g
+        .call(d3.axisTop(x).ticks(12))
+        .call((g) => g.select(".domain").attr("display", "none"));
+
+    const gy = svg.append("g");
+
+    const yAxis = (g, y) => g
+        .call(d3.axisRight(y).ticks(12 * k))
+        .call((g) => g.select(".domain").attr("display", "none"));
+
+    svg.call(zoom.transform, input.value);
+
+    function zoomed({transform}) {
+      g.attr("transform", transform).attr("stroke-width", 5 / transform.k);
+      gx.call(xAxis, transform.rescaleX(x));
+      gy.call(yAxis, transform.rescaleY(y));
+    }
+
+    display(svg.node());
+
+    function update(transform) {
+      svg.transition()
+          .duration(1500)
+          .call(zoom.transform, transform);
+    }
+  </script>
+  <script id="6" type="module" pinned="">
+    update(transform); // side-effect to trigger animation
+  </script>
+  <script id="4" type="module" pinned="">
+    const height = 600;
+    const k = height / width;
+    const x = d3.scaleLinear().domain([-4.5, 4.5]).range([0, width]);
+    const y = d3.scaleLinear().domain([-4.5 * k, 4.5 * k]).range([height, 0]);
+    const transforms = [["Overview", d3.zoomIdentity]].concat(d3.groups(data, (d) => d[2]).map(([key, data]) => {
+      const [x0, x1] = d3.extent(data, (d) => d[0]).map(x);
+      const [y1, y0] = d3.extent(data, (d) => d[1]).map(y);
+      const k = 0.9 * Math.min(width / (x1 - x0), height / (y1 - y0));
+      const tx = (width - k * (x0 + x1)) / 2;
+      const ty = (height - k * (y0 + y1)) / 2;
+      return [`Cluster ${key}`, d3.zoomIdentity.translate(tx, ty).scale(k)];
+    }));
+  </script>
+  <script id="5" type="module" pinned="">
+    const random = d3.randomNormal(0, 0.2);
+    const sqrt3 = Math.sqrt(3);
+    const data = display([
+      ...Array.from({length: 300}, () => [random() + sqrt3, random() + 1, 0]),
+      ...Array.from({length: 300}, () => [random() - sqrt3, random() + 1, 1]),
+      ...Array.from({length: 300}, () => [random(), random() - 1, 2])
+    ]);
+  </script>
+</notebook>

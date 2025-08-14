@@ -14,7 +14,7 @@ export interface OJSCell {
 export interface OJSOutput {
     notebookId: string;
     folder: string;
-    files: ohq.File[], // notebook: ohq.Notebook;
+    files: ohq.File[], // notebook: onb.Notebook;
     cell: OJSCell;
     otherCells: OJSCell[];
 }

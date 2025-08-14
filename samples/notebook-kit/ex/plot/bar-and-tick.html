@@ -1,0 +1,20 @@
+<!doctype html>
+<notebook>
+  <title>Bar and tick</title>
+  <script id="1" type="text/markdown">
+    # Bar and tick
+
+    A [tick](https://observablehq.com/plot/marks/tick) is convenient for stroking the upper bound of a [bar](https://observablehq.com/plot/marks/bar) for emphasis.
+  </script>
+  <script id="5" type="module" pinned="">
+    Plot.plot({
+      x: {label: null},
+      y: {percent: true},
+      marks: [
+        Plot.barY(alphabet, {x: "letter", y: "frequency", fillOpacity: 0.2}),
+        Plot.tickY(alphabet, {x: "letter", y: "frequency"}),
+        Plot.ruleY([0])
+      ]
+    })
+  </script>
+</notebook>

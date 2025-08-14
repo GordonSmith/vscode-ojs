@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observable JS Test</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .observable-cell {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Observable JS HTML Preview Test</h1>
+
+    <p>This is a test file to demonstrate HTML transpilation with Observable JS.</p>
+
+    <!-- Observable code block -->
+    <script type="observable">
+        data = [
+            {name: "Alice", age: 30},
+            {name: "Bob", age: 25},
+            {name: "Charlie", age: 35}
+        ]
+    </script>
+
+    <script type="observable">
+        import {table} from "@observablehq/inputs"
+        viewof selectedData = table(data)
+    </script>
+
+    <!-- Another Observable code block -->
+    <pre class="observable">
+        {
+            const result = data.map(d => d.age).reduce((a, b) => a + b, 0) / data.length;
+            return `Average age: ${result}`;
+        }
+    </pre>
+
+    <p>The transpiler should convert the Observable code blocks above into executable JavaScript.</p>
+
+    <!-- Regular HTML content should remain unchanged -->
+    <div>
+        <h2>Regular HTML Content</h2>
+        <p>This content should not be modified by the transpiler.</p>
+    </div>
+
+    <!-- Test script that should be preserved -->
+    <script>
+        console.log("Regular JavaScript should be preserved");
+    </script>
+</body>
+
+</html>

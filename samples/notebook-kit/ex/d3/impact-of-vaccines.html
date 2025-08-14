@@ -1,0 +1,115 @@
+<!doctype html>
+<notebook theme="air">
+  <title>The impact of vaccines</title>
+  <script id="1" type="text/markdown">
+    # The impact of vaccines
+
+    A recreation of [a WSJ graphic](http://graphics.wsj.com/infectious-diseases-and-vaccines/) by Tynan DeBold and Dov Friedman.
+  </script>
+  <script id="119" type="module">
+    Plot.legend({
+      color: {
+        type: "sqrt",
+        domain: color.domain(),
+        interpolate: color.interpolator()
+      },
+      label: "Measles cases per 100,000 people",
+      width: 360
+    })
+  </script>
+  <script id="46" type="module" pinned="">
+    // Declare the chart dimensions and margins.
+    const marginTop = 20;
+    const marginRight = 1;
+    const marginBottom = 40;
+    const marginLeft = 40;
+    const rowHeight = 14;
+    const width = 960;
+    const height = rowHeight * names.length + marginTop + marginBottom;
+
+    // Create a number format.
+    const f = d3.format(",d");
+    const format = (d) => isNaN(d) ? "N/A cases"
+        : d === 0 ? "0 cases"
+        : d < 1 ? "<1 case"
+        : d < 1.5 ? "1 case"
+        : `${f(d)} cases`;
+
+    // Create the scales.
+    const x = d3.scaleLinear()
+        .domain([d3.min(years), d3.max(years) + 1])
+        .rangeRound([marginLeft, width - marginRight])
+
+    const y = d3.scaleBand()
+        .domain(names)
+        .rangeRound([marginTop, height - marginBottom])
+
+    const color = d3.scaleSequentialSqrt()
+        .domain([0, d3.max(values, (d) => d3.max(d))])
+        .interpolator(d3.interpolatePuRd);
+
+    // Create the SVG container.
+    const svg = d3.create("svg")
+        .attr("viewBox", [0, 0, width, height])
+        .attr("width", width)
+        .attr("height", height)
+        .attr("style", "max-width: 100%; height: auto;");
+
+    svg.append("g")
+        .attr("transform", `translate(${marginLeft},0)`)
+        .call(d3.axisLeft(y).tickSize(0))
+        .call((g) => g.select(".domain").remove());
+
+    // Create a cell for each (state, year) value.
+    svg.append("g")
+      .selectAll("g")
+      .data(values)
+      .join("g")
+        .attr("transform", (d, i) => `translate(0,${y(names[i])})`)
+      .selectAll("rect")
+      .data((d) => d)
+      .join("rect")
+        .attr("x", (d, i) => x(years[i]) + 1)
+        .attr("width", (d, i) => x(years[i] + 1) - x(years[i]) - 1)
+        .attr("height", y.bandwidth() - 1)
+        .attr("fill", (d) => isNaN(d) ? "#eee" : d === 0 ? "#fff" : color(d))
+      .append("title")
+        .text((d, i) => `${format(d)} per 100,000 people in ${years[i]}`);
+
+    // Append the axes.
+    svg.append("g")
+        .call((g) => g.append("g")
+          .attr("transform", `translate(0,${marginTop})`)
+          .call(d3.axisTop(x).ticks(null, "d"))
+          .call((g) => g.select(".domain").remove()))
+        .call((g) => g.append("g")
+          .attr("transform", `translate(0,${height - marginBottom + 4})`)
+          .call(d3.axisBottom(x)
+              .tickValues([year])
+              .tickFormat((x) => x)
+              .tickSize(marginTop + marginBottom - height - 10))
+          .call((g) => g.select(".tick text")
+              .clone()
+              .attr("dy", "2em")
+              .style("font-weight", "bold")
+              .text("Measles vaccine introduced"))
+          .call((g) => g.select(".domain").remove()));
+
+    display(svg.node());
+  </script>
+  <script id="3" type="module" pinned="">
+    const names = ["Alaska", "Ala.", "Ark.", "Ariz.", "Calif.", "Colo.", "Conn.", "D.C.", "Del.", "Fla.", "Ga.", "Hawaii", "Iowa", "Idaho", "Ill.", "Ind.", "Kan.", "Ky.", "La.", "Mass.", "Md.", "Maine", "Mich.", "Minn.", "Mo.", "Miss.", "Mont.", "N.C.", "N.D.", "Neb.", "N.H.", "N.J.", "N.M", "Nev.", "N.Y.", "Ohio", "Okla.", "Ore.", "Pa.", "R.I.", "S.C.", "S.D.", "Tenn.", "Texas", "Utah", "Va.", "Vt.", "Wash.", "Wis.", "W.Va.", "Wyo."];
+    const diseases = await FileAttachment("data/vaccines.json").json();
+    const [measles] = diseases;
+    const values = [];
+    const year0 = d3.min(measles.data.values.data, (d) => d[0]);
+    const year1 = d3.max(measles.data.values.data, (d) => d[0]);
+    const years = d3.range(year0, year1 + 1);
+    const year = measles.data.chart_options.vaccine_year;
+    for (const [year, i, value] of measles.data.values.data) {
+      if (value == null) continue;
+      (values[i] || (values[i] = []))[year - year0] = value;
+    }
+    display({values, years, year});
+  </script>
+</notebook>
