@@ -1,6 +1,7 @@
 # ObservableHQ Notebook
 
-![Pull Build Test](https://img.shields.io/github/workflow/status/GordonSmith/vscode-ojs/Pull%20Build%20Test.svg?logo=github&label=Pull%20Build%20Test)
+[![Pull Build Test](https://github.com/GordonSmith/vscode-ojs/actions/workflows/pull-build-test.yml/badge.svg)](https://github.com/GordonSmith/vscode-ojs/actions/workflows/pull-build-test.yml)
+![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/GordonSmith.observable-js)
 
 ## New: Observable Notebook Kit 2.0 Support
 
@@ -53,7 +54,8 @@ Once a file is open, you can switch between views using toolbar buttons:
 
 ## Supports
 
-- [JavaScript](https://www.javascript.com/) via [ObservableHQ JavaScript](https://observablehq.com/@observablehq/introduction-to-code?collection=@observablehq/notebook-fundamentals)
+- [JavaScript](https://www.javascript.com/) 
+- [ObservableHQ JavaScript](https://observablehq.com/@observablehq/introduction-to-code?collection=@observablehq/notebook-fundamentals)
 - [Markdown](https://www.markdownguide.org/)
 - [ObservableHQ Markdown](https://observablehq.com/@observablehq/markdown-quick-reference?collection=@observablehq/notebook-fundamentals)
 - [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)
@@ -67,7 +69,16 @@ Once a file is open, you can switch between views using toolbar buttons:
 
 To get the full experience, it is recommended to install this extension as part of the [JavsaScript Notebook](https://marketplace.visualstudio.com/items?itemName=GordonSmith.js-notebook-extension-pack) extension pack.
 
-## Quick Start with Observable Notebooks (beta)
+## Quick Start with ObservableHQ Notebook-Kit
+
+![Demo GIF](./images/notebook-kit-demo.gif)
+
+1. Open a `notebook-kit`notebook (extension .html)
+2. Click "Switch to Notebook View" in the text toolbar.
+3. Edit, run and save your notebook.
+4. Optionally click "Switch to Text View" to go back to the HTML source.
+
+## Quick Start with Observable Notebooks
 
 ![Demo GIF](./images/ojsDemoNotebook.gif)
 
@@ -199,7 +210,7 @@ This extension would not have been possible without the following:
 - [ObservableHQ/runtime](https://github.com/observablehq/runtime)
 - [ObservableHQ/inspector](https://github.com/observablehq/inspector)
 - [ObservableHQ/stdlib](https://github.com/observablehq/stdlib)
-- [@hpcc-js/observable-md](https://github.com/hpcc-systems/Visualization/tree/master/packages/observable-md)
+- [@hpcc-js/observablehq-compiler](https://github.com/hpcc-systems/Visualization/tree/trunk/packages/observablehq-compiler)
 
 ## Recommended Extensions
 
