@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.39](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.38...v0.4.39) (2025-08-15)
+
 ### [0.4.38](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.37...v0.4.38) (2025-08-14)
 
 
