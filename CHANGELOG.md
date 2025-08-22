@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.40](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.39...v0.4.40) (2025-08-22)
+
+
+### Bug Fixes
+
+* re-run causing new obeserver to be created ([13e0592](https://github.com/GordonSmith/vscode-ojs/commit/13e0592eaf5f4ac843bbc032cc8add19f199d686)), closes [#77](https://github.com/GordonSmith/vscode-ojs/issues/77)
+
 ### [0.4.39](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.38...v0.4.39) (2025-08-15)
 
 ### [0.4.38](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.37...v0.4.38) (2025-08-14)
