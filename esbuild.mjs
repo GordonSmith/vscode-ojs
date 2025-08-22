@@ -1,7 +1,7 @@
 import * as esbuild from "esbuild";
-import copyStaticFiles from "esbuild-copy-static-files";
 import process from "node:process";
-import path from "node:path";
+import console from "node:console";
+
 import { problemMatcher } from "@hpcc-js/esbuild-plugins";
 import { readFileSync } from "node:fs";
 

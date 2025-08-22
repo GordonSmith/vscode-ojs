@@ -137,7 +137,9 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
                 id: cellId,
                 value: cell.value,
                 mode,
-                pinned
+                pinned,
+                hidden: undefined,
+                since: undefined,
             });
         }
 

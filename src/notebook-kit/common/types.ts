@@ -1,4 +1,4 @@
-import { Cell, JavaScriptCell, TranspiledJavaScript } from "@observablehq/notebook-kit";
+import { type Cell } from "@observablehq/notebook-kit";
 
 export const OBSERVABLE_KIT_MIME = "application/observable-kit+json";
 
@@ -25,6 +25,5 @@ export const observable2vscode: Record<Cell["mode"], string> = {
 
 export interface NotebookCell {
     metadata: Cell;
-    parsed: JavaScriptCell | undefined;
-    transpiled: TranspiledJavaScript;
+    cellText: string;
 }
