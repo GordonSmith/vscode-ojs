@@ -35,7 +35,7 @@ export class Commands {
     }
 
     private static updatePinContext(editor: vscode.NotebookEditor): void {
-        if (editor.notebook.notebookType === "onb-notebook-kit" && editor.selections.length > 0) {
+        if (editor.notebook.notebookType === "notebook-kit" && editor.selections.length > 0) {
             const cell = editor.notebook.cellAt(editor.selections[0].start);
             const isPinned = cell.metadata?.pinned === true;
             vscode.commands.executeCommand("setContext", "observable-kit.currentCellPinned", isPinned);
@@ -61,7 +61,7 @@ export class Commands {
 
             if (!hasNotebookKit) {
                 const install = await vscode.window.showInformationMessage(
-                    "Observable Notebook Kit is not installed. Install it now?",
+                    "ObservableHQ Notebook is not installed. Install it now?",
                     "Install", "Cancel"
                 );
 
@@ -96,38 +96,53 @@ export class Commands {
 
         const fileName = await vscode.window.showInputBox({
             prompt: "Enter notebook name",
-            placeHolder: "my-notebook.onb.html"
+            placeHolder: "my-notebook.html"
         });
 
         if (!fileName) {
             return;
         }
 
-        // Ensure proper extension
         let notebookName = fileName;
-        if (!notebookName.endsWith(".onb.html")) {
-            notebookName = `${fileName}.onb.html`;
+        if (!notebookName.endsWith(".html")) {
+            notebookName = `${fileName}.html`;
         }
 
         const notebookPath = path.join(workspaceFolder.uri.fsPath, notebookName);
 
-        // Extract base name for title
         const baseName = path.basename(fileName)
-            .replace(".onb.html", "")
             .replace(".html", "");
 
-        const notebookContent = `<!doctype html>
+        const notebookContent = `\
+<!doctype html>
 <notebook>
   <title>${baseName}</title>
-  <script id="intro" type="text/markdown">
-    # Welcome to Observable Notebook Kit
+  <script id="1" type="text/markdown">
+    # Welcome to ObservableHQ Notebook
 
-    This is a new notebook using the Observable Notebook Kit format.
+    This is a new notebook using the ObservableHQ Notebook format.
   </script>
-  <script id="hello" type="module">
-    // Vanilla JavaScript with Observable functions
-    const message = "Hello, Observable Notebook Kit!";
+  <script id="2" type="module">
+    const message = "Hello, ObservableHQ Notebook!";
     display(message);
+  </script>
+  <script type="text/html">
+    <h1>Hello, <i>world</i>!</h1>
+  </script>
+  <script type="application/sql" database="reporting">
+    SELECT * FROM customers
+  </script>
+  <script type="application/x-tex">
+    \int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+  </script>
+  <script type="text/vnd.graphviz">
+    digraph G {
+        A -> B -> C;
+        A -> C;
+    }
+  </script>
+  <script type="application/vnd.observable.javascript">
+    foo = 42
   </script>
 </notebook>
 `;
@@ -185,7 +200,7 @@ export class Commands {
             await Commands.installNotebookKit(workspaceFolder);
             await Commands.setupPackageJson(workspaceFolder);
 
-            vscode.window.showInformationMessage("Observable Notebook Kit setup complete!");
+            vscode.window.showInformationMessage("ObservableHQ Notebook setup complete!");
 
         } catch (error) {
             vscode.window.showErrorMessage(`Setup failed: ${error}`);

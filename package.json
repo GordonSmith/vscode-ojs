@@ -111,7 +111,7 @@
   "extensionDependencies": [],
   "activationEvents": [
     "onNotebook:ojs-notebook",
-    "onNotebook:onb-notebook-kit",
+    "onNotebook:notebook-kit",
     "onLanguage:html",
     "onWebviewPanel:OJSPreview"
   ],
@@ -255,20 +255,20 @@
       {
         "category": "Observable Kit",
         "command": "observable-kit.createNotebook",
-        "title": "Create New Notebook",
-        "description": "Create a new Observable Notebook Kit notebook"
+        "title": "Observable Kit Notebook",
+        "description": "Create a new ObservableHQ Notebook notebook"
       },
       {
         "category": "Observable Kit",
         "command": "observable-kit.convertFromLegacy",
         "title": "Convert from Legacy Format",
-        "description": "Convert .ojsnb file to Observable Notebook Kit format"
+        "description": "Convert .ojsnb file to ObservableHQ Notebook format"
       },
       {
         "category": "Observable Kit",
         "command": "observable-kit.setupWorkspace",
         "title": "Setup Workspace",
-        "description": "Setup Observable Notebook Kit in current workspace"
+        "description": "Setup ObservableHQ Notebook in current workspace"
       },
       {
         "category": "Observable Kit",
@@ -320,6 +320,11 @@
       }
     ],
     "menus": {
+      "file/newFile": [
+        {
+          "command": "observable-kit.createNotebook"
+        }
+      ],
       "commandPalette": [
         {
           "command": "ojs.checkSyntax",
@@ -347,7 +352,7 @@
         },
         {
           "command": "observable-kit.switchToTextView",
-          "when": "notebookType == onb-notebook-kit"
+          "when": "notebookType == notebook-kit"
         }
       ],
       "explorer/context": [
@@ -401,7 +406,7 @@
           "group": "navigation@999"
         },
         {
-          "when": "notebookType == onb-notebook-kit",
+          "when": "notebookType == notebook-kit",
           "command": "observable-kit.switchToTextView",
           "group": "navigation@999"
         }
@@ -419,12 +424,12 @@
         },
         {
           "command": "observable-kit.cell.pin",
-          "when": "notebookType == onb-notebook-kit && !observable-kit.currentCellPinned",
+          "when": "notebookType == notebook-kit && !observable-kit.currentCellPinned",
           "group": "inline@100"
         },
         {
           "command": "observable-kit.cell.unpin",
-          "when": "notebookType == onb-notebook-kit && observable-kit.currentCellPinned",
+          "when": "notebookType == notebook-kit && observable-kit.currentCellPinned",
           "group": "inline@100"
         }
       ]
@@ -478,9 +483,9 @@
         ]
       },
       {
-        "id": "onb-notebook-kit",
-        "type": "onb-notebook-kit",
-        "displayName": "Observable Notebook Kit",
+        "id": "notebook-kit",
+        "type": "notebook-kit",
+        "displayName": "ObservableHQ Notebook",
         "selector": [
           {
             "filenamePattern": "*.html"
@@ -501,7 +506,7 @@
       },
       {
         "id": "observable-kit-renderer",
-        "displayName": "Observable Notebook Kit Renderer",
+        "displayName": "ObservableHQ Notebook Renderer",
         "entrypoint": "./dist/observable-kit-renderer.js",
         "mimeTypes": [
           "application/observable-kit+json"

@@ -87,7 +87,8 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
     }
 
     private isObservableKitFormat(content: string): boolean {
-        return content.includes("<notebook") && content.includes("<!doctype html>");
+        const lowerContent = content.toLowerCase();
+        return lowerContent.includes("<!doctype html>") && lowerContent.includes("<notebook") && lowerContent.includes("<title");
     }
 
     private deserializeObservableKitNotebook(content: string): vscode.NotebookData {

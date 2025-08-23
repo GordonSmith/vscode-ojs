@@ -4,10 +4,9 @@ import { NotebookKitSerializer } from "./controller/serializer";
 import { Commands } from "./commands";
 
 export function activate(ctx: ExtensionContext) {
-    // Register the notebook serializer for Observable Notebook Kit format
     ctx.subscriptions.push(
         workspace.registerNotebookSerializer(
-            "onb-notebook-kit",
+            "notebook-kit",
             NotebookKitSerializer.attach(),
             {
                 transientOutputs: true,

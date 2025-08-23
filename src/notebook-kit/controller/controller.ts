@@ -4,8 +4,8 @@ import { OBSERVABLE_KIT_MIME, vscode2observable, NotebookCell } from "../common/
 
 export class NotebookKitController {
     readonly controllerId = "observable-kit-kernel";
-    readonly notebookType = "onb-notebook-kit";
-    readonly label = "Observable Notebook Kit";
+    readonly notebookType = "notebook-kit";
+    readonly label = "ObservableHQ Notebook";
     readonly supportedLanguages = Object.keys(vscode2observable);
 
     private readonly _controller: vscode.NotebookController;

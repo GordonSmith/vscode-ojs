@@ -111,7 +111,7 @@ export class HTMLNotebookDetector {
             }
 
             try {
-                // Open directly as notebook using the onb-notebook-kit serializer
+                // Open directly as notebook using the notebook-kit serializer
                 const document = await vscode.workspace.openNotebookDocument(uri);
                 await vscode.window.showNotebookDocument(document);
 
@@ -219,7 +219,7 @@ export class HTMLNotebookDetector {
 
         // Handle notebook editor changes to clear HTML context when notebook is active
         const notebookChangeHandler = vscode.window.onDidChangeActiveNotebookEditor(async (editor) => {
-            if (editor && editor.notebook.notebookType === "onb-notebook-kit") {
+            if (editor && editor.notebook.notebookType === "notebook-kit") {
                 // When a notebook is active, clear the HTML context to show the text view button
                 await this.setContext(false);
             }
