@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.41](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.40...v0.4.41) (2025-08-23)
+
+
+### Features
+
+* add "new file" aupport ([8bb7189](https://github.com/GordonSmith/vscode-ojs/commit/8bb71893b6dbc09deb64d02b837904b86d69c879))
+
 ### [0.4.40](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.39...v0.4.40) (2025-08-22)
 
 
