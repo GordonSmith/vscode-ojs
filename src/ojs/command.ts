@@ -1,7 +1,5 @@
 import * as vscode from "vscode";
-import * as fs from "fs";
 import fetch from "node-fetch";
-import * as path from "path";
 import { ohq } from "@hpcc-js/observable-shim";
 import { ojs2notebook, omd2notebook } from "@hpcc-js/observablehq-compiler";
 import { serializer } from "../notebook/controller/serializer";
@@ -164,10 +162,9 @@ ${encode(node.value)}
                 if (textEditor) {
                     InsertText(textEditor, () => text);
                 } else {
-                    const folder = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders[0]?.uri.path;
+                    const folder = vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders[0]?.uri;
                     if (folder) {
-                        const filePath = path.posix.join(folder, `Untitled-${Math.round(1000 + Math.random() * 1000)}.${languageId}`);
-                        const newFile = vscode.Uri.parse("untitled://" + filePath);
+                        const newFile = vscode.Uri.parse("untitled://" + folder.path + `/Untitled-${Math.round(1000 + Math.random() * 1000)}.${languageId}`);
                         const document = await vscode.workspace.openTextDocument(newFile);
                         const edit = new vscode.WorkspaceEdit();
                         edit.insert(newFile, new vscode.Position(0, 0), text);
@@ -248,13 +245,12 @@ ${encode(node.value)}
             }
         }
         if (htmlPath && notebook) {
-            vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(htmlPath), saveLabel: "Export to HTML" }).then(resource => {
+            vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(htmlPath), saveLabel: "Export to HTML" }).then(async resource => {
                 if (resource) {
                     const html = this.exportTpl("", notebook!);
-                    fs.writeFile(resource.fsPath, html, "utf8", () => { });
+                    await vscode.workspace.fs.writeFile(resource, new TextEncoder().encode(html));
                 }
             });
-
         }
     }
 
@@ -269,14 +265,24 @@ EXPORT ${attrID} := ${escapedTextParts.map(line => `'${line}`).join("\\n' + \n")
         if (vscode.window.activeTextEditor) {
             const textDocument = vscode.window.activeTextEditor.document;
             const eclPath = textDocument.languageId === "omd" ? textDocument.uri.path.replace(".omd", ".ecl") : textDocument.uri.path.replace(".ojs", ".ecl");
-            vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(eclPath), saveLabel: "Export to ECL" }).then(resource => {
+            vscode.window.showSaveDialog({ defaultUri: vscode.Uri.file(eclPath), saveLabel: "Export to ECL" }).then(async resource => {
                 if (resource) {
                     const text = textDocument.getText();
-                    const ecl = this.exportECLTpl(path.basename(textDocument.uri.path, path.extname(textDocument.uri.path)), text);
-                    fs.writeFile(resource.fsPath, ecl, "utf8", () => { });
+                    const ecl = this.exportECLTpl(Commands.basename(textDocument.uri.path), text);
+                    await vscode.workspace.fs.writeFile(resource, new TextEncoder().encode(ecl));
                 }
             });
         }
+    }
+}
+
+// Minimal basename helper using path splitting (avoid node:path)
+export namespace Commands {
+    export function basename(p: string): string {
+        const parts = p.split(/[\\/]/);
+        const last = parts[parts.length - 1] || p;
+        const dot = last.lastIndexOf(".");
+        return dot >= 0 ? last.substring(0, dot) : last;
     }
 }
 

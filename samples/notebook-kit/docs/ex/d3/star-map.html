@@ -146,7 +146,7 @@
     display(svg.node());
   </script>
   <script id="5" type="module" pinned="">
-    const data = FileAttachment("data/bright-stars.csv").text()
+    const data = FileAttachment("../data/bright-stars.csv").text()
       .then((text) => d3.csvParse(text, (d) => {
         d3.autoType(d);
         d[0] = (d.RA_hour + d.RA_min / 60 + d.RA_sec / 3600) * 15; // longitude

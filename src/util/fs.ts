@@ -1,18 +1,15 @@
 import * as os from "os";
-import * as path from "path";
 import { Disposable, FileType, TextDocument, Uri, workspace } from "vscode";
 import { random } from "./math";
 
 const fs = workspace.fs;
 
-export const dirname = (fsPath: string): string => {
-    return path.dirname(fsPath);
-};
+export const dirname = (fsPath: string): string => fsPath.replace(/[\\/][^\\/]*$/, "");
 
 export const leafname = (fsPath: string): string => {
-    const basename = path.basename(fsPath);
-    const ext = path.extname(basename);
-    return basename.substring(0, basename.length - ext.length);
+    const base = fsPath.split(/[\\/]/).pop() || fsPath;
+    const idx = base.lastIndexOf(".");
+    return idx >= 0 ? base.substring(0, idx) : base;
 };
 
 export const exists = async (fsPath: string): Promise<boolean> => {
@@ -58,14 +55,14 @@ export async function isDirectory(fsPath: string): Promise<boolean> {
 
 export const isTypeDirectory = (type: FileType): boolean => !!(type & FileType.Directory);
 
-export const isEcl = (source: string) => path.extname(source).toLowerCase() === ".ecl";
+export const isEcl = (source: string) => /\.ecl$/i.test(source);
 
 export const modAttrs = async (source: string) => {
     return (await fs.readDirectory(Uri.file(source)))
         .filter(([name, type]) => {
             return !isHidden(name);
         }).map(([name, type]) => {
-            return [path.join(source, name), type] as [string, FileType];
+            return [source.replace(/[\\/]$/, "") + "/" + name, type] as [string, FileType];
         }).filter(([fsPath, type]) => {
             return isTypeDirectory(type) || isEcl(fsPath);
         })
@@ -84,7 +81,8 @@ export async function writeTempFile({
     content = "",
 }): Promise<DisposableFile> {
     while (true) {
-        const tmpPath = path.join(folder, `${prefix}-${random(100000, 999999)}.${ext}`);
+        const folderNorm = folder.replace(/[\\/]$/, "");
+        const tmpPath = `${folderNorm}/${prefix}-${random(100000, 999999)}.${ext}`;
         if (!await exists(tmpPath)) {
             await writeFile(tmpPath, content);
             return {

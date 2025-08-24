@@ -27,3 +27,21 @@ export interface NotebookCell {
     metadata: Cell;
     cellText: string;
 }
+
+export const NOTEBOOK_THEMES = [
+    "air",
+    "coffee",
+    "cotton",
+    "deep-space",
+    "glacier",
+    "ink",
+    "midnight",
+    "near-midnight",
+    "ocean-floor",
+    "parchment",
+    "slate",
+    "stark",
+    "sun-faded"
+] as const;
+
+export type NotebookTheme = typeof NOTEBOOK_THEMES[number];

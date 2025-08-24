@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
-import * as path from "path";
-import * as fs from "fs";
+import { NOTEBOOK_THEMES } from "./common/types";
 
 export class Commands {
 
@@ -105,23 +104,8 @@ export class Commands {
             vscode.window.showErrorMessage("No Observable Notebook active");
             return;
         }
-        const themes = [
-            "air",
-            "coffee",
-            "cotton",
-            "deep-space",
-            "glacier",
-            "ink",
-            "midnight",
-            "near-midnight",
-            "ocean-floor",
-            "parchment",
-            "slate",
-            "stark",
-            "sun-faded"
-        ];
         const current: string = (editor.notebook.metadata?.theme as string) || "air";
-        const theme = await vscode.window.showQuickPick(themes, {
+        const theme = await vscode.window.showQuickPick(NOTEBOOK_THEMES, {
             title: "Select Notebook Theme",
             placeHolder: current,
             canPickMany: false
@@ -245,7 +229,7 @@ export class Commands {
                 cwd: workspaceFolder.uri.fsPath
             });
 
-            terminal.sendText(`npx notebooks build --root ${path.dirname(targetUri.fsPath)} -- ${targetUri.fsPath}`);
+            terminal.sendText(`npx notebooks build --root ${Commands.dirnameFsPath(targetUri.fsPath)} -- ${targetUri.fsPath}`);
             terminal.show();
 
         } catch (error) {
@@ -275,10 +259,10 @@ export class Commands {
             notebookName = `${fileName}.html`;
         }
 
-        const notebookPath = path.join(workspaceFolder.uri.fsPath, notebookName);
+        const notebookUri = vscode.Uri.joinPath(workspaceFolder.uri, notebookName);
 
-        const baseName = path.basename(fileName)
-            .replace(".html", "");
+        const baseName = Commands.basename(fileName)
+            .replace(/\.html$/i, "");
 
         const notebookContent = `\
 <!doctype html>
@@ -315,8 +299,8 @@ export class Commands {
 `;
 
         try {
-            fs.writeFileSync(notebookPath, notebookContent);
-            const document = await vscode.workspace.openTextDocument(notebookPath);
+            await vscode.workspace.fs.writeFile(notebookUri, new TextEncoder().encode(notebookContent));
+            const document = await vscode.workspace.openTextDocument(notebookUri);
             await vscode.window.showTextDocument(document);
         } catch (error) {
             vscode.window.showErrorMessage(`Failed to create notebook: ${error}`);
@@ -342,13 +326,12 @@ export class Commands {
             const htmlContent = Commands.convertToObservableKitFormat(cells);
 
             // Save as Observable Kit HTML file
-            const htmlPath = targetUri.fsPath.replace(".ojsnb", ".okit.html");
-            fs.writeFileSync(htmlPath, htmlContent);
+            const htmlUri = targetUri.with({ path: targetUri.path.replace(/\.ojsnb$/i, ".okit.html") });
+            await vscode.workspace.fs.writeFile(htmlUri, new TextEncoder().encode(htmlContent));
 
-            const htmlDocument = await vscode.workspace.openTextDocument(htmlPath);
+            const htmlDocument = await vscode.workspace.openTextDocument(htmlUri);
             await vscode.window.showTextDocument(htmlDocument);
-
-            vscode.window.showInformationMessage(`Converted to ${path.basename(htmlPath)}`);
+            vscode.window.showInformationMessage(`Converted to ${Commands.basename(htmlUri.path)}`);
 
         } catch (error) {
             vscode.window.showErrorMessage(`Conversion failed: ${error}`);
@@ -375,14 +358,21 @@ export class Commands {
     }
 
     private static async checkNotebookKitInstallation(workspaceFolder: vscode.WorkspaceFolder): Promise<boolean> {
-        const packageJsonPath = path.join(workspaceFolder.uri.fsPath, "package.json");
+        const packageJsonUri = vscode.Uri.joinPath(workspaceFolder.uri, "package.json");
 
-        if (!fs.existsSync(packageJsonPath)) {
+        let exists = true;
+        try {
+            await vscode.workspace.fs.stat(packageJsonUri);
+        } catch {
+            exists = false;
+        }
+        if (!exists) {
             return false;
         }
 
         try {
-            const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+            const bytes = await vscode.workspace.fs.readFile(packageJsonUri);
+            const packageJson = JSON.parse(Buffer.from(bytes).toString("utf8"));
             const deps = { ...packageJson.dependencies, ...packageJson.devDependencies };
             return "@observablehq/notebook-kit" in deps;
         } catch {
@@ -405,12 +395,19 @@ export class Commands {
     }
 
     private static async setupPackageJson(workspaceFolder: vscode.WorkspaceFolder): Promise<void> {
-        const packageJsonPath = path.join(workspaceFolder.uri.fsPath, "package.json");
-
+        const packageJsonUri = vscode.Uri.joinPath(workspaceFolder.uri, "package.json");
         let packageJson: any = {};
 
-        if (fs.existsSync(packageJsonPath)) {
-            packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+        let exists = true;
+        try {
+            await vscode.workspace.fs.stat(packageJsonUri);
+        } catch {
+            exists = false;
+        }
+
+        if (exists) {
+            const bytes = await vscode.workspace.fs.readFile(packageJsonUri);
+            packageJson = JSON.parse(Buffer.from(bytes).toString("utf8"));
         } else {
             packageJson = {
                 name: workspaceFolder.name,
@@ -439,7 +436,7 @@ export class Commands {
 
         packageJson.dependencies["@observablehq/notebook-kit"] = "^1.0.1";
 
-        fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+        await vscode.workspace.fs.writeFile(packageJsonUri, new TextEncoder().encode(JSON.stringify(packageJson, null, 2)));
     }
 
     private static parseVSCodeNotebook(content: string): Array<{ id?: string, language: string, content: string }> {
@@ -559,6 +556,19 @@ export class Commands {
 
         await vscode.workspace.applyEdit(edit);
         await vscode.commands.executeCommand("setContext", "observable-kit.currentCellHidden", false);
+    }
+}
+
+// --- Local path utilities (avoid node:path to prefer VS Code APIs) ------------------
+export namespace Commands { // augmentation for helper functions
+    /** Return directory portion of a filesystem path (platform agnostic). */
+    export function dirnameFsPath(fsPath: string): string {
+        return fsPath.replace(/[\\/][^\\/]*$/, "");
+    }
+    /** Return basename (filename + extension) of a path. */
+    export function basename(p: string): string {
+        const parts = p.split(/[\\/]/);
+        return parts[parts.length - 1] || p;
     }
 }
 

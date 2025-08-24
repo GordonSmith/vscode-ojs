@@ -1,4 +1,3 @@
-import * as path from "path";
 import * as vscode from "vscode";
 import type { AlertMessage, LoadedMessage, Value, ValueMessage } from "../webview";
 import { Diagnostic } from "./diagnostic";
@@ -27,7 +26,7 @@ export class Preview {
 
         // Otherwise, create a new panel.
         const localResourceRoots = [
-            vscode.Uri.file(path.join(ctx.extensionPath, "dist")),
+            vscode.Uri.joinPath(vscode.Uri.file(ctx.extensionPath), "dist"),
             ...vscode.workspace.workspaceFolders?.map(wf => wf.uri) ?? []
         ];
         const panel = vscode.window.createWebviewPanel(
@@ -117,7 +116,7 @@ export class Preview {
 
     evaluate(doc: vscode.TextDocument, text?: string): Promise<Value[]> {
         this._doc = doc;
-        const folder = this._panel.webview.asWebviewUri(vscode.Uri.file(path.dirname(doc.uri.fsPath))).toString();
+        const folder = this._panel.webview.asWebviewUri(vscode.Uri.file(doc.uri.fsPath.replace(/[\\/][^\\/]*$/, ""))).toString();
         return new Promise((resolve, reject) => {
             const callbackID = ++this._callbackID;
             this._callbacks[callbackID] = (msg: ValueMessage) => {
@@ -163,9 +162,7 @@ export class Preview {
 
     private getHtmlForWebview(webview: vscode.Webview) {
         // Local path to main script run in the webview
-        const scriptPathOnDisk = vscode.Uri.file(
-            path.join(this._extensionPath, "dist", "webview.js")
-        );
+        const scriptPathOnDisk = vscode.Uri.joinPath(vscode.Uri.file(this._extensionPath), "dist", "webview.js");
 
         // And the uri we use to load this script in the webview
         const scriptUri = webview.asWebviewUri(scriptPathOnDisk);

@@ -1,6 +1,5 @@
 import type { ohq } from "@hpcc-js/observablehq-compiler";
 
-import * as path from "path";
 import { NotebookSerializer, CancellationToken, NotebookData, NotebookCellData, NotebookCellKind, NotebookCell, Uri, NotebookCellOutput, NotebookCellOutputItem, NotebookRange, NotebookDocument } from "vscode";
 import { v4 as uuidv4 } from "uuid";
 import { TextDecoder, TextEncoder } from "util";
@@ -92,7 +91,7 @@ export class Serializer implements NotebookSerializer {
     }
 
     ojsOutput(cell: NotebookCell, uri: Uri, otherCells: NotebookCell[]): OJSOutput {
-        const folder = path.dirname(cell.document.uri.path);
+        const folder = cell.document.uri.path.replace(/[\\/][^\\/]*$/, "");
 
         return {
             notebookId: cell.notebook.metadata.id,
