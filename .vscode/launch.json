@@ -22,7 +22,7 @@
 			"args": [
 				"--disable-extensions",
 				"--extensionDevelopmentPath=${workspaceRoot}",
-				"${workspaceRoot}/samples"
+				"${workspaceRoot}/samples/notebook-kit"
 			],
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"

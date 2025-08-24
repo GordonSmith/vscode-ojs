@@ -1,0 +1,240 @@
+<!doctype html>
+<notebook theme="slate">
+  <title>Observable Notebooks Database connectors</title>
+  <script id="1" type="text/markdown">
+    # Observable Notebooks<br> <span style="color: var(--theme-foreground-faint);">Database connectors</span>
+
+    <link rel="stylesheet" href="./style.css">
+  </script>
+  <script id="17" type="text/markdown">
+    **Database connectors** allow you to query databases and data warehouses from notebooks. They power SQL cells, as well as the `DatabaseClient` JavaScript API.
+  </script>
+  <script id="18" type="text/markdown">
+    **Why would I want to connect to a database?** Business data is often stored in databases. If you want to do business intelligence, exploratory data analysis, or simply make a chart or dashboard, you'll likely need to query data from a database.
+  </script>
+  <script id="33" type="text/markdown">
+    **Why do I need a database connector to connect to a database?** Databases typically need specialized software (database drivers) to connect and execute queries. Notebooks run in the browser, and databases don't typically expose an HTTP API, so browsers can't talk to them directly.
+  </script>
+  <script id="34" type="text/markdown">
+    **Do I really need a database connector?** No, you don't need a database connector to work with data from a database in a notebook: you can manually extract data from your database, store it in a file, and use the `FileAttachment` JavaScript API to load it into a notebook.
+  </script>
+  <script id="14" type="text/markdown">
+    **So why do I need a database connector?** Database connectors make it much more convenient to query data, and to keep data up-to-date, because you don't have to switch tools and juggle files --- you can query right from a notebook! You can even query databases interactively, for example passing in dynamic parameters that are specified via a menu, slider, or text input. You rarely know upfront which data you'll need during exploratory analysis, so being able to query instantly at the moment of need dramatically accelerates analysis.
+  </script>
+  <script id="50" type="text/markdown">
+    **Are query results saved?** Yes. To improve performance, to ensure that everyone sees the same data, and to enable point-in-time analysis (not just live dashboards), query results are automatically saved to a `.observable/cache` directory on your local file system alongside your notebooks. Notebooks typically load instantly because queries are precomputed.
+  </script>
+  <script id="21" type="text/markdown">
+    **That's a big difference from notebooks 1.0!** Yes. Database connectors in notebooks 1.0 only support live (unsaved) queries. This often means slow notebooks and users seeing inconsistent data. And it makes point-in-time analysis tedious because query results must be manually captured as file attachments. And likewise if you want to share a notebook without giving access to the database. Automatic query caching in notebooks 2.0 isn't just about performance; it unlocks more robust and secure ways of working and sharing analysis.
+  </script>
+  <script id="20" type="text/markdown">
+    **If query results are saved, how do I update them?** In Observable Desktop, you can re-run a SQL cell by clicking the **Play** button, by hitting <span style="font-family: var(--sans-serif);">**shift-return**</span>, or by clicking on the query age in the cell toolbar. In Observable Notebook Kit, delete the corresponding file from the `.observable/cache` directory; you can also use continuous deployment, such as GitHub Actions, to refresh data automatically.
+  </script>
+  <script id="28" type="text/markdown">
+    **How do I configure my database?** When using DuckDB or (localhost) Postgres with the default settings, no configuration is required; simply specify `duckdb`, `postgres`, or a `.duckdb` (or `.db`) file as the **database** in the SQL cell. Note: you must save your notebook before running queries, since where you save the notebook determines which databases are accessible and where query results are saved. To configure databases, edit the <code>.observable/<wbr>databases.json</code> file alongside your notebook; see below for details. For example, if your notebooks are stored in `docs`,
+    then a notebook `docs/example.html` can access any database configured in <code>docs/<wbr>.observable/<wbr>databases.json</code>. In the future, Observable Desktop will provide a built-in UI for configuring databases.
+  </script>
+  <script id="15" type="text/markdown">
+    **Which databases are supported?** Currently DuckDB, Snowflake, and Postgres (PostgreSQL). The Postgres driver should also work with Postgres-compatible databases such as ClickHouse, Amazon Redshift, and Google Cloud SQL. We plan on adding more data connectors soon, notably Google BigQuery and Databricks. Our data connectors are [open-source](https://github.com/observablehq/notebook-kit/tree/main/src/databases) and we welcome contributions of additional database drivers! While you can query OLTP databases, we recommend OLAP databases because fast _ad hoc_ queries greatly accelerate analysis.
+  </script>
+  <script id="35" type="text/markdown">
+    **How do I query my database?** Insert a new cell, say by clicking the <b>+</b> button between cells. Convert the new cell to SQL by hitting down or <span style="font-family: var(--sans-serif);">⌘4</span>. By default, SQL cells query the default `duckdb` in-memory database. To query a different database, edit the **database** in the cell toolbar, then click ↩︎ or hit <span style="font-family: var(--sans-serif);">return</span>. Then refocus the SQL cell, edit your query, and hit <span style="font-family: var(--sans-serif);">shift-return</span> to run it.
+  </script>
+  <script id="36" type="application/sql" pinned="" database="duckdb">
+    SELECT 1 + 2
+  </script>
+  <script id="40" type="text/markdown">
+    <figcaption>A SQL cell typically contains a single <code>SELECT</code> statement.</figcaption>
+  </script>
+  <script id="24" type="text/markdown">
+    **How are query results displayed?** SQL cells display the query results as a table above the query. You can sort columns by clicking on column headers.
+  </script>
+  <script id="41" type="text/markdown">
+    **Can I hide the table?** Yes. In Desktop, use <span style="font-family: var(--sans-serif);">command-,</span> (or <span style="font-family: var(--sans-serif);">esc</span> <span style="font-family: var(--sans-serif);">,</span>) to hide the cell's display; you can also hide the cell from the cell menu, which is accessed by clicking the cell type (`sql` in the cell toolbar), or via the Edit menu. In Notebook Kit, use the <code>hidden</code> attribute.
+  </script>
+  <script id="26" type="text/markdown">
+    **I would like better tables.** Us too! We're currently using [`Inputs.table`](https://observablehq.com/@observablehq/input-table) from Observable Inputs, but we plan on implementing summary tables similar to those in [Notebooks 1.0](https://observablehq.com/documentation/cells/sql) and in [Canvases](https://observablehq.com/platform/canvases). These future summary tables will provide a better visual overview and allow more powerful interactive filtering. Note that you can already filter tables using the checkboxes in the first column: only checked rows will be visible to downstream cells. Interactive filters are not persistent; they are reset when you re-run the cell or reload the notebook.
+  </script>
+  <script id="23" type="text/markdown">
+    **How do I access query results from other cells?** Defining an **output** for a SQL cell exposes a top-level variable that allows other cells to access the query results. Query results are currently represented in array-of-objects format; however, in the future, we will likely switch to Apache Arrow for scalability.
+  </script>
+  <script id="37" type="application/sql" pinned="" database="duckdb" output="three">
+    SELECT 1 AS foo
+    UNION ALL SELECT 2
+    UNION ALL SELECT 3
+  </script>
+  <script id="39" type="text/markdown">
+    The output `three` in JavaScript is an array of three objects:
+  </script>
+  <script id="38" type="module" pinned="">
+    three
+  </script>
+  <script id="49" type="text/markdown">
+    **Show me a more interesting example.** How about a quick look at a dataset of 20M taxi rides? The query below counts the number of trips per hour. (Data is via the [NYC Taxi & Limousine Commission](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page), June 2025.)
+  </script>
+  <script id="3" type="application/sql" pinned="" database="duckdb" output="trips">
+    SELECT
+      DATE_TRUNC('hour', pickup_datetime) AS date,
+      COUNT(*) AS count
+    FROM read_parquet("fhvhv_tripdata_2025-06.parquet")
+    GROUP BY 1
+    ORDER BY 1 DESC
+  </script>
+  <script id="60" type="text/markdown">
+    As an area chart with Observable Plot:
+  </script>
+  <script id="5" type="module" pinned="">
+    Plot.plot({
+      y: {grid: true},
+      height: 240,
+      marks: [
+        Plot.axisY({tickFormat: (d) => d / 1000, label: "Trips per hour (thousands)"}),
+        Plot.areaY(trips, {x: "date", y: "count", curve: "step", fillOpacity: 0.2}),
+        Plot.ruleY([0]),
+        Plot.lineY(trips, {x: "date", y: "count", curve: "step", tip: true}),
+      ]
+    })
+  </script>
+  <script id="58" type="text/markdown">
+    The daily and weekly periodicity is quite prominent. How about grouping the data by hour of day and day of week?
+  </script>
+  <script id="55" type="application/sql" pinned="" database="duckdb" output="trips_heatmap">
+    SELECT
+      dayofweek(pickup_datetime) AS dow,
+      hour(pickup_datetime) AS hour,
+      COUNT(*) / COUNT(DISTINCT date(pickup_datetime)) AS rate
+    FROM read_parquet("fhvhv_tripdata_2025-06.parquet")
+    GROUP BY 1, 2
+    ORDER BY 1, 2
+  </script>
+  <script id="61" type="text/markdown">
+    As a heatmap, showing busy morning commutes and saturday nights:
+  </script>
+  <script id="56" type="module" pinned="">
+    Plot.plot({
+      padding: 0,
+      label: null,
+      y: {tickFormat: Plot.formatWeekday("en")},
+      color: {scheme: "ylorrd", label: "Trips per hour (avg.)", zero: true, legend: true},
+      marks: [Plot.rect(trips_heatmap, {x: "hour", y: "dow", fill: "rate", inset: 0.5, tip: true})]
+    })
+  </script>
+  <script id="16" type="text/markdown">
+    **My data is sensitive; where does it go when I run a query?** Database connectors run locally on your computer, so your data stays private. You access data on your local machine or private networks without going through Observable servers.
+  </script>
+  <script id="43" type="text/markdown">
+    **My database credentials are sensitive! How do I keep them secure?** Because the `databases.json` file typically contains credentials, it should not be committed to source control. We recommend excluding the entire `.observable` directory by adding it to your `.gitignore`, like so:
+
+    ```gitignore
+    .observable
+    ```
+
+    The `.observable` folder also contains saved query results (`.observable/cache`) and the built site (`.observable/dist`), which you likely do not want to commit to source control. (But you can if you want.)
+  </script>
+  <script id="44" type="text/markdown">
+    **Some of my notebooks need to talk to different databases, and some of my notebooks are untrusted; what do I do?** Use folders to separate notebooks with different levels of trust, and to configure different databases. A notebook can only access files and databases that live in the same folder (or subfolder) as the notebook. If you configure a sensitive database or have sensitive files, only put trusted notebooks in that folder. Don't mix trusted and untrusted notebooks in the same folder.
+  </script>
+  <script id="22" type="text/markdown">
+    **Does sharing my notebook require giving readers access to my database?** No. Notebook Kit builds a static site from your notebooks which includes the saved query results. Query results can therefore be shared without giving readers access to your database. However, this also means that shared notebooks cannot use dynamic queries (which by nature cannot be "baked" at build time). If desired, use JavaScript or DuckDB-Wasm (`DuckDBClient`) to filter and transform data interactively on the client.
+  </script>
+  <script id="63" type="text/markdown">
+    **How do I run dynamic queries?** Use `$\{…}` to interpolate JavaScript values into SQL cells. You can also use the `DatabaseClient` JavaScript API like so:
+
+    ```js
+    const db = DatabaseClient("duckdb");
+    const three = await db.sql`SELECT 1 + $\{2}`;
+    ```
+
+    Since dynamic queries are not baked, they are only suitable for use within Observable Desktop, while previewing with Notebook Kit, or when using a client-side database such as `DuckDBClient` (DuckDB-Wasm).
+  </script>
+  <script id="42" type="text/markdown">
+    **What about custom database clients and DuckDB-Wasm?** If you specify a SQL's database using `var:` (such as `var:db`), you can then provide a custom database client of the given name (such as `db`) that runs in the browser. This feature is most often used with `DuckDBClient` (DuckDB-Wasm), but you can provide any object that exposes a `sql` tagged template literal.
+  </script>
+  <script id="10" type="text/markdown">
+    **How do I use databases with Notebook Kit?** Database drivers come bundled with Observable Desktop, but are not installed by default with Notebook Kit. Database drivers are instead marked as optional peer dependencies, and you must install them yourself.
+
+    To install the DuckDB driver:
+
+    ```sh
+    npm add @duckdb/node-api
+    ```
+
+    To install the Postgres driver:
+
+    ```sh
+    npm add postgres
+    ```
+
+    To install the Snowflake driver:
+
+    ```sh
+    npm add snowflake-sdk
+    ```
+  </script>
+  <script id="46" type="text/markdown">
+    **What is the format of the `databases.json` file?** This file can configure multiple databases. Each database must have a unique name, the database type, and any corresponding configuration options. Here is how you might configure a `demo` Snowflake database:
+
+    ```json
+    {
+      "demo": {
+        "type": "snowflake",
+        "account": "tk421.us-east-1.aws",
+        "database": "demo",
+        "role": "public",
+        "schema": "public",
+        "username": "demo",
+        "warehouse": "demo",
+        "password": "opensesame"
+      }
+    }
+    ```
+  </script>
+  <script id="53" type="text/markdown">
+    **How do I configure DuckDB?** The following options are supported:
+
+    ```ts
+    type DuckDBConfig = {
+      type: "duckdb";
+      path?: string;
+      options?: {[key: string]: string};
+    }
+    ```
+
+    The **path** option stores the relative path to the DuckDB (`.duckdb`) database file; if not specified, the database will be in-memory (`:memory:`). The **options** object contains any [DuckDB configuration options](https://duckdb.org/docs/stable/configuration/overview.html).
+  </script>
+  <script id="52" type="text/markdown">
+    **How do I configure Postgres?** The following options are supported:
+
+    ```ts
+     type PostgresConfig = {
+      type: "postgres";
+      host?: string;
+      port?: string | number;
+      username?: string;
+      password?: string;
+      database?: string;
+      ssl?: boolean;
+    }
+    ```
+
+    If you do not specify any options, the Postgres database must be running on localhost with the default user and database. See the [Postgres driver documentation](https://github.com/porsager/postgres/blob/master/README.md#connection-details) for details.
+  </script>
+  <script id="51" type="text/markdown">
+    **How do I configure Snowflake?** The following options are supported:
+
+    ```ts
+    type SnowflakeConfig = {
+      type: "snowflake";
+      account: string;
+      database?: string;
+      role?: string;
+      schema?: string;
+      username?: string;
+      warehouse?: string;
+      password?: string;
+    }
+    ```
+
+    See the [Snowflake Node.js driver documentation](https://docs.snowflake.com/en/developer-guide/node-js/nodejs-driver-authenticate) for details.
+  </script>
+</notebook>

@@ -317,6 +317,18 @@
         "title": "Unpin Cell",
         "description": "Unpin this cell to hide it from the output",
         "icon": "$(pinned)"
+      },
+      {
+        "command": "observable-kit.cell.hide",
+        "title": "Hide Cell",
+        "description": "Hide this cell's source in the notebook output",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "observable-kit.cell.show",
+        "title": "Show Cell",
+        "description": "Show this cell's source in the notebook output",
+        "icon": "$(eye)"
       }
     ],
     "menus": {
@@ -431,6 +443,16 @@
           "command": "observable-kit.cell.unpin",
           "when": "notebookType == notebook-kit && observable-kit.currentCellPinned",
           "group": "inline@100"
+        },
+        {
+          "command": "observable-kit.cell.hide",
+          "when": "notebookType == notebook-kit && !observable-kit.currentCellHidden",
+          "group": "inline@101"
+        },
+        {
+          "command": "observable-kit.cell.show",
+          "when": "notebookType == notebook-kit && observable-kit.currentCellHidden",
+          "group": "inline@101"
         }
       ]
     },

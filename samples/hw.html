@@ -1,0 +1,31 @@
+<!doctype html>
+<notebook>
+  <title>hw</title>
+  <script id="1" type="text/markdown">
+    # Welcome to ObservableHQ Notebook
+
+    This is a new notebook using the ObservableHQ Notebook format.
+  </script>
+  <script id="2" type="module">
+    const message = "Hello, ObservableHQ Notebook!";
+    display(message);
+  </script>
+  <script type="text/html">
+    <h1>Hello, <i>world</i>!</h1>
+  </script>
+  <script type="application/sql" database="reporting">
+    SELECT * FROM customers
+  </script>
+  <script type="application/x-tex">
+    int_{-infty}^{infty} e^{-x^2} dx = sqrt{pi}
+  </script>
+  <script type="text/vnd.graphviz">
+    digraph G {
+        A -> B -> C;
+        A -> C;
+    }
+  </script>
+  <script type="application/vnd.observable.javascript">
+    foo = 42
+  </script>
+</notebook>

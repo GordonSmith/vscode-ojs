@@ -1,0 +1,303 @@
+<!doctype html>
+<notebook theme="slate">
+  <title>Observable Desktop User guide</title>
+  <script id="1" type="text/markdown">
+    # Observable Desktop <span style="color: var(--theme-foreground-faint);">User guide</span>
+
+    <link rel="stylesheet" href="./style.css">
+
+    <style>
+
+    figure img {
+      border-radius: 6px;
+    }
+
+    .sans {
+      font-family: var(--sans-serif);
+    }
+
+    </style>
+  </script>
+  <script id="21" type="text/markdown">
+    ---
+
+    ## Installing
+
+    Observable Desktop currently requires macOS 15+ and Apple Silicon.
+  </script>
+  <script id="3" type="text/markdown">
+    <figure>
+      <img src="./videos/install.webp" loading="lazy">
+      <figcaption>Installing Observable Desktop</figcaption>
+    </figure>
+
+    1. [Download](https://releases-desktop.observablehq.com/Observable_Desktop_1.0.darwin-aarch64.dmg) and open the disk image (`.dmg`).
+    1. Copy **Observable Desktop** to your **Applications** folder.
+    1. Double-click to open the application.
+  </script>
+  <script id="22" type="text/markdown">
+    ---
+
+    ## Signing in
+
+    Observable Desktop requires an Observable account. If you don't already have one, you can create one when you sign in.
+  </script>
+  <script id="4" type="text/markdown">
+    <figure>
+      <img src="./videos/sign-in.webp" loading="lazy">
+      <figcaption>Signing in to Observable</figcaption>
+    </figure>
+
+    1. Open **Observable Desktop**, then click **Open browser**.
+    1. If needed, **sign in** to your Observable account, or **create an account**.
+    1. Click **Authorize the desktop app**.
+    1. Close the **Success** window to return to Observable Desktop.
+    1. Wait a few seconds for Observable Desktop to sign in.
+  </script>
+  <script id="20" type="text/markdown">
+    ---
+
+    ## Creating and opening notebooks
+
+    Notebooks are stored as local `.html` files. New notebooks are not saved until you save them, but subsequent edits are saved automatically.
+  </script>
+  <script id="6" type="text/markdown">
+    <figure>
+      <img src="./videos/new-save.webp" loading="lazy">
+      <figcaption>Creating and saving a new notebook</figcaption>
+    </figure>
+
+    1. Choose <span class="sans">**File** > **New** ⌘N</span> to open a new, blank notebook.
+    1. Make any edits, as desired.
+    1. Choose <span class="sans">**File** > **Save** ⌘S</span> to save your notebook.
+  </script>
+  <script id="7" type="text/markdown">
+    <figure>
+      <img src="./videos/open.webp" loading="lazy">
+      <figcaption>Opening an existing notebook</figcaption>
+    </figure>
+
+    1. Choose <span class="sans">**File** > **Open** ⌘O</span> to open a notebook.
+  </script>
+  <script id="23" type="text/markdown">
+    ---
+
+    ## Opening and closing cells
+
+    Notebooks are comprised of small programs, or _cells_, which can be written in Markdown, HTML, JavaScript, and other languages. A cell's source code is visible below the cell's output if the cell is pinned or focused.
+  </script>
+  <script id="24" type="text/markdown">
+    <figure>
+      <img src="./videos/open-mouse.webp" loading="lazy">
+      <figcaption>Opening and closing a cell by clicking the left gutter</figcaption>
+    </figure>
+
+    1. Click the **left gutter** to focus the cell.
+    2. Edit the cell as desired.
+    3. Click the **left gutter** to blur the cell and run the new code.
+  </script>
+  <script id="2" type="text/markdown">
+    <figure>
+      <img src="./videos/open-keyboard.webp" loading="lazy">
+      <figcaption>Opening and closing a cell using keyboard shortcuts</figcaption>
+    </figure>
+
+    1. <span class="sans">**enter ↩︎**</span> to select the cell, then <span class="sans">**enter ↩︎**</span> again to focus it.
+    2. Edit the cell as desired.
+    3. <span class="sans">**esc ⎋**</span> to select the cell, then <span class="sans">**esc ⎋**</span> again to blur it.
+  </script>
+  <script id="25" type="text/markdown">
+    ---
+
+    ## Pinning cells
+
+    Pinned cells stay open even when they are not focused. JavaScript cells are pinned by default, but other cells default to unpinned. If a cell doesn't display anything, it will stay open regardless of whether it is pinned.
+  </script>
+  <script id="18" type="text/markdown">
+    <figure>
+      <img src="./videos/pin.webp" loading="lazy">
+      <figcaption>Pinning and unpinning cells</figcaption>
+    </figure>
+
+    1. Click the **left gutter** to focus the cell.
+    2. Click the **pin icon** in the toolbar.
+    3. Click the **close icon** in the toolbar to blur the cell.
+  </script>
+  <script id="26" type="text/markdown">
+    ---
+
+    ## Inserting and deleting cells
+
+    You can split existing cells or merge them together. You can also insert new, blank JavaScript cells. You can delete cells after selecting them. Empty cells are deleted automatically on blur.
+  </script>
+  <script id="27" type="text/markdown">
+    <figure>
+      <img src="./videos/split-merge.webp" loading="lazy">
+      <figcaption>Splitting and merging cells with keyboard shortcuts</figcaption>
+    </figure>
+
+    1. Split a cell at the caret with <span class="sans">**option-enter ⌥↩︎**</span>.
+    2. Merge a cell into the previous cell with <span class="sans">**option-delete ⌥⌫**</span>.
+    3. Split a cell at the caret with <span class="sans">**option-shift-enter ⌥⇧↩︎**</span>.
+    4. Marge a cell into the next cell with <span class="sans">**control-option-D ⌃⌥D**</span>.
+  </script>
+  <script id="28" type="text/markdown">
+    <figure>
+      <img src="./videos/insert-keyboard.webp" loading="lazy">
+      <figcaption>Inserting JavaScript cells with keyboard shortcuts</figcaption>
+    </figure>
+
+    1. Insert a JavaScript cell below with <span class="sans">**command-enter ⌘↩︎**</span>.
+    2. Insert a JavaScript cell above with <span class="sans">**shift-command-enter ⇧⌘↩︎**</span>.
+  </script>
+  <script id="17" type="text/markdown">
+    <figure>
+      <img src="./videos/insert-mouse.webp" loading="lazy">
+      <figcaption>Inserting JavaScript cells by clicking the inserter</figcaption>
+    </figure>
+
+    1. Insert a JavaScript cell by clicking the **inserter**.
+    2. Insert a Markdown cell by <span class="sans">**option ⌥**</span>-clicking the **inserter**.
+  </script>
+  <script id="29" type="text/markdown">
+    <figure>
+      <img src="./videos/delete.webp" loading="lazy">
+      <figcaption>Deleting cells with keyboard shortcuts</figcaption>
+    </figure>
+
+    1. Focus a cell, say by clicking the editor.
+    2. Select the cell with <span class="sans">**esc ⎋**</span>.
+    3. Delete the cell with <span class="sans">**D**</span>.
+    4. Clear the selection with <span class="sans">**esc ⎋**</span>.
+  </script>
+  <script id="35" type="text/markdown">
+    ---
+
+    ## Cell modes
+
+    Cells can be written in JavaScript, Markdown, HTML, and several other languages. You can cycle between the primary modes when a cell is empty, or use the mode menu or edit menu to change the mode.
+  </script>
+  <script id="37" type="text/markdown">
+    <figure>
+      <img src="./videos/mode-empty.webp" loading="lazy">
+      <figcaption>Changing the mode of an empty cell</figcaption>
+    </figure>
+
+    1. Insert a new, empty cell.
+    2. Change the cell mode with <span class="sans">**down ↓**</span> or <span class="sans">**up ↑**</span>.
+  </script>
+  <script id="38" type="text/markdown">
+    <figure>
+      <img src="./videos/mode-keyboard.webp" loading="lazy">
+      <figcaption>Changing the mode via keyboard shortcuts</figcaption>
+    </figure>
+
+    1. Focus a cell, say by clicking on the editor.
+    2. Change the cell mode to JavaScript with <span class="sans">**command-1 ⌘1**</span>.
+    2. Change the cell mode to Markdown with <span class="sans">**command-2 ⌘2**</span>.
+    2. Change the cell mode to HTML with <span class="sans">**command-3 ⌘3**</span>.
+  </script>
+  <script id="39" type="text/markdown">
+    <figure>
+      <img src="./videos/mode-menu.webp" loading="lazy">
+      <figcaption>Changing the mode via the mode menu</figcaption>
+    </figure>
+
+    1. Focus a cell, say by clicking on the editor.
+    2. Change the cell mode using the **mode menu**.
+  </script>
+  <script id="30" type="text/markdown">
+    ---
+
+    ## Running cells
+
+    You can run cells while editing. If you edit a cell, it will run automatically when blurred. When a cell has edits that have not yet been run (a "dirty" cell), the cell will have a dark blue border and the play button will be highlighted.
+  </script>
+  <script id="5" type="text/markdown">
+    <figure>
+      <img src="./videos/run-mouse.webp" loading="lazy">
+      <figcaption>Running a cell by clicking the play button</figcaption>
+    </figure>
+
+    1. Focus a cell, say by clicking the editor.
+    2. Click the **play button** to run the cell.
+  </script>
+  <script id="31" type="text/markdown">
+    <figure>
+      <img src="./videos/run-keyboard.webp" loading="lazy">
+      <figcaption>Running a cell with ⇧↩︎</figcaption>
+    </figure>
+
+    1. Focus a cell, say by clicking the editor.
+    2. Run the cell with <span class="sans">**shift-enter ⇧↩︎**</span>.
+  </script>
+  <script id="32" type="text/markdown">
+    ---
+
+    ## Navigating between cells
+
+    There are a variety of keyboard shortcuts for fast navigation between cells.
+
+  </script>
+  <script id="33" type="text/markdown">
+    <figure>
+      <img src="./videos/navigate-tab.webp" loading="lazy">
+      <figcaption>Navigating between cells using focus</figcaption>
+    </figure>
+
+    1. Focus a cell, say by clicking the editor.
+    2. Focus the cell below with <span class="sans">**option-tab ⌥⇥**</span>.
+    3. Focus the cell above with <span class="sans">**shift-option-tab ⌥⇧⇥**</span>.
+  </script>
+  <script id="12" type="text/markdown">
+    <figure>
+      <img src="./videos/navigate-esc.webp" loading="lazy">
+      <figcaption>Navigating between cells using selection</figcaption>
+    </figure>
+
+    1. Select a cell, say with <span class="sans">**enter ↩︎**</span>.
+    1. Select the cell below with <span class="sans">**J**</span>.
+    1. Select the cell above with <span class="sans">**K**</span>.
+    1. Focus the cell with <span class="sans">**enter ↩︎**</span>.
+  </script>
+  <script id="19" type="text/markdown">
+    ---
+
+    ## Loading data
+
+    After saving a notebook, you can open a local file in the same folder using <code>FileAttachment</code>.
+
+    <figure>
+      <img src="./videos/file.webp" loading="lazy">
+      <figcaption>Loading data from a local file with <code>FileAttachment</code></figcaption>
+    </figure>
+
+    1. Open a saved notebook, or save the current one.
+    2. Insert a JavaScript cell.
+    3. Call **`FileAttachment`**, passing in the relative path to the file.
+    4. Call the appropriate method to load the data, such as **`csv()`** or **`json()`**.
+  </script>
+  <script id="34" type="text/markdown">
+    ---
+
+    ## Exporting images
+
+    You can export graphics as SVG or PNG.
+
+    <figure>
+      <img src="./videos/export.webp" loading="lazy">
+      <figcaption>Exporting a chart as PNG</figcaption>
+    </figure>
+
+    1. Focus or select a cell.
+    2. Click the **export menu** in the toolbar.
+    3. Click **Export PNG** or **Export SVG**.
+  </script>
+  <script id="40" type="text/markdown">
+    ---
+
+    ## Next steps
+
+    If you're comfortable with the Desktop editor and are ready to learn about authoring notebooks, please see the [Notebooks system guide](./system-guide).
+  </script>
+</notebook>

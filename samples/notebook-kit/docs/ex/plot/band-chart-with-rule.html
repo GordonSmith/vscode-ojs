@@ -1,0 +1,22 @@
+<!doctype html>
+<notebook>
+  <title>Band chart with rule</title>
+  <script id="1" type="text/markdown">
+    # Band chart with rule
+
+    A [ruleX](https://observablehq.com/plot/marks/rule) encodes a vertical extent at a given horizontal position.
+  </script>
+  <script id="5" type="module" pinned="">
+    Plot.plot({
+      y: {grid: true, label: "↑ Temperature (°C)"},
+      color: {scheme: "BuRd"},
+      marks: [
+        Plot.ruleY([0]),
+        Plot.ruleX(seattle, {x: "date", y1: "temp_min", y2: "temp_max", stroke: "temp_min"})
+      ]
+    })
+  </script>
+  <script id="8" type="module" pinned="">
+    const seattle = FileAttachment("data/seattle-weather.csv").csv({typed: true}).then(display);
+  </script>
+</notebook>

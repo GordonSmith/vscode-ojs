@@ -15,12 +15,14 @@ export class Commands {
             vscode.commands.registerCommand("observable-kit.setupWorkspace", Commands.setupWorkspace),
             vscode.commands.registerCommand("observable-kit.cell.pin", Commands.pinCell),
             vscode.commands.registerCommand("observable-kit.cell.unpin", Commands.unpinCell),
+            vscode.commands.registerCommand("observable-kit.cell.hide", Commands.hideCell),
+            vscode.commands.registerCommand("observable-kit.cell.show", Commands.showCell),
         );
 
         // Handle cell selection changes to update pin context
         ctx.subscriptions.push(
             vscode.window.onDidChangeNotebookEditorSelection(e => {
-                Commands.updatePinContext(e.notebookEditor);
+                Commands.updateCellContexts(e.notebookEditor);
             })
         );
 
@@ -28,17 +30,19 @@ export class Commands {
         ctx.subscriptions.push(
             vscode.window.onDidChangeActiveNotebookEditor(e => {
                 if (e) {
-                    Commands.updatePinContext(e);
+                    Commands.updateCellContexts(e);
                 }
             })
         );
     }
 
-    private static updatePinContext(editor: vscode.NotebookEditor): void {
+    private static updateCellContexts(editor: vscode.NotebookEditor): void {
         if (editor.notebook.notebookType === "notebook-kit" && editor.selections.length > 0) {
             const cell = editor.notebook.cellAt(editor.selections[0].start);
-            const isPinned = cell.metadata?.pinned === true;
+            const isPinned: boolean = cell.metadata?.pinned === true;
+            const isHidden: boolean = cell.metadata?.hidden === true;
             vscode.commands.executeCommand("setContext", "observable-kit.currentCellPinned", isPinned);
+            vscode.commands.executeCommand("setContext", "observable-kit.currentCellHidden", isHidden);
         }
     }
 
@@ -365,6 +369,36 @@ export class Commands {
         ]);
 
         await vscode.workspace.applyEdit(edit);
+    }
+
+    static async hideCell(cell: vscode.NotebookCell): Promise<void> {
+        if (!cell) {
+            return;
+        }
+
+        const edit = new vscode.WorkspaceEdit();
+        const newMetadata = { ...cell.metadata, hidden: true };
+        edit.set(cell.notebook.uri, [
+            vscode.NotebookEdit.updateCellMetadata(cell.index, newMetadata)
+        ]);
+
+        await vscode.workspace.applyEdit(edit);
+        await vscode.commands.executeCommand("setContext", "observable-kit.currentCellHidden", true);
+    }
+
+    static async showCell(cell: vscode.NotebookCell): Promise<void> {
+        if (!cell) {
+            return;
+        }
+
+        const edit = new vscode.WorkspaceEdit();
+        const newMetadata = { ...cell.metadata, hidden: false };
+        edit.set(cell.notebook.uri, [
+            vscode.NotebookEdit.updateCellMetadata(cell.index, newMetadata)
+        ]);
+
+        await vscode.workspace.applyEdit(edit);
+        await vscode.commands.executeCommand("setContext", "observable-kit.currentCellHidden", false);
     }
 }
 

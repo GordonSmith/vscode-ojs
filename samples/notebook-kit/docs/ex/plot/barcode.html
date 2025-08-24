@@ -1,0 +1,33 @@
+<!doctype html>
+<notebook>
+  <title>Barcode chart</title>
+  <script id="1" type="text/markdown">
+    # Barcode chart
+
+    A barcode chart just adds a [tick](https://observablehq.com/plot/marks/tick) for each value; if the values overlap, use strokeOpacity to give a sense of density. In this example, the populations are [normalized](https://observablehq.com/plot/transforms/normalize) to reflect the percentage of each age class in every State.
+  </script>
+  <script id="11" type="module" pinned="">
+    Plot.plot({
+      x: {
+        grid: true,
+        label: "Population (%) →",
+        percent: true
+      },
+      y: {
+        domain: ages, // in age order
+        reverse: true,
+        label: "↑ Age (years)",
+        labelAnchor: "top"
+      },
+      marks: [
+        Plot.ruleX([0]),
+        Plot.tickX(stateage, Plot.normalizeX("sum", {z: "state", x: "population", y: "age"}))
+      ]
+    })
+  </script>
+  <script id="5" type="module" pinned="">
+    const wide = await FileAttachment("data/us-population-state-age.csv").csv({typed: true});
+    const ages = wide.columns.slice(1);
+    const stateage = display(wide.flatMap(({name, ...values}) => ages.map((age) => ({state: name, age, population: values[age]}))));
+  </script>
+</notebook>

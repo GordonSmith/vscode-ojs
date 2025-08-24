@@ -1,0 +1,59 @@
+.observablehq--cell:first-of-type {
+  position: relative;
+  color: var(--theme-background);
+  padding-bottom: 5rem;
+}
+
+.observablehq--cell:first-of-type h1 {
+  color: inherit;
+}
+
+.observablehq--cell:first-of-type h1 + h2 {
+  color: inherit;
+  font-style: normal;
+  font-weight: 500;
+  opacity: 0.7;
+  margin-top: 1rem;
+}
+
+.observablehq--cell:first-of-type::before {
+  content: "";
+  display: block;
+  position: absolute;
+  background: var(--theme-foreground);
+  inset: 0;
+  width: 100vw;
+  margin: -68px calc((100% - 100vw) / 2) 2rem;
+  z-index: -1;
+}
+
+h1 {
+  color: var(--theme-foreground);
+  font-size: clamp(3rem, 8vw, 4rem);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--sans-serif);
+}
+
+aside {
+  font: small var(--sans-serif);
+  color: var(--theme-foreground-muted);
+  max-width: 640px;
+}
+
+aside code {
+  font-size: inherit;
+}
+
+@media (min-width: calc(640px + 17rem)) {
+  aside {
+    float: right;
+    width: 12rem;
+  }
+}

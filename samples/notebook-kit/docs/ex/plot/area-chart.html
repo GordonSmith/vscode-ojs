@@ -1,0 +1,15 @@
+<!doctype html>
+<notebook>
+  <title>Area chart</title>
+  <script id="1" type="text/markdown">
+    # Area chart
+
+    The [area](https://observablehq.com/plot/marks/area) mark draws the region between a baseline (**x1**, **y1**) and a topline (**x2**, **y2**) as in an area chart. Often the baseline represents _y_ = 0, and because the area mark interpolates between adjacent data points, typically both the x and y scales are quantitative or temporal.
+  </script>
+  <script id="5" type="module" pinned="">
+    Plot.areaY(aapl, {x: "Date", y: "Close"}).plot()
+  </script>
+  <script id="6" type="module" pinned="">
+    const aapl = FileAttachment("data/AAPL.csv").csv({typed: true}).then(display);
+  </script>
+</notebook>

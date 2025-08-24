@@ -109,10 +109,13 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
                 language
             );
 
-            // Ensure pinned property is explicitly boolean
-            const metadata = { ...cell };
+            // Ensure pinned and hidden properties are explicitly boolean
+            const metadata: any = { ...cell };
             if (metadata.pinned === undefined || metadata.pinned === null) {
                 metadata.pinned = false;
+            }
+            if (metadata.hidden === undefined || metadata.hidden === null) {
+                metadata.hidden = false;
             }
             cellData.metadata = metadata;
             cells.push(cellData);
@@ -133,13 +136,14 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
             const cellId = cell.metadata?.id ? parseInt(cell.metadata.id) : cellIdCounter++;
             const mode = vscode2observable[cell.languageId] || "js";
             const pinned = cell.metadata?.pinned ?? false;
+            const hidden = cell.metadata?.hidden ?? false;
 
             cells.push({
                 id: cellId,
                 value: cell.value,
                 mode,
                 pinned,
-                hidden: undefined,
+                hidden,
                 since: undefined,
             });
         }
