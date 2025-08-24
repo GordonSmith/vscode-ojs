@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.42](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.41...v0.4.42) (2025-08-24)
+
+
+### Features
+
+* add notebook metadata support ([c5a8f63](https://github.com/GordonSmith/vscode-ojs/commit/c5a8f63340495c1770e715b112f4fa6b99f85305))
+
 ### [0.4.41](https://github.com/GordonSmith/vscode-ojs/compare/v0.4.40...v0.4.41) (2025-08-23)
 
 
