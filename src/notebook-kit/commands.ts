@@ -5,6 +5,8 @@ import * as fs from "fs";
 export class Commands {
 
     private static _ctx: vscode.ExtensionContext;
+    private static _titleStatusBarItem: vscode.StatusBarItem | undefined;
+    private static _themeStatusBarItem: vscode.StatusBarItem | undefined;
 
     static attach(ctx: vscode.ExtensionContext) {
         Commands._ctx = ctx;
@@ -13,18 +15,29 @@ export class Commands {
             vscode.commands.registerCommand("observable-kit.createNotebook", Commands.createNotebook),
             vscode.commands.registerCommand("observable-kit.convertFromLegacy", Commands.convertFromLegacy),
             vscode.commands.registerCommand("observable-kit.setupWorkspace", Commands.setupWorkspace),
+            vscode.commands.registerCommand("observable-kit.notebook.setTitle", Commands.setNotebookTitle),
+            vscode.commands.registerCommand("observable-kit.notebook.setTheme", Commands.setNotebookTheme),
+            vscode.commands.registerCommand("observable-kit.notebook.setReadOnly", Commands.setNotebookReadOnly),
+            vscode.commands.registerCommand("observable-kit.notebook.setReadWrite", Commands.setNotebookReadWrite),
             vscode.commands.registerCommand("observable-kit.cell.pin", Commands.pinCell),
             vscode.commands.registerCommand("observable-kit.cell.unpin", Commands.unpinCell),
             vscode.commands.registerCommand("observable-kit.cell.hide", Commands.hideCell),
             vscode.commands.registerCommand("observable-kit.cell.show", Commands.showCell),
         );
 
+        // Status bar item to show current notebook title (toolbar command text cannot be dynamic)
+        Commands._titleStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+        Commands._titleStatusBarItem.command = "observable-kit.notebook.setTitle";
+        ctx.subscriptions.push(Commands._titleStatusBarItem);
+        // Status bar item for theme
+        Commands._themeStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 99);
+        Commands._themeStatusBarItem.command = "observable-kit.notebook.setTheme";
+        ctx.subscriptions.push(Commands._themeStatusBarItem);
+
         // Handle cell selection changes to update pin context
-        ctx.subscriptions.push(
-            vscode.window.onDidChangeNotebookEditorSelection(e => {
-                Commands.updateCellContexts(e.notebookEditor);
-            })
-        );
+        ctx.subscriptions.push(vscode.window.onDidChangeNotebookEditorSelection(e => {
+            Commands.updateCellContexts(e.notebookEditor);
+        }));
 
         // Handle when a different notebook becomes active
         ctx.subscriptions.push(
@@ -34,6 +47,126 @@ export class Commands {
                 }
             })
         );
+
+        // Track notebook document metadata changes to update read-only context
+        ctx.subscriptions.push(vscode.workspace.onDidChangeNotebookDocument(e => {
+            if (e.notebook.notebookType === "notebook-kit") {
+                // Metadata changes show up with 'metadata' property on the event
+                Commands.setNotebookReadOnlyContext(e.notebook.metadata?.readOnly === true);
+                if (vscode.window.activeNotebookEditor?.notebook === e.notebook) {
+                    Commands.updateNotebookTitleStatusBar(e.notebook);
+                    Commands.updateNotebookThemeStatusBar(e.notebook);
+                }
+            }
+        }));
+
+        // Initialize contexts if an editor is already active
+        if (vscode.window.activeNotebookEditor) {
+            Commands.updateCellContexts(vscode.window.activeNotebookEditor);
+            Commands.updateNotebookTitleStatusBar(vscode.window.activeNotebookEditor.notebook);
+            Commands.updateNotebookThemeStatusBar(vscode.window.activeNotebookEditor.notebook);
+        }
+
+        ctx.subscriptions.push(vscode.window.onDidChangeActiveNotebookEditor(editor => {
+            if (editor) {
+                Commands.updateNotebookTitleStatusBar(editor.notebook);
+                Commands.updateNotebookThemeStatusBar(editor.notebook);
+            } else {
+                Commands._titleStatusBarItem?.hide();
+                Commands._themeStatusBarItem?.hide();
+            }
+        }));
+    }
+
+    // --- Notebook-level metadata edits ------------------------------------------------
+
+    static async setNotebookTitle(): Promise<void> {
+        const editor = vscode.window.activeNotebookEditor;
+        if (!editor || editor.notebook.notebookType !== "notebook-kit") {
+            vscode.window.showErrorMessage("No Observable Notebook active");
+            return;
+        }
+        const current: string = (editor.notebook.metadata?.title as string) || "";
+        const value = await vscode.window.showInputBox({
+            prompt: "Notebook Title",
+            value: current,
+            placeHolder: "Enter notebook title"
+        });
+        if (value === undefined) { // cancelled
+            return;
+        }
+        await Commands.applyNotebookMetadataEdit(editor.notebook, { title: value.trim() || "Untitled Notebook" });
+        Commands.updateNotebookTitleStatusBar(editor.notebook);
+    }
+
+    static async setNotebookTheme(): Promise<void> {
+        const editor = vscode.window.activeNotebookEditor;
+        if (!editor || editor.notebook.notebookType !== "notebook-kit") {
+            vscode.window.showErrorMessage("No Observable Notebook active");
+            return;
+        }
+        const themes = [
+            "air",
+            "coffee",
+            "cotton",
+            "deep-space",
+            "glacier",
+            "ink",
+            "midnight",
+            "near-midnight",
+            "ocean-floor",
+            "parchment",
+            "slate",
+            "stark",
+            "sun-faded"
+        ];
+        const current: string = (editor.notebook.metadata?.theme as string) || "air";
+        const theme = await vscode.window.showQuickPick(themes, {
+            title: "Select Notebook Theme",
+            placeHolder: current,
+            canPickMany: false
+        });
+        if (!theme) {
+            return;
+        }
+        await Commands.applyNotebookMetadataEdit(editor.notebook, { theme });
+        Commands.updateNotebookThemeStatusBar(editor.notebook);
+    }
+
+    static async setNotebookReadOnly(): Promise<void> {
+        const editor = vscode.window.activeNotebookEditor;
+        if (!editor || editor.notebook.notebookType !== "notebook-kit") {
+            vscode.window.showErrorMessage("No Observable Notebook active");
+            return;
+        }
+        if (editor.notebook.metadata?.readOnly === true) {
+            return; // already read-only
+        }
+        await Commands.applyNotebookMetadataEdit(editor.notebook, { readOnly: true });
+        vscode.window.showInformationMessage("Notebook set to read-only.");
+    }
+
+    static async setNotebookReadWrite(): Promise<void> {
+        const editor = vscode.window.activeNotebookEditor;
+        if (!editor || editor.notebook.notebookType !== "notebook-kit") {
+            vscode.window.showErrorMessage("No Observable Notebook active");
+            return;
+        }
+        if (editor.notebook.metadata?.readOnly !== true) {
+            return; // already read/write
+        }
+        await Commands.applyNotebookMetadataEdit(editor.notebook, { readOnly: false });
+        vscode.window.showInformationMessage("Notebook set to read/write.");
+    }
+
+    private static async applyNotebookMetadataEdit(notebook: vscode.NotebookDocument, patch: Record<string, unknown>): Promise<void> {
+        const edit = new vscode.WorkspaceEdit();
+        const newMetadata = { ...notebook.metadata, ...patch };
+        edit.set(notebook.uri, [vscode.NotebookEdit.updateNotebookMetadata(newMetadata)]);
+        await vscode.workspace.applyEdit(edit);
+        if (Object.prototype.hasOwnProperty.call(patch, "readOnly")) {
+            Commands.setNotebookReadOnlyContext(!!(patch as any).readOnly);
+        }
     }
 
     private static updateCellContexts(editor: vscode.NotebookEditor): void {
@@ -43,7 +176,37 @@ export class Commands {
             const isHidden: boolean = cell.metadata?.hidden === true;
             vscode.commands.executeCommand("setContext", "observable-kit.currentCellPinned", isPinned);
             vscode.commands.executeCommand("setContext", "observable-kit.currentCellHidden", isHidden);
+            Commands.setNotebookReadOnlyContext(editor.notebook.metadata?.readOnly === true);
         }
+    }
+
+    private static setNotebookReadOnlyContext(readOnly: boolean): void {
+        vscode.commands.executeCommand("setContext", "observable-kit.notebook.readOnly", readOnly);
+    }
+
+    private static updateNotebookTitleStatusBar(notebook: vscode.NotebookDocument): void {
+        if (!Commands._titleStatusBarItem) return;
+        if (notebook.notebookType !== "notebook-kit") {
+            Commands._titleStatusBarItem.hide();
+            return;
+        }
+        const title = (notebook.metadata?.title as string) || "Untitled Notebook";
+        const truncated = title.length > 60 ? title.slice(0, 57) + "…" : title;
+        Commands._titleStatusBarItem.text = `$(book) ${truncated}`;
+        Commands._titleStatusBarItem.tooltip = `Notebook title: ${title}\nClick to rename`;
+        Commands._titleStatusBarItem.show();
+    }
+
+    private static updateNotebookThemeStatusBar(notebook: vscode.NotebookDocument): void {
+        if (!Commands._themeStatusBarItem) return;
+        if (notebook.notebookType !== "notebook-kit") {
+            Commands._themeStatusBarItem.hide();
+            return;
+        }
+        const theme = (notebook.metadata?.theme as string) || "air";
+        Commands._themeStatusBarItem.text = `$(symbol-color) ${theme}`;
+        Commands._themeStatusBarItem.tooltip = `Notebook theme: ${theme}\nClick to change`;
+        Commands._themeStatusBarItem.show();
     }
 
     static async build(uri?: vscode.Uri): Promise<void> {
@@ -344,15 +507,12 @@ export class Commands {
         }
 
         const edit = new vscode.WorkspaceEdit();
-        // Ensure pinned is explicitly boolean true
         const newMetadata = { ...cell.metadata, pinned: true };
         edit.set(cell.notebook.uri, [
             vscode.NotebookEdit.updateCellMetadata(cell.index, newMetadata)
         ]);
 
         await vscode.workspace.applyEdit(edit);
-
-        // Update our custom context immediately
         await vscode.commands.executeCommand("setContext", "observable-kit.currentCellPinned", true);
     }
 
@@ -362,13 +522,13 @@ export class Commands {
         }
 
         const edit = new vscode.WorkspaceEdit();
-        // Set pinned to false instead of removing it to ensure proper context evaluation
         const newMetadata = { ...cell.metadata, pinned: false };
         edit.set(cell.notebook.uri, [
             vscode.NotebookEdit.updateCellMetadata(cell.index, newMetadata)
         ]);
 
         await vscode.workspace.applyEdit(edit);
+        await vscode.commands.executeCommand("setContext", "observable-kit.currentCellPinned", false);
     }
 
     static async hideCell(cell: vscode.NotebookCell): Promise<void> {

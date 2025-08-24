@@ -272,6 +272,34 @@
       },
       {
         "category": "Observable Kit",
+        "command": "observable-kit.notebook.setTitle",
+        "title": "Title",
+        "description": "Edit the notebook title metadata",
+        "icon": "$(edit)"
+      },
+      {
+        "category": "Observable Kit",
+        "command": "observable-kit.notebook.setTheme",
+        "title": "Theme",
+        "description": "Choose the visual theme for this notebook",
+        "icon": "$(symbol-color)"
+      },
+      {
+        "category": "Observable Kit",
+        "command": "observable-kit.notebook.setReadOnly",
+        "title": "read/write",
+        "description": "Switch notebook to read-only mode",
+        "icon": "$(unlock)"
+      },
+      {
+        "category": "Observable Kit",
+        "command": "observable-kit.notebook.setReadWrite",
+        "title": "read only",
+        "description": "Switch notebook to read/write mode",
+        "icon": "$(lock)"
+      },
+      {
+        "category": "Observable Kit",
         "command": "observable-kit.openHtmlAsNotebook",
         "title": "Open HTML as Observable Notebook",
         "description": "Open HTML file as Observable Notebook (without renaming)"
@@ -308,26 +336,26 @@
       },
       {
         "command": "observable-kit.cell.pin",
-        "title": "Pin Cell",
-        "description": "Pin this cell to make it visible in the output",
+        "title": "Pin Source Code",
+        "description": "Pin this cell to make its source code visible in the output",
         "icon": "$(pin)"
       },
       {
         "command": "observable-kit.cell.unpin",
-        "title": "Unpin Cell",
-        "description": "Unpin this cell to hide it from the output",
+        "title": "Unpin Source Code",
+        "description": "Unpin this cell to hide its source code from the output",
         "icon": "$(pinned)"
       },
       {
         "command": "observable-kit.cell.hide",
         "title": "Hide Cell",
-        "description": "Hide this cell's source in the notebook output",
+        "description": "Hide this cell's output in the notebook",
         "icon": "$(eye-closed)"
       },
       {
         "command": "observable-kit.cell.show",
         "title": "Show Cell",
-        "description": "Show this cell's source in the notebook output",
+        "description": "Show this cell's output in the notebook",
         "icon": "$(eye)"
       }
     ],
@@ -453,6 +481,28 @@
           "command": "observable-kit.cell.show",
           "when": "notebookType == notebook-kit && observable-kit.currentCellHidden",
           "group": "inline@101"
+        }
+      ],
+      "notebook/toolbar": [
+        {
+          "command": "observable-kit.notebook.setTitle",
+          "when": "notebookType == notebook-kit",
+          "group": "navigation@100"
+        },
+        {
+          "command": "observable-kit.notebook.setTheme",
+          "when": "notebookType == notebook-kit",
+          "group": "navigation@101"
+        },
+        {
+          "command": "observable-kit.notebook.setReadOnly",
+          "when": "notebookType == notebook-kit && !observable-kit.notebook.readOnly",
+          "group": "navigation@102"
+        },
+        {
+          "command": "observable-kit.notebook.setReadWrite",
+          "when": "notebookType == notebook-kit && observable-kit.notebook.readOnly",
+          "group": "navigation@102"
         }
       ]
     },

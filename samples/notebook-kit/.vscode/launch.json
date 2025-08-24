@@ -8,7 +8,7 @@
             "name": "Launch Edge",
             "request": "launch",
             "type": "msedge",
-            "url": "http://localhost:5173/system-guide.html",
+            "url": "http://localhost:5173/index.html",
             "webRoot": "${workspaceFolder}"
         }
     ]

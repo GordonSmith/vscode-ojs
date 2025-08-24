@@ -149,9 +149,7 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
         }
 
         const notebook: Notebook = {
-            title: data.metadata?.title || "Untitled Notebook",
-            theme: data.metadata?.theme || "air",
-            readOnly: data.metadata?.readOnly || false,
+            ...data.metadata as Notebook,
             cells
         };
 
