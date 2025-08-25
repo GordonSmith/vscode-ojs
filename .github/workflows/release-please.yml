@@ -1,0 +1,98 @@
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+name: release-please
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: .github/release-please-config.json
+          manifest-file: .github/release-please-manifest.json
+
+  publish:
+    needs: [release-please]
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      release_name: ${{ steps.event_details.outputs.release_name }}
+      tag_name: ${{ steps.event_details.outputs.tag_name }}
+      version: ${{ steps.event_details.outputs.version }}
+    steps:
+      - name: Check event details
+        id: event_details
+        env:
+          RELEASE_NAME: ${{ needs.release-please.outputs.tag_name }}
+          TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
+        run: |
+          echo "release_name=${RELEASE_NAME}" >> $GITHUB_OUTPUT
+          echo "tag_name=${TAG_NAME}" >> $GITHUB_OUTPUT
+          echo "version=${TAG_NAME##*-v}" >> $GITHUB_OUTPUT
+          echo "package_name=${RELEASE_NAME%:*}" >> $GITHUB_OUTPUT
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.event_details.outputs.tag_name }}
+      - name: Add files and publish release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          VSCE_PAT: ${{ secrets.VSCE_TOKEN }}
+          TAG_NAME: ${{ steps.event_details.outputs.tag_name }}
+        run: |
+          npm ci
+          npm run package
+          mv gordonsmith.observable-js.vsix gordonsmith.${TAG_NAME}.vsix
+          gh release upload gordonsmith.${TAG_NAME} gordonsmith.${TAG_NAME}.vsix
+          npx vsce publish --packagePath gordonsmith.${TAG_NAME}.vsix
+
+  label:
+    needs: [publish]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+      repository-projects: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add label to PR
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          PR_NUMBER=$(gh pr list --state merged --label 'autorelease: tagged' --json number --jq '.[0].number')
+          gh pr edit ${PR_NUMBER} --add-label 'autorelease: published'
+
+  comments:
+    needs: [publish]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: apexskier/github-release-commenter@v1
+        with:
+          GITHUB_TOKEN: ${{ github.token }}
+          comment-template: |
+            :tada: This change has been included in ${{ needs.publish.outputs.tag_name }} :tada:
+
+            The release is available on:
+            - GitHub releases: {release_link}
+
+            Your **[release-please](https://github.com/googleapis/release-please)** bot :rocket::pray:
