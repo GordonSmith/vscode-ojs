@@ -35,7 +35,7 @@
   ],
   "scripts": {
     "vsce-publish": "vsce publish",
-    "vsce-package": "vsce package -o ./gordonsmith.js-notebook-extension-pack.vsix"
+    "vsce-package": "vsce package -o ./js-notebook-extension-pack.vsix"
   },
   "extensionPack": [
     "GordonSmith.observable-js",
