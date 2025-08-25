@@ -25,7 +25,7 @@
   ],
   "main": "./dist/extension.js",
   "scripts": {
-    "clean": "rimraf --glob out lib* dist* types hpcc-systems.ecl.vsix",
+    "clean": "rimraf --glob out lib* dist* types *.vsix",
     "gen-node-types": "tsc --project tsconfig.json --emitDeclarationOnly",
     "gen-node-watch": "npm run gen-node-types -- -w",
     "gen-webview-types": "tsc --project tsconfig.webview.json --emitDeclarationOnly",
