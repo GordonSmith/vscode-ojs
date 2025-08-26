@@ -118,7 +118,6 @@ export class Commands {
             }
             const document = await vscode.workspace.openNotebookDocument(targetUri);
             await vscode.window.showNotebookDocument(document);
-            vscode.window.showInformationMessage("Opened notebook view. Both text and notebook views are now available.");
         } catch (error) {
             console.error("Error switching to notebook view:", error);
             vscode.window.showErrorMessage(`Failed to switch to notebook view: ${error}`);
@@ -135,7 +134,6 @@ export class Commands {
             const notebookUri = activeNotebook.notebook.uri;
             const textDocument = await vscode.workspace.openTextDocument(notebookUri);
             await vscode.window.showTextDocument(textDocument);
-            vscode.window.showInformationMessage("Opened text view. Both notebook and text views are now available.");
         } catch (error) {
             console.error("Error switching to text view:", error);
             vscode.window.showErrorMessage(`Failed to switch to text view: ${error}`);
@@ -190,7 +188,6 @@ export class Commands {
             return; // already read-only
         }
         await Commands.applyNotebookMetadataEdit(editor.notebook, { readOnly: true });
-        vscode.window.showInformationMessage("Notebook set to read-only.");
     }
 
     static async setNotebookReadWrite(): Promise<void> {
@@ -203,7 +200,6 @@ export class Commands {
             return; // already read/write
         }
         await Commands.applyNotebookMetadataEdit(editor.notebook, { readOnly: false });
-        vscode.window.showInformationMessage("Notebook set to read/write.");
     }
 
     private static async applyNotebookMetadataEdit(notebook: vscode.NotebookDocument, patch: Record<string, unknown>): Promise<void> {

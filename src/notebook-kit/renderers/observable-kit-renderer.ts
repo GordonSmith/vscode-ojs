@@ -1,6 +1,6 @@
 import type { ActivationFunction } from "vscode-notebook-renderer";
 import { type DefineState, type Definition, NotebookRuntime, observe } from "@observablehq/notebook-kit/runtime";
-import { kit } from "../kit/index";
+import { compileKit } from "@hpcc-js/observablehq-compiler";
 import { NotebookCell } from "../common/types";
 
 import "@observablehq/notebook-kit/index.css";
@@ -57,7 +57,7 @@ export const activate: ActivationFunction = context => {
                     readOnly: true,
                     cells: [{ ...data.metadata, value: data.cellText }]
                 };
-                const compiled = kit.compile(notebook);
+                const compiled = compileKit(notebook);
                 compiled.forEach((cell) => {
                     const definition: Definition = {
                         id: cell.id,

@@ -63,6 +63,7 @@ export class HTMLNotebookDetector implements vscode.FileDecorationProvider, vsco
             vscode.workspace.onDidOpenTextDocument(doc => {
                 if (doc.languageId === "html") {
                     this.updateContextFromDocument(doc);
+                    void this.maybeAutoOpenNotebook(doc);
                 }
             }),
             vscode.window.onDidChangeActiveTextEditor(editor => {
@@ -104,10 +105,25 @@ export class HTMLNotebookDetector implements vscode.FileDecorationProvider, vsco
         void this.setContext(isObservableNotebookDocument(doc));
     }
 
+    private async maybeAutoOpenNotebook(doc: vscode.TextDocument): Promise<void> {
+        if (doc.uri.scheme !== "file" || doc.languageId !== "html") { return; }
+        if (!isObservableNotebookDocument(doc)) { return; }
+        try {
+            const notebook = await vscode.workspace.openNotebookDocument(doc.uri);
+            if (notebook.notebookType === "notebook-kit") {
+                vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+                vscode.window.showNotebookDocument(notebook, { preview: false });
+            }
+        } catch (error) {
+            console.error("Failed to open notebook:", error);
+        } finally {
+        }
+    }
+
     async provideFileDecoration(uri: vscode.Uri): Promise<vscode.FileDecoration | undefined> {
         if (await isObservableNotebookUri(uri)) {
             return {
-                badge: "O",
+                badge: "ⓝ",
                 tooltip: "ObservableHQ Notebook"
             };
         }

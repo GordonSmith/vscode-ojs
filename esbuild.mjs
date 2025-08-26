@@ -3,7 +3,8 @@ import process from "node:process";
 import console from "node:console";
 
 import { problemMatcher } from "@hpcc-js/esbuild-plugins";
-import { readFileSync } from "node:fs";
+import { readFileSync, copyFileSync } from "node:fs";
+import path from "node:path";
 
 const tsconfigNode = JSON.parse(readFileSync("./tsconfig.json", "utf8"));
 const tsconfigBrowser = JSON.parse(readFileSync("./tsconfig.webview.json", "utf8"));
@@ -39,6 +40,29 @@ const aliasPlugin = {
     }
 };
 
+const xhrSyncWorkerPlugin = {
+    name: "xhr-sync-worker",
+    setup(build) {
+        const workerSource = path.resolve("node_modules/jsdom/lib/jsdom/living/xhr/xhr-sync-worker.js");
+        build.onStart(() => {
+            try {
+                copyFileSync(workerSource, path.join(outputDirectory, "xhr-sync-worker.js"));
+            } catch {
+                // Ignore if jsdom not installed; worker not needed.
+            }
+        });
+        build.onLoad({ filter: /XMLHttpRequest-impl\.js$/ }, async (args) => {
+            let contents = readFileSync(args.path, "utf8");
+            // Replace only if the exact snippet exists.
+            const search = 'const syncWorkerFile = require.resolve ? require.resolve("./xhr-sync-worker.js") : null;';
+            if (contents.includes(search)) {
+                contents = contents.replace(search, 'const syncWorkerFile = require.resolve ? require.resolve(require("node:path").join(__dirname, "xhr-sync-worker.js")) : null;');
+            }
+            return { contents, loader: "js" };
+        });
+    }
+};
+
 async function main(tsconfigRaw, entryPoint, platform, format, plugins = [], outputName = null) {
     // External dependencies for browser builds - npm: protocol dependencies from Observable Kit
     const npmExternals = [
@@ -66,8 +90,11 @@ async function main(tsconfigRaw, entryPoint, platform, format, plugins = [], out
         target: platform === "node" ? "node20" : "es2022",
         external,
         logLevel: production ? "silent" : "info",
+        // No alias overrides currently needed; remove invalid relative alias that broke esbuild
+        // We intentionally do not suppress jsdom warnings; instead we rewrite resolution for the worker.
         plugins: [
             aliasPlugin,
+            ...(platform === "node" ? [xhrSyncWorkerPlugin] : []),
             ...plugins,
             problemMatcher(),
         ]

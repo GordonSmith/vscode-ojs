@@ -1,55 +1,14 @@
 import * as vscode from "vscode";
 import { TextDecoder, TextEncoder } from "util";
-import { deserialize, serialize, type Notebook, type Cell } from "@observablehq/notebook-kit";
+import { type Notebook, type Cell } from "@observablehq/notebook-kit";
+import { html2notebook, notebook2html } from "@hpcc-js/observablehq-compiler/dist/node/index.js";
+// import { JSDOM } from "jsdom";
 import { observable2vscode, vscode2observable } from "../common/types";
-import { installMinimalDOMPolyfill } from "./dom-polyfill";
 import { isObservableNotebook } from "../../util/htmlNotebookDetector";
 
-// Adapter to make xmldom nodes compatible with css-select
-const xmldomAdapter = {
-    isTag: (node: Node): node is Element => node.nodeType === 1, // ELEMENT_NODE
-
-    getAttributeValue: (elem: Element, name: string): string | undefined => {
-        return elem.getAttribute(name) || undefined;
-    },
-
-    getChildren: (node: Node): Node[] => {
-        return Array.from(node.childNodes || []);
-    },
-
-    getName: (elem: Element): string => {
-        return elem.nodeName?.toLowerCase() || "";
-    },
-
-    getParent: (node: Element): Node | null => {
-        return node.parentNode;
-    },
-
-    getSiblings: (node: Node): Node[] => {
-        if (!node.parentNode) return [node];
-        return Array.from(node.parentNode.childNodes || []);
-    },
-
-    getText: (node: Node): string => {
-        return node.textContent || "";
-    },
-
-    hasAttrib: (elem: Element, name: string): boolean => {
-        return elem.hasAttribute(name);
-    },
-
-    removeSubsets: (nodes: Node[]): Node[] => {
-        return nodes.filter((node, i) => {
-            return !nodes.some((other, j) => {
-                return i !== j && other.contains && other.contains(node);
-            });
-        });
-    },
-
-    equals: (a: Node, b: Node): boolean => {
-        return a === b;
-    }
-};
+// const { window } = new JSDOM();
+// globalThis.document = globalThis.document ?? window.document;
+// globalThis.DOMParser = globalThis.DOMParser ?? window.DOMParser;
 
 let serializer: NotebookKitSerializer;
 
@@ -64,7 +23,6 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
         if (!serializer) {
             serializer = new NotebookKitSerializer();
         }
-        installMinimalDOMPolyfill();
         return serializer;
     }
 
@@ -82,14 +40,13 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
         data: vscode.NotebookData,
         token: vscode.CancellationToken
     ): Promise<Uint8Array> {
-        // Default to Observable Kit format for new notebooks
         const htmlContent = this.serializeToObservableKitFormat(data);
         return this._textEncoder.encode(htmlContent);
     }
 
     private deserializeObservableKitNotebook(content: string): vscode.NotebookData {
 
-        const notebook: Notebook = deserialize(content);
+        const notebook: Notebook = html2notebook(content);
         const cells: vscode.NotebookCellData[] = [];
 
         for (const cell of notebook.cells) {
@@ -105,7 +62,6 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
                 language
             );
 
-            // Ensure pinned and hidden properties are explicitly boolean
             const metadata: any = { ...cell };
             if (metadata.pinned === undefined || metadata.pinned === null) {
                 metadata.pinned = false;
@@ -124,7 +80,6 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
     }
 
     private serializeToObservableKitFormat(data: vscode.NotebookData): string {
-        // Convert VSCode notebook data to Observable Kit format
         const cells: Cell[] = [];
         let cellIdCounter = 1;
 
@@ -149,8 +104,7 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
             cells
         };
 
-        // Use the official Observable Kit serialize function
-        return serialize(notebook);
+        return notebook2html(notebook);
     }
 
 }

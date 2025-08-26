@@ -1,4 +1,4 @@
-import type { CellFunc, compileFunc, ohq } from "@hpcc-js/observablehq-compiler";
+import type { CellFunc, CompileFunc, ohq } from "@hpcc-js/observablehq-compiler";
 import type { ActivationFunction } from "vscode-notebook-renderer";
 import type { OJSOutput } from "../controller/ojsOutput";
 
@@ -8,7 +8,7 @@ import { Inspector } from "@observablehq/inspector";
 
 interface Renderer {
     runtime: ohq.Runtime;
-    define: compileFunc;
+    define: CompileFunc;
     main: ohq.Module;
 }
 
