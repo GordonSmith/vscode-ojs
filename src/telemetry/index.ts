@@ -15,5 +15,5 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate(): void {
     reporter.sendTelemetryEvent("deactivate");
 
-    void reporter.dispose();
+    reporter.dispose();
 }

@@ -106,6 +106,7 @@
     "onNotebook:ojs-notebook",
     "onNotebook:notebook-kit",
     "onLanguage:html",
+    "workspaceContains:**/*.html",
     "onWebviewPanel:OJSPreview"
   ],
   "contributes": {

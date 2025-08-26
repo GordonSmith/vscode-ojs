@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { NOTEBOOK_THEMES } from "./common/types";
+import { isObservableNotebook } from "../util/htmlNotebookDetector";
 
 export class Commands {
 
@@ -14,6 +15,9 @@ export class Commands {
             vscode.commands.registerCommand("observable-kit.createNotebook", Commands.createNotebook),
             vscode.commands.registerCommand("observable-kit.convertFromLegacy", Commands.convertFromLegacy),
             vscode.commands.registerCommand("observable-kit.setupWorkspace", Commands.setupWorkspace),
+            vscode.commands.registerCommand("observable-kit.openHtmlAsNotebook", Commands.openHtmlAsNotebook),
+            vscode.commands.registerCommand("observable-kit.switchToNotebookView", Commands.switchToNotebookView),
+            vscode.commands.registerCommand("observable-kit.switchToTextView", Commands.switchToTextView),
             vscode.commands.registerCommand("observable-kit.notebook.setTitle", Commands.setNotebookTitle),
             vscode.commands.registerCommand("observable-kit.notebook.setTheme", Commands.setNotebookTheme),
             vscode.commands.registerCommand("observable-kit.notebook.setReadOnly", Commands.setNotebookReadOnly),
@@ -77,7 +81,66 @@ export class Commands {
         }));
     }
 
-    // --- Notebook-level metadata edits ------------------------------------------------
+    static async openHtmlAsNotebook(uri?: vscode.Uri): Promise<void> {
+        const targetUri = uri || vscode.window.activeTextEditor?.document.uri;
+        if (!targetUri) return;
+        try {
+            const contentBytes = await vscode.workspace.fs.readFile(targetUri);
+            const contentStr = Buffer.from(contentBytes).toString("utf8");
+            if (!isObservableNotebook(contentStr)) {
+                vscode.window.showWarningMessage("This HTML file is not an Observable notebook.");
+                return;
+            }
+            try {
+                const document = await vscode.workspace.openNotebookDocument(targetUri);
+                await vscode.window.showNotebookDocument(document);
+                vscode.window.showInformationMessage("Opened as Observable notebook. Both text and notebook views are available.");
+            } catch (error) {
+                console.error("Failed to open as notebook:", error);
+                const textDocument = await vscode.workspace.openTextDocument(targetUri);
+                await vscode.window.showTextDocument(textDocument);
+            }
+        } catch (error) {
+            console.error("Error opening HTML as notebook:", error);
+            vscode.window.showErrorMessage(`Failed to open file: ${error}`);
+        }
+    }
+
+    static async switchToNotebookView(uri?: vscode.Uri): Promise<void> {
+        const targetUri = uri || vscode.window.activeTextEditor?.document.uri;
+        if (!targetUri) return;
+        try {
+            const contentBytes = await vscode.workspace.fs.readFile(targetUri);
+            const contentStr = Buffer.from(contentBytes).toString("utf8");
+            if (!isObservableNotebook(contentStr)) {
+                vscode.window.showWarningMessage("This HTML file is not an Observable notebook.");
+                return;
+            }
+            const document = await vscode.workspace.openNotebookDocument(targetUri);
+            await vscode.window.showNotebookDocument(document);
+            vscode.window.showInformationMessage("Opened notebook view. Both text and notebook views are now available.");
+        } catch (error) {
+            console.error("Error switching to notebook view:", error);
+            vscode.window.showErrorMessage(`Failed to switch to notebook view: ${error}`);
+        }
+    }
+
+    static async switchToTextView(): Promise<void> {
+        try {
+            const activeNotebook = vscode.window.activeNotebookEditor;
+            if (!activeNotebook) {
+                vscode.window.showWarningMessage("No active notebook found.");
+                return;
+            }
+            const notebookUri = activeNotebook.notebook.uri;
+            const textDocument = await vscode.workspace.openTextDocument(notebookUri);
+            await vscode.window.showTextDocument(textDocument);
+            vscode.window.showInformationMessage("Opened text view. Both notebook and text views are now available.");
+        } catch (error) {
+            console.error("Error switching to text view:", error);
+            vscode.window.showErrorMessage(`Failed to switch to text view: ${error}`);
+        }
+    }
 
     static async setNotebookTitle(): Promise<void> {
         const editor = vscode.window.activeNotebookEditor;

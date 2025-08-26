@@ -75,7 +75,7 @@ viewof; cars;
 ~~~
 
 `);
-    compile(ohqnb).then(compiledNB => {
+    void compile(ohqnb).then(compiledNB => {
         const library = new Library();
         const runtime = new Runtime(library);
         compiledNB(runtime, name => {
@@ -250,14 +250,14 @@ viewof; cars;
         const message = event.data; // The json data that the extension sent
         switch (message.command) {
             case "evaluate":
-                evaluate(message.content, message.languageId, message.folder, message.callbackID);
+                void evaluate(message.content, message.languageId, message.folder, message.callbackID);
                 vscode.setState(message);
                 break;
             case "pull":
                 pull(message.url, message.callbackID);
                 break;
             case "echo":
-                echo(message.content);
+                void echo(message.content);
                 break;
         }
     });
@@ -268,7 +268,7 @@ viewof; cars;
 
     const prevState = vscode.getState();
     if (prevState) {
-        evaluate(prevState.content, prevState.languageId, prevState.folder, prevState.callbackID);
+        void evaluate(prevState.content, prevState.languageId, prevState.folder, prevState.callbackID);
     }
 
 }

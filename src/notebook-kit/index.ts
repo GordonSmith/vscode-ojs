@@ -15,9 +15,7 @@ export function activate(ctx: ExtensionContext) {
         )
     );
 
-    // Register the notebook controller
     ctx.subscriptions.push(new NotebookKitController());
 
-    // Register commands
     Commands.attach(ctx);
 }

@@ -3,6 +3,7 @@ import { TextDecoder, TextEncoder } from "util";
 import { deserialize, serialize, type Notebook, type Cell } from "@observablehq/notebook-kit";
 import { observable2vscode, vscode2observable } from "../common/types";
 import { installMinimalDOMPolyfill } from "./dom-polyfill";
+import { isObservableNotebook } from "../../util/htmlNotebookDetector";
 
 // Adapter to make xmldom nodes compatible with css-select
 const xmldomAdapter = {
@@ -72,7 +73,7 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
         token: vscode.CancellationToken
     ): Promise<vscode.NotebookData> {
         const contentStr = this._textDecoder.decode(content);
-        if (this.isObservableKitFormat(contentStr)) {
+        if (isObservableNotebook(contentStr)) {
             return this.deserializeObservableKitNotebook(contentStr);
         }
     }
@@ -84,11 +85,6 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
         // Default to Observable Kit format for new notebooks
         const htmlContent = this.serializeToObservableKitFormat(data);
         return this._textEncoder.encode(htmlContent);
-    }
-
-    private isObservableKitFormat(content: string): boolean {
-        const lowerContent = content.toLowerCase();
-        return lowerContent.includes("<!doctype html>") && lowerContent.includes("<notebook") && lowerContent.includes("<title");
     }
 
     private deserializeObservableKitNotebook(content: string): vscode.NotebookData {
