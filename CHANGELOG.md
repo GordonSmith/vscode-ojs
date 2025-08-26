@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.44](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.43...observable-js-v0.4.44) (2025-08-26)
+
+
+### Features
+
+* add file decarator for html notebooks ([ac21321](https://github.com/GordonSmith/vscode-ojs/commit/ac21321ee1af99b4cfeb776a23ee05f02af7151f))
+* auto show html notebooks when valid ([4ca2a7c](https://github.com/GordonSmith/vscode-ojs/commit/4ca2a7c0d642423d40356b61f719670633fc0262))
+
 ## [0.4.43](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.42...observable-js-v0.4.43) (2025-08-25)
 
 
