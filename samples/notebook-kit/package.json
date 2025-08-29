@@ -7,13 +7,14 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "preview": "notebooks preview --root docs",
+    "download": "notebooks download ",
     "build": "notebooks build --root docs -- docs/kit.html",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "notebooks preview --root docs",
     "update-major": "npx -y npm-check-updates -u",
-    "update": "npx -y npm-check-updates -u -t minor"
+    "update": "npx -y npm-check-updates -u -t minor",
+    "extract-data": "node docs/reactive-demo/export-json.mjs"
   },
   "devDependencies": {
-    "@observablehq/notebook-kit": "1.1.0-rc.9"
+    "@observablehq/notebook-kit": "1.2.0"
   }
 }

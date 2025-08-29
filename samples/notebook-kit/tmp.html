@@ -1,0 +1,383 @@
+
+> notebook-kit@1.0.0 download
+> notebooks download @bennyschudel/zoomable-timeline
+
+<!doctype html>
+<notebook theme="air">
+  <title>Zoomable Timeline</title>
+  <script id="0" type="text/markdown">
+    # Zoomable Timeline
+  </script>
+  <script id="59" type="application/vnd.observable.javascript">
+    chart.element
+  </script>
+  <script id="196" type="application/vnd.observable.javascript">
+    Inputs.button("Reset zoom", { reduce: chart.reset })
+  </script>
+  <script id="117" type="application/vnd.observable.javascript">
+    viewof years = Inputs.range([1, 20], { value: 10, step: 1, label: "Years" })
+  </script>
+  <script id="54" type="application/vnd.observable.javascript">
+    chart = Timeline(scaleX, margin, 240)
+  </script>
+  <script id="9" type="application/vnd.observable.javascript" pinned="">
+    function Timeline(scaleX, margin, height = 240) {
+      let axis = {};
+      let nodes = {};
+
+      let originalScaleX = scaleX.copy();
+
+      const parts = ["yearly", "daily", "weekly", "grid", "yearlyGrid"];
+
+      const findDensityConfig = (map, value) => {
+        for (const [limit, config] of map) {
+          if (value < limit) {
+            return config;
+          }
+        }
+
+        return [];
+      };
+
+      const ensureTimeFormat = (value = "") => {
+        return typeof value !== "function" ? d3.utcFormat(value) : value;
+      };
+
+      axis["yearly"] = (parentNode, density) => {
+        const densityMap = [
+          [
+            3,
+            [
+              d3.utcMonth,
+              (d) => {
+                const startOfTheYear =
+                  d.getUTCMonth() === 0 && d.getUTCDate() === 1;
+                const format = startOfTheYear ? "%Y – %B" : "%B";
+
+                return d3.utcFormat(format)(d);
+              },
+            ],
+          ],
+          [Infinity, [d3.utcYear, "%Y"]],
+        ];
+
+        let [interval, format] = findDensityConfig(densityMap, density);
+        format = ensureTimeFormat(format);
+
+        const el = parentNode
+          .attr("transform", `translate(0,${margin.top - 48})`)
+          .call(
+            d3
+              .axisTop(scaleX)
+              .ticks(interval)
+              .tickFormat(format)
+              .tickSizeOuter(0)
+          );
+
+        el.select(".domain").remove();
+
+        el.selectAll("text")
+          .attr("y", 0)
+          .attr("x", 6)
+          .style("text-anchor", "start");
+
+        el.selectAll("line").attr("y1", -7).attr("y2", 6);
+      };
+
+      axis["daily"] = (parentNode, density) => {
+        const densityMap = [
+          [1, [d3.utcDay, "%-d"]],
+          [3, [d3.utcDay, ""]],
+          [8, [d3.utcMonth, "%B"]],
+          [13, [d3.utcMonth, "%b"]],
+          [22, [d3.utcMonth, (d) => d3.utcFormat("%B")(d).charAt(0)]],
+          [33, [d3.utcMonth.every(3), "Q%q"]],
+          [Infinity, [d3.utcMonth.every(3), ""]],
+        ];
+
+        let [interval, format] = findDensityConfig(densityMap, density);
+        format = ensureTimeFormat(format);
+
+        const el = parentNode
+          .attr("transform", `translate(0,${margin.top - 28})`)
+          .call(
+            d3
+              .axisTop(scaleX)
+              .ticks(interval)
+              .tickFormat(format)
+              .tickSizeOuter(0)
+          );
+
+        el.select(".domain").remove();
+
+        el.selectAll("text")
+          .attr("y", 0)
+          .attr("x", 6)
+          .style("text-anchor", "start");
+
+        el.selectAll("line").attr("y1", -7).attr("y2", 0);
+      };
+
+      axis["weekly"] = (parentNode, density) => {
+        const densityMap = [
+          [10, [d3.utcMonday, (d) => +d3.utcFormat("%-V")(d)]],  // monday as first of week and zero based
+          [33, [d3.utcMonday, ""]],
+          [Infinity, [d3.utcMonday.every(4), ""]],
+        ];
+
+        let [interval, format] = findDensityConfig(densityMap, density);
+        format = ensureTimeFormat(format);
+
+        const el = parentNode
+          .attr("transform", `translate(0,${margin.top - 8})`)
+          .call(
+            d3
+              .axisTop(scaleX)
+              .ticks(interval)
+              .tickFormat(format)
+              .tickSizeOuter(0)
+          );
+
+        el.select(".domain").remove();
+        el.selectAll("line").style(
+          "visibility",
+          density > densityMap[0][0] ? "visible" : "hidden"
+        );
+
+        el.selectAll("text")
+          .attr("y", 0)
+          .attr("x", 6)
+          .style("text-anchor", "start");
+
+        el.selectAll("line").attr("y1", -7).attr("y2", 0);
+      };
+
+      axis["grid"] = (parentNode, density) => {
+        const densityMap = [
+          [1, [d3.utcDay]],
+          [8, [d3.utcMonday]],
+          [22, [d3.utcMonth]],
+          [Infinity, [d3.utcMonth.every(3)]],
+        ];
+
+        const [interval] = findDensityConfig(densityMap, density);
+
+        const el = parentNode
+          .attr("transform", `translate(0,${margin.top})`)
+          .call(d3.axisTop(scaleX).ticks(interval).tickSizeOuter(0));
+
+        el.select(".domain").remove();
+        el.selectAll("text").remove();
+
+        el.selectAll("line")
+          .attr("y1", 0)
+          .attr("y2", height - margin.top - margin.bottom);
+      };
+
+      axis["yearlyGrid"] = (parentNode, density) => {
+        const densityMap = [
+          [3, [d3.utcMonth, "%B"]],
+          [Infinity, [d3.utcYear, "%Y"]],
+        ];
+
+        let [interval, format] = findDensityConfig(densityMap, density);
+        format = ensureTimeFormat(format);
+
+        const el = parentNode
+          .attr("transform", `translate(0,${margin.top})`)
+          .call(
+            d3
+              .axisTop(scaleX)
+              .ticks(interval)
+              .tickFormat(format)
+              .tickSizeOuter(0)
+          );
+
+        el.select(".domain").remove();
+        el.selectAll("text").remove();
+
+        el.selectAll("line")
+          .attr("y1", 0)
+          .attr("y2", height - margin.top - margin.bottom);
+      };
+
+      const setup = () => {
+        const svg = d3.create("svg")
+          .attr("width", width)
+          .attr("height", height)
+          .attr("viewBox", [0, 0, width, height])
+          .classed("timeline", true)
+          .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
+
+        const element = svg.node();
+
+        const rootNode = svg.append("g").classed("timeline-axis", true);
+
+        parts.forEach((part) => {
+          nodes[part] = rootNode.append("g").classed(part, true);
+        });
+
+        const update = () => {
+          // NOTE: Not used atm.
+          // const [startDate, endDate] = scaleX.domain();
+          // const totalVisibleDays = Math.abs(startDate - endDate) / MS_PER_DAY;
+
+          const density =
+            Math.abs(scaleX.invert(0) - scaleX.invert(1)) / MS_PER_HOUR; // in pixels per hour
+
+          parts.forEach((part) => {
+            nodes[part].call(axis[part], density);
+          });
+        };
+
+        const { zoom, reset } = zoomPlugin(svg,
+          ({ transform }) => {
+            scaleX = transform.rescaleX(originalScaleX);
+
+            update();
+          }
+        );
+
+        update();
+
+        return {
+          element,
+          update,
+          reset,
+        };
+      };
+
+      return setup();
+    }
+  </script>
+  <script id="92" type="application/vnd.observable.javascript">
+    function zoomPlugin(svg, zoomed) {
+      const zoom = d3.zoom()
+        .scaleExtent(zoomScaleExtent)
+        .extent([[margin.left, 0], [width - margin.right, 0]])
+        .translateExtent([
+          [margin.left, 0],
+          [width - margin.right, 0]
+        ])
+        .filter(filter)
+        .on("zoom", zoomed);
+
+      svg.call(zoom);
+
+      function reset() {
+        svg.transition()
+          .duration(750)
+          .call(zoom.transform, d3.zoomIdentity);
+      }
+
+      // prevent scrolling then apply the default filter
+      function filter(event) {
+        event.preventDefault();
+        return (!event.ctrlKey || event.type === 'wheel') && !event.button;
+      }
+
+      return {
+        zoom,
+        reset
+      };
+    }
+  </script>
+  <script id="17" type="application/vnd.observable.javascript">
+    scaleX = {
+      function getDate(date) {
+        return new Date(date.toISOString().split('T')[0]);
+      }
+
+      const now = new Date();
+      const until = new Date(years * MS_PER_YEAR + now.getTime()); 
+
+      const nowDate = getDate(now);
+      const untilDate = getDate(until);
+
+      const timeScale = d3.scaleUtc().domain([nowDate, untilDate]).range([margin.left, width - margin.right]);
+
+      return timeScale;
+    }
+  </script>
+  <script id="141" type="application/vnd.observable.javascript">
+    scaleX.domain()
+  </script>
+  <script id="205" type="application/vnd.observable.javascript">
+    function getDays(a, b) { return Math.abs(a - b) / MS_PER_DAY; }
+  </script>
+  <script id="210" type="application/vnd.observable.javascript">
+    days = getDays(...scaleX.domain())
+  </script>
+  <script id="214" type="application/vnd.observable.javascript">
+    zoomScaleExtent = [1, Math.round(days * 0.033)]
+  </script>
+  <script id="35" type="application/vnd.observable.javascript">
+    margin = ({ top: 80, right: 20, bottom: 20, left: 20 });
+  </script>
+  <script id="24" type="application/vnd.observable.javascript">
+    MS_PER_DAY = 24 * MS_PER_HOUR;
+  </script>
+  <script id="27" type="application/vnd.observable.javascript">
+    MS_PER_HOUR = 60 * 60 * 1000;
+  </script>
+  <script id="31" type="application/vnd.observable.javascript">
+    MS_PER_YEAR = 365.24 * MS_PER_DAY; // include leap year
+  </script>
+  <script id="133" type="application/vnd.observable.javascript">
+    html`
+    <style type="text/css">
+      .timeline {
+        --background-color: #334155;
+        --daily-gridline-color: #cbd5e1;
+        --yearly-gridline-color: #e2e8f0;
+        --yearly-tick-color: #e2e8f0;
+        --yearly-label-color: #f8fafc;
+        --daily-tick-color: #e2e8f0;
+        --daily-label-color: #f8fafc;
+        --weekly-tick-color: #e2e8f0;
+        --weekly-label-color: #f8fafc;
+
+        background-color: var(--background-color);
+        border-radius: 0.25rem;
+      }
+
+      .timeline-axis line {
+        shape-rendering: geometricPrecision;
+        stroke-width: 0.5;
+      }
+
+      .timeline-axis .yearly line {
+        stroke: var(--yearly-tick-color);
+      }
+
+      .timeline-axis .yearly text {
+        color: var(--yearly-label-color);
+      }
+
+      .timeline-axis .daily line {
+        stroke: var(--daily-tick-color);
+      }
+
+      .timeline-axis .daily text {
+        color: var(--daily-label-color);
+      }
+
+      .timeline-axis .weekly line {
+        stroke: var(--weekly-tick-color);
+      }
+
+      .timeline-axis .weekly text {
+        color: var(--weekly-label-color);
+      }
+
+      .timeline-axis .grid line {
+        stroke: var(--daily-gridline-color);
+      }
+
+      .timeline-axis .yearlyGrid line {
+        stroke: var(--yearly-gridline-color);
+      }
+    </style>
+    `
+  </script>
+</notebook>
