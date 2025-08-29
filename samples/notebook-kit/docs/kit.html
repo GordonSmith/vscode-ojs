@@ -10,7 +10,7 @@
     **Observable Notebook Kit** is an [open-source command-line tool](https://github.com/observablehq/notebook-kit) for building static sites from Observable Notebooks based on an open file format. Notebook Kit also includes a Vite plugin and a low-level JavaScript interface for deep integration of Observable Notebooks with custom web applications.
   </script>
   <script id="43" type="text/markdown">
-    Notebook Kit is available as part of [**Notebooks 2.0 Technology Preview**](./), which includes **Observable Desktop**, a macOS application for editing notebooks.
+    Notebook Kit is available as part of [**Notebooks 2.0 Technology Preview**](./), which includes [Observable Desktop](./desktop), a macOS application for editing notebooks.
   </script>
   <script id="46" type="text/markdown">
     For more on authoring notebooks, see the [Notebooks system guide](./system-guide).
@@ -32,7 +32,37 @@
     pnpm add @observablehq/notebook-kit @fontsource/inter @fontsource/source-serif-4 @fontsource/spline-sans-mono
     ```
 
-    Notebook Kit requires [Node.js](https://nodejs.org/en) 20.19+ or 22.12+.
+    If you plan on using [database connectors](./databases), you must also install the drivers for the databases you wish to use. To install the DuckDB driver:
+
+    ```sh
+    npm add @duckdb/node-api
+    ```
+
+    To install the Postgres driver:
+
+    ```sh
+    npm add postgres
+    ```
+
+    To install the Snowflake driver:
+
+    ```sh
+    npm add snowflake-sdk
+    ```
+
+    To install the Google BigQuery driver:
+
+    ```sh
+    npm add @google-cloud/bigquery
+    ```
+
+    To install the Databricks driver:
+
+    ```sh
+    npm add @databricks/sql
+    ```
+
+    Notebook Kit requires [Node.js](https://nodejs.org/en) 20.19+ or 22.12+. To use the SQLite database connector, you must use Node.js 24+. [Bun](https://bun.com/) 1.2+ should also work, but is not officially supported.
   </script>
   <script id="47" type="text/markdown">
     ---
@@ -123,7 +153,7 @@
     A SQL (`application/sql`) cell:
 
     ```html
-    <script type="application/sql" database="reporting">
+    <script type="application/sql" database="reporting" output="customers">
       SELECT * FROM customers
     <\/script>
     ```
@@ -227,7 +257,7 @@
 
     ## Command-line interface
 
-    Notebook Kit's CLI supports three commands: `preview` for a live preview of notebooks, `build` for building a static site, and `download` for downloading Observable Notebooks as HTML.
+    Notebook Kit's CLI supports four commands: `preview` for a live preview of notebooks, `build` for building a static site, `download` for downloading Observable Notebooks as HTML, and `query` for saving the results of database queries.
   </script>
   <script id="71" type="text/markdown">
     We recommend that you install Notebook Kit locally to a project using a package manager such as npm, and then add preview and build scripts to your `package.json`.
@@ -235,7 +265,7 @@
     ```json
     {
       "dependencies": {
-        "@observablehq/notebook-kit": "^1.0.1"
+        "@observablehq/notebook-kit": "^%VITE_VERSION%"
       },
       "scripts": {
         "docs:preview": "notebooks preview --root docs",
@@ -283,6 +313,15 @@
     notebooks download https://observablehq.com/@d3/bar-chart > docs/bar-chart.html
     ```
   </script>
+  <script id="76" type="text/markdown">
+    ### Query
+
+    Run the `query` command to save the result of a [database query](./databases). (This is typically done automatically, but can be used to prepare or refresh queries manually.) Pass positional arguments to interpolate JSON-encoded values into the query.
+
+    ```sh
+    notebooks query --database duckdb 'SELECT 1 + ' '2'
+    ```
+  </script>
   <script id="6" type="text/markdown">
     ---
 
@@ -296,14 +335,14 @@
     The Vite plugin is recommended for Vite-based applications.
   </script>
   <script id="42" type="text/markdown">
-    #### <code class="language-ts">observable({template?: string}): PluginOption</code>
+    #### <code class="language-ts">observable({template?: string, transformTemplate?: (template: string) => string | Promise&lt;string&gt;, transformNotebook?: (notebook: Notebook) => Notebook | Promise&lt;Notebook&gt;, window?: Window, parser?: DOMParser} = {}): PluginOption</code>
 
     Returns a Vite plugin for rendering notebook HTML as vanilla HTML. Markdown and HTML cells are rendered statically (without any interpolated dynamic values), and then, if needed, replaced with dynamic content when the page loads. Other cell modes are exclusively dynamic. Pinned cells display their source code statically rendered below any output. Supported languages are syntax-highlighted using Lezer.
   </script>
   <script id="41" type="text/markdown">
     #### <code class="language-ts">config(): UserConfig</code>
 
-    Returns the base Vite config needed to use the `observable()` Vite plugin; this enables top-level await and adds resolvers for `npm:`, `jsr:`, and `observable:` import protocols.
+    Returns the base Vite config needed to use the `observable()` Vite plugin; this enables top-level await, multi-page application behavior, and adds resolvers for `npm:`, `jsr:`, and `observable:` import protocols.
   </script>
   <script id="17" type="text/markdown">
     ### Build API
@@ -326,9 +365,9 @@
     Parses the specified template cell source code (such as the contents of a Markdown or SQL cell), returning the resulting AST as a `TemplateLiteral`. (This method is called internally by `transpile`.)
   </script>
   <script id="22" type="text/markdown">
-    #### <code class="language-ts">transpile(input: string, mode: Cell[\"mode\"], options?: TranspileOptions): TranspiledJavaScript</code>
+    #### <code class="language-ts">transpile(input: Cell, options?: TranspileOptions): TranspiledJavaScript</code>
 
-    Transpiles the specified cell source code, given the cell's `mode`. The transpiled source is returned as a `body` function suitable for use with [`variable.define`](https://github.com/observablehq/runtime/blob/main/README.md#variabledefinename-inputs-definition) from the Observable Runtime, along with any named `inputs` (unbound references) and `outputs` (top-level declarations).
+    Transpiles the specified cell. The transpiled source is returned as a `body` function suitable for use with [`variable.define`](https://github.com/observablehq/runtime/blob/main/README.md#variabledefinename-inputs-definition) from the Observable Runtime, along with any named `inputs` (unbound references) and `outputs` (top-level declarations).
   </script>
   <script id="23" type="text/markdown">
     #### <code class="language-ts">transpileJavaScript(input: string, options?: TranspileOptions): TranspiledJavaScript</code>
@@ -336,9 +375,9 @@
     Transpiles the specified JavaScript cell source code. The transpiled source is returned as a `body` function suitable for use with [`variable.define`](https://github.com/observablehq/runtime/blob/main/README.md#variabledefinename-inputs-definition) from the Observable Runtime, along with any named `inputs` (unbound references) and `outputs` (top-level declarations).
   </script>
   <script id="21" type="text/markdown">
-    #### <code class="language-ts">transpileTemplate(input: string, tag = \"\", raw = false): string</code>
+    #### <code class="language-ts">transpileTemplate(input: Cell): string</code>
 
-    Transpiles the specified template cell source code (such as the contents of a Markdown or SQL cell), returning the corresponding JavaScript source code consisting of a single template literal expression; the given `tag` is the source code of the template literal tag, if any (such as `md` for Markdown), and the given `raw` flag indicates whether the template literal is raw. (This method is called internally by `transpile`, and the result is passed to `transpileJavaScript`.)
+    Transpiles the specified template cell, such as a Markdown or SQL cell, returning the corresponding JavaScript source code consisting of a single template literal expression. (This method is called internally by `transpile`, and the result is passed to `transpileJavaScript`.)
   </script>
   <script id="45" type="text/markdown">
     ### Utility API
@@ -360,10 +399,25 @@
 
     Returns the default `pinned` value for the given cell `mode`.
   </script>
+  <script id="84" type="text/markdown">
+    #### <code class="language-ts">serialize(notebook: Notebook, {document?: Document} = {}): string</code>
+
+    Serializes the specified notebook to HTML.
+  </script>
+  <script id="85" type="text/markdown">
+    #### <code class="language-ts">deserialize(html: string, {parser?: DOMParser} = {}): Notebook</code>
+
+    Deserializes the specified HTML to a notebook.
+  </script>
   <script id="15" type="text/markdown">
     ### Runtime API
 
     The Runtime API provides some additional logic on top of the [Observable Runtime](https://github.com/observablehq/runtime) to run the notebook, allowing cells to be redefined at runtime, and implementing the notebook standard library, including the `display` and `view` functions which are scoped per-cell.
+  </script>
+  <script id="77" type="text/markdown">
+    #### <code class="language-ts">constructor NotebookRuntime(builtins?: Record<string, unknown>)</code>
+
+    Instantiates a new notebook runtime, given the specified built-ins, which defaults to (the standard) `library`. The returned instance exposes a `runtime`, `main`, and `define` methods which are equivalent to those below, but scoped to this specific instance. This constructor allows multiple notebooks to be instantiated concurrently.
   </script>
   <script id="28" type="text/markdown">
     #### <code class="language-ts">define(state: DefineState, definition: Definition, observe?: () => Observer): void</code>
@@ -419,5 +473,25 @@
     #### <code class="language-ts">library: Record<string, unknown></code>
 
     The built-ins provided to the runtime; the notebook standard library. This object includes the definitions for various built-ins, such as `now`, `width`, `Generators`, and `Mutable`.
+  </script>
+  <script id="78" type="text/markdown">
+    ### Database API
+
+    The Database API provides a low-level API for running [database queries](./databases).
+  </script>
+  <script id="81" type="text/markdown">
+    #### <code class="language-ts"> getDatabaseConfig(sourcePath: string, databaseName: string): Promise&lt;DatabaseConfig&gt;</code>
+
+    Loads the database config given a path to a notebook source file and the name of a database.
+  </script>
+  <script id="82" type="text/markdown">
+    #### <code class="language-ts"> getDatabase(config: DatabaseConfig): Promise&lt;QueryTemplateFunction&gt;</code>
+
+    Returns the query template function (equivalent to the `sql` tagged template literal) for running a query against the given database.
+  </script>
+  <script id="83" type="text/markdown">
+    #### <code class="language-ts">getQueryCachePath(sourcePath: string, databaseName: string, strings: readonly string[], ...params: unknown[]): Promise&lt;string&gt;</code>
+
+    Returns the path to the query results cache file, given a path to a notebook source file, the name of a database, and query template parts.
   </script>
 </notebook>

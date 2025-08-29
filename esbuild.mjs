@@ -2,7 +2,7 @@ import * as esbuild from "esbuild";
 import process from "node:process";
 import console from "node:console";
 
-import { problemMatcher } from "@hpcc-js/esbuild-plugins";
+import { problemMatcher, inlineCSS } from "@hpcc-js/esbuild-plugins";
 import { readFileSync, copyFileSync } from "node:fs";
 import path from "node:path";
 
@@ -110,7 +110,8 @@ async function main(tsconfigRaw, entryPoint, platform, format, plugins = [], out
 Promise.all([
     main(tsconfigNode, "./src/extension.ts", "node", "cjs"),
     main(tsconfigBrowser, "./src/notebook/renderers/ojsRenderer.ts", "browser", "esm"),
-    main(tsconfigBrowser, "./src/notebook-kit/renderers/observable-kit-renderer.ts", "browser", "esm", [], "observable-kit-renderer"),
+    // Inline CSS for observable-kit-renderer bundle only
+    main(tsconfigBrowser, "./src/notebook-kit/renderers/observable-kit-renderer.ts", "browser", "esm", [inlineCSS()], "observable-kit-renderer"),
     main(tsconfigBrowser, "./src/webview.ts", "browser", "iife")
 ]).catch((e) => {
     console.error(e);

@@ -25,23 +25,103 @@
       @import url("@fontsource/inter/600-italic.css");
       @import url("@fontsource/inter/700-italic.css");
     </style>
+    <style type="text/css">
+      #header,
+      #navigation {
+        background: var(--theme-foreground);
+        color: var(--theme-background);
+        transition: box-shadow ease 250ms,
+          background-color linear 250ms,
+          color linear 250ms;
+      }
+      :root.scrolled1 #header {
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+      }
+      :root.scrolled2 #header {
+        background: var(--theme-background);
+        color: var(--theme-foreground);
+      }
+      #navigation::backdrop {
+        background: rgba(0, 0, 0, 0.3);
+      }
+      #navigation-trigger:hover,
+      #navigation-trigger:focus {
+        text-decoration: underline;
+      }
+      #navigation-trigger:has(~ #navigation:popover-open) {
+        text-decoration: none;
+        pointer-events: none;
+      }
+      #navigation-trigger::after {
+        content: "";
+        background-color: currentColor;
+        mask-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M4.41435 6.53148C4.6731 6.20803 5.14507 6.15559 5.46852 6.41435L8.125 8.53953L10.7815 6.41435C11.1049 6.15559 11.5769 6.20803 11.8356 6.53148C12.0944 6.85492 12.042 7.32689 11.7185 7.58565L8.125 10.4605L4.53148 7.58565C4.20803 7.32689 4.15559 6.85492 4.41435 6.53148Z' fill='currentColor' /%3E%3C/svg%3E");
+        mask-repeat: no-repeat;
+        width: 16px;
+        height: 16px;
+      }
+      #navigation-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+      }
+      @media (max-width: 640px) {
+        #navigation-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
   </head>
   <body>
-    <header style="width: 100vw; margin: -32px calc((100% - 100vw) / 2) 4rem; background-color: var(--theme-foreground); color: var(--theme-background); font: 500 16px/normal var(--sans-serif);">
+    <header id="header" style="position: sticky; z-index: 10; top: 0; margin: -32px calc((100% - 100vw) / 2) 4rem; font: 500 16px/normal var(--sans-serif);">
       <div style="display: flex; max-width: var(--max-width); padding: 1rem; margin: auto; gap: 1rem; justify-content: space-between;">
-        <a href="/notebook-kit/" style="color: inherit; display: flex; align-items: center; gap: 0.5rem;">
-          <svg role="img" width="24" height="24" viewBox="0 0 24 24" aria-label="Observable" fill="currentColor">
-            <path d="M11.4413 19.7265C10.3849 19.7265 9.46964 19.4977 8.69544 19.04C7.92403 18.5841 7.30727 17.9383 6.91536 17.1761C6.49867 16.3829 6.19365 15.5442 6.00767 14.6801C5.81035 13.743 5.71422 12.7903 5.72068 11.8359C5.72068 11.0802 5.77027 10.3577 5.87038 9.66687C5.96953 8.97688 6.15355 8.27548 6.42147 7.56358C6.68939 6.85167 7.03454 6.23445 7.45501 5.71104C7.89276 5.17482 8.45875 4.73835 9.10924 4.4354C9.79191 4.10837 10.568 3.9453 11.4413 3.9453C12.4977 3.9453 13.4131 4.17413 14.1873 4.63178C14.9587 5.08762 15.5755 5.73343 15.9674 6.49571C16.3811 7.28039 16.6834 8.11242 16.875 8.99178C17.0658 9.87026 17.1621 10.8189 17.1621 11.8359C17.1621 12.5917 17.1125 13.3141 17.0123 14.0049C16.9057 14.7222 16.7171 15.4272 16.4498 16.1082C16.1733 16.8201 15.8301 17.4374 15.4162 17.9608C15.0025 18.4842 14.4552 18.9094 13.7735 19.2364C13.0918 19.5634 12.3147 19.7265 11.4413 19.7265ZM13.4608 13.9249C14.0079 13.3785 14.3122 12.6225 14.3017 11.8359C14.3017 11.0232 14.0281 10.3268 13.4817 9.74686C12.9344 9.1669 12.2547 8.87692 11.4413 8.87692C10.628 8.87692 9.94827 9.1669 9.40099 9.74686C8.86507 10.2993 8.56912 11.0534 8.58102 11.8359C8.58102 12.6486 8.85467 13.3449 9.40099 13.9249C9.94827 14.5049 10.628 14.7949 11.4413 14.7949C12.2547 14.7949 12.9278 14.5049 13.4608 13.9249ZM11.4413 23.6718C17.7599 23.6718 22.8828 18.3723 22.8828 11.8359C22.8828 5.29952 17.7599 0 11.4413 0C5.12287 0 0 5.29952 0 11.8359C0 18.3723 5.12287 23.6718 11.4413 23.6718Z"></path>
-          </svg>
-          Notebooks 2.0
-        </a>
+        <button id="navigation-trigger" title="Open menu" popovertarget="navigation" style="cursor: pointer; border: none; background: transparent; font: inherit; color: inherit; display: flex; align-items: center; padding: 0;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <svg role="img" width="24" height="24" viewBox="0 0 24 24" aria-label="Observable" fill="currentColor">
+              <path d="M11.4413 19.7265C10.3849 19.7265 9.46964 19.4977 8.69544 19.04C7.92403 18.5841 7.30727 17.9383 6.91536 17.1761C6.49867 16.3829 6.19365 15.5442 6.00767 14.6801C5.81035 13.743 5.71422 12.7903 5.72068 11.8359C5.72068 11.0802 5.77027 10.3577 5.87038 9.66687C5.96953 8.97688 6.15355 8.27548 6.42147 7.56358C6.68939 6.85167 7.03454 6.23445 7.45501 5.71104C7.89276 5.17482 8.45875 4.73835 9.10924 4.4354C9.79191 4.10837 10.568 3.9453 11.4413 3.9453C12.4977 3.9453 13.4131 4.17413 14.1873 4.63178C14.9587 5.08762 15.5755 5.73343 15.9674 6.49571C16.3811 7.28039 16.6834 8.11242 16.875 8.99178C17.0658 9.87026 17.1621 10.8189 17.1621 11.8359C17.1621 12.5917 17.1125 13.3141 17.0123 14.0049C16.9057 14.7222 16.7171 15.4272 16.4498 16.1082C16.1733 16.8201 15.8301 17.4374 15.4162 17.9608C15.0025 18.4842 14.4552 18.9094 13.7735 19.2364C13.0918 19.5634 12.3147 19.7265 11.4413 19.7265ZM13.4608 13.9249C14.0079 13.3785 14.3122 12.6225 14.3017 11.8359C14.3017 11.0232 14.0281 10.3268 13.4817 9.74686C12.9344 9.1669 12.2547 8.87692 11.4413 8.87692C10.628 8.87692 9.94827 9.1669 9.40099 9.74686C8.86507 10.2993 8.56912 11.0534 8.58102 11.8359C8.58102 12.6486 8.85467 13.3449 9.40099 13.9249C9.94827 14.5049 10.628 14.7949 11.4413 14.7949C12.2547 14.7949 12.9278 14.5049 13.4608 13.9249ZM11.4413 23.6718C17.7599 23.6718 22.8828 18.3723 22.8828 11.8359C22.8828 5.29952 17.7599 0 11.4413 0C5.12287 0 0 5.29952 0 11.8359C0 18.3723 5.12287 23.6718 11.4413 23.6718Z"></path>
+            </svg>
+            Notebooks 2.0
+          </div>
+        </button>
         <div style="display: flex; align-items: center; justify-self: end; gap: 1rem; font-size: 14px;">
-          <a href="https://github.com/observablehq/notebook-kit/releases" style="color: inherit;">
+          <a href="https://github.com/observablehq/notebook-kit/releases" title="View release notes" style="color: inherit;">
             %VITE_VERSION%
           </a>
-          <a href="https://github.com/observablehq/notebook-kit" style="color: inherit;">
+          <a href="https://github.com/observablehq/notebook-kit" title="View source on GitHub" style="color: inherit;">
             GitHub ★
           </a>
+        </div>
+        <div id="navigation" popover style="font: inherit; padding: 2rem; bottom: unset; top: 4rem; max-width: min(40rem, calc(100% - 6rem)); width: auto; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); overflow-y: auto; max-height: calc(100% - 7rem);">
+          <div id="navigation-grid">
+            <a href="/notebook-kit/" style="color: inherit;">
+              <div>Notebooks 2.0</div>
+              <div style="opacity: 0.8; font-weight: normal; font-size: 14px;">An overview of the new Observable Notebooks, and why we’re doing this</div>
+            </a>
+            <a href="/notebook-kit/kit" style="color: inherit;">
+              <div>Notebook Kit</div>
+              <div style="opacity: 0.8; font-weight: normal; font-size: 14px;">An open file format for notebooks, and accompanying tooling for generating static sites</div>
+            </a>
+            <a href="/notebook-kit/gallery" style="color: inherit;">
+              <div>Notebooks gallery</div>
+              <div style="opacity: 0.8; font-weight: normal; font-size: 14px;">More examples than you can shake a stick at, featuring interactive visualizations</div>
+            </a>
+            <a href="/notebook-kit/system-guide" style="color: inherit;">
+              <div>Notebooks system guide</div>
+              <div style="opacity: 0.8; font-weight: normal; font-size: 14px;">An introduction to authoring notebooks with reactive JavaScript, Markdown, and HTML</div>
+            </a>
+            <a href="/notebook-kit/desktop" style="color: inherit;">
+              <div>Desktop</div>
+              <div style="opacity: 0.8; font-weight: normal; font-size: 14px;">A desktop application for editing notebooks as local files, and with a radical new approach to AI</div>
+            </a>
+            <a href="/notebook-kit/desktop-guide" style="color: inherit;">
+              <div>Desktop user guide</div>
+              <div style="opacity: 0.8; font-weight: normal; font-size: 14px;">A visual guide to editing notebooks with Observable Desktop</div>
+            </a>
+            <a href="/notebook-kit/databases" style="color: inherit;">
+              <div>Database connectors</div>
+              <div style="opacity: 0.8; font-weight: normal; font-size: 14px;">Query SQL databases and data warehouses from notebooks</div>
+            </a>
+          </div>
         </div>
       </div>
     </header>
@@ -53,6 +133,30 @@
     </div>
     <script type="module">
       document.querySelector("#edit-page").href += `/edit/main/docs${location.pathname.replace(/^\/notebook-kit\//, "/") + (location.pathname.endsWith("/") ? "index" : "")}.html`;
+    </script>
+    <script type="module">
+      let scrolled = false;
+      function onscroll() {
+        const s = scrollY > 0;
+        if (scrolled === s) return;
+        document.documentElement.classList.toggle("scrolled1", scrolled = s);
+      }
+      onscroll();
+      document.addEventListener("scroll", onscroll);
+    </script>
+    <script type="module">
+      let side;
+      let scrolled = false;
+      function onscroll() {
+        const cell = document.querySelector(".observablehq--cell");
+        if (!cell) return;
+        if (!side) side = getComputedStyle(cell).paddingBottom === "0px" ? "top" : "bottom";
+        const s = cell.getBoundingClientRect()[side] < 90;
+        if (scrolled === s) return;
+        document.documentElement.classList.toggle("scrolled2", scrolled = s);
+      }
+      onscroll();
+      document.addEventListener("scroll", onscroll);
     </script>
     <footer style="width: 100vw; margin: 2rem calc((100% - 100vw) / 2) -32px; padding-bottom: 16px; background-color: var(--theme-foreground); color: var(--theme-background); font: 12px/normal var(--sans-serif);">
       <div style="display: flex; flex-wrap: wrap; max-width: var(--max-width); padding: 2rem 1rem; margin: auto; gap: 2rem;">

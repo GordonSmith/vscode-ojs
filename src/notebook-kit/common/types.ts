@@ -1,4 +1,4 @@
-import { type Cell } from "@observablehq/notebook-kit";
+import { type Notebook, type Cell } from "@observablehq/notebook-kit";
 
 export const OBSERVABLE_KIT_MIME = "application/observable-kit+json";
 
@@ -7,7 +7,6 @@ export const vscode2observable: Record<string, Cell["mode"]> = {
     "javascript": "js",
     "ojs": "ojs",
     "html": "html",
-    "css": "html", // CSS is treated as HTML in Observable Kit
     "tex": "tex",
     "sql": "sql",
     "dot": "dot"
@@ -24,8 +23,11 @@ export const observable2vscode: Record<Cell["mode"], string> = {
 };
 
 export interface NotebookCell {
-    metadata: Cell;
+    notebook: Notebook;
+    cell: Cell;
     cellText: string;
+    /** Absolute filesystem folder of the backing notebook document (no trailing slash). */
+    folder?: string;
 }
 
 export const NOTEBOOK_THEMES = [

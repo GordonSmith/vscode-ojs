@@ -4,16 +4,20 @@
   "description": "",
   "license": "ISC",
   "author": "",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "preview": "notebooks preview --root docs",
-    "build": "notebooks build --root docs -- docs/kit.html",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rimraf docs/.observable",
+    "download": "notebooks download ",
+    "build": "notebooks build --no-minify --root docs -- docs/index.html",
+    "watch": "notebooks preview --root docs",
+    "notebooks": "notebooks",
     "update-major": "npx -y npm-check-updates -u",
-    "update": "npx -y npm-check-updates -u -t minor"
+    "update": "npx -y npm-check-updates -u -t minor",
+    "extract-data": "node docs/reactive-demo/export-json.mjs"
   },
   "devDependencies": {
-    "@observablehq/notebook-kit": "1.1.0-rc.9"
+    "@observablehq/notebook-kit": "1.2.0",
+    "rimraf": "^6.0.1"
   }
 }

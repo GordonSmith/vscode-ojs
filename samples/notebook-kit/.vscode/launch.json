@@ -10,6 +10,13 @@
             "type": "msedge",
             "url": "http://localhost:5173/index.html",
             "webRoot": "${workspaceFolder}"
+        },
+        {
+            "name": "reactive-demo.html",
+            "request": "launch",
+            "type": "msedge",
+            "url": "http://localhost:5173/reactive-demo/index.html",
+            "webRoot": "${workspaceFolder}"
         }
     ]
 }

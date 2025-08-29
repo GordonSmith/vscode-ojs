@@ -1,14 +1,13 @@
 import * as vscode from "vscode";
+import { JSDOM } from "jsdom";
 import { TextDecoder, TextEncoder } from "util";
-import { type Notebook, type Cell } from "@observablehq/notebook-kit";
-import { html2notebook, notebook2html } from "@hpcc-js/observablehq-compiler/dist/node/index.js";
-// import { JSDOM } from "jsdom";
+import { type Notebook, type Cell, html2notebook, notebook2html } from "../compiler";
 import { observable2vscode, vscode2observable } from "../common/types";
 import { isObservableNotebook } from "../../util/htmlNotebookDetector";
 
-// const { window } = new JSDOM();
-// globalThis.document = globalThis.document ?? window.document;
-// globalThis.DOMParser = globalThis.DOMParser ?? window.DOMParser;
+const { window } = new JSDOM();
+globalThis.document = window.document;
+globalThis.DOMParser = window.DOMParser;
 
 let serializer: NotebookKitSerializer;
 

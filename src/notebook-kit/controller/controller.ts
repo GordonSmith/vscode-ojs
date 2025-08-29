@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
-import { type Cell } from "@observablehq/notebook-kit";
+import { type Notebook, type Cell } from "../compiler";
 import { OBSERVABLE_KIT_MIME, vscode2observable, NotebookCell } from "../common/types";
+import path from "node:path";
 
 export class NotebookKitController {
     readonly controllerId = "observable-kit-kernel";
@@ -65,12 +66,66 @@ export class NotebookKitController {
         notebook: vscode.NotebookDocument
     ): Promise<vscode.NotebookCellOutput | undefined> {
         const cellText = cell.document.getText();
+        const baseDir = path.dirname(notebook.uri.fsPath);
+        const resolvedCellText = this.resolveRelativeImports(cellText, baseDir);
         const outputData: NotebookCell = {
-            metadata: cell.metadata as Cell,
-            cellText
+            notebook: notebook.metadata as Notebook,
+            cell: cell.metadata as Cell,
+            cellText: resolvedCellText
         };
         return new vscode.NotebookCellOutput([
             vscode.NotebookCellOutputItem.json(outputData, OBSERVABLE_KIT_MIME)
         ]);
+    }
+
+    /**
+     * Find all import/export specifiers in the provided cell text that are relative (start with ./ or ../)
+     * and rewrite them to be relative to this module's __dirname (normalized with forward slashes).
+     * This includes forms:
+     *  - import x from "./foo.js";
+     *  - import {x} from '../bar';
+     *  - import "./side-effect";
+     *  - export {x} from './reexport';
+     *  - export * from '../reexport-all';
+     *  - dynamic import("./foo.js")
+     */
+    private resolveRelativeImports(cellText: string, baseDir: string): string {
+        const toAbs = (rel: string): string => {
+            try {
+                const abs = path.resolve(baseDir, rel);
+                return abs;
+            } catch {
+                return rel; // Fallback: leave unchanged on error
+            }
+        };
+
+        const transformLine = (line: string): string => {
+            if (!/(?:import|export)/.test(line)) return line;
+
+            const patterns: RegExp[] = [
+                /(import\s+[^"'`\n]*?from\s+)(['"])(\.{1,2}\/[^'"`]+)(\2)/, // 0: import X from './rel'
+                /(export\s+[^"'`\n]*?from\s+)(['"])(\.{1,2}\/[^'"`]+)(\2)/, // 1: export { X } from './rel'
+                /(import\s+)(['"])(\.{1,2}\/[^'"`]+)(\2)/,                 // 2: import './rel'
+                /(\bimport\(\s*)(['"])(\.{1,2}\/[^'"`]+)(\2)(\s*\))/    // 3: dynamic import('./rel')
+            ];
+
+            patterns.forEach((re, idx) => {
+                line = line.replace(re, (m, p1, quote, rel, p4, p5) => {
+                    const abs = toAbs(rel);
+                    let relFromHere = path.relative(__dirname, abs).replace(/\\/g, "/");
+                    if (!relFromHere.startsWith(".")) relFromHere = `./${relFromHere}`;
+                    if (idx === 3) {
+                        return `${p1}${quote}${relFromHere}${quote}${p5}`;
+                    }
+                    return `${p1}${quote}${relFromHere}${quote}`;
+                });
+            });
+            return line;
+        };
+
+        // Process line-by-line to avoid crossing line boundaries with simple regex
+        const lines = cellText.split(/\r?\n/);
+        const transformed = lines.map(transformLine).join("\n");
+        return transformed;
     }
 }
