@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.47](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.46...observable-js-v0.4.47) (2025-08-31)
+
+
+### Bug Fixes
+
+* import failed accross drive boundarys ([ea5fe02](https://github.com/GordonSmith/vscode-ojs/commit/ea5fe02ad74bc8d7121ae0c24a5f5933f4c0361e))
+
 ## [0.4.46](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.45...observable-js-v0.4.46) (2025-08-31)
 
 
