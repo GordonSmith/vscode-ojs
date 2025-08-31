@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.45](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.44...observable-js-v0.4.45) (2025-08-31)
+
+
+### Bug Fixes
+
+* add missing styles ([8344162](https://github.com/GordonSmith/vscode-ojs/commit/8344162214e9def7f2e5ce49f30b42b849c0ca82))
+
 ## [0.4.44](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.43...observable-js-v0.4.44) (2025-08-26)
 
 
