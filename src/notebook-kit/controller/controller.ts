@@ -80,7 +80,8 @@ export class NotebookKitController {
 
     /**
      * Find all import/export specifiers in the provided cell text that are relative (start with ./ or ../)
-     * and rewrite them to be relative to this module's __dirname (normalized with forward slashes).
+     * and rewrite them to absolute file paths prefixed with the VS Code webview CDN base
+     * "https://file+.vscode-resource.vscode-cdn.net/" (normalized with forward slashes).
      * This includes forms:
      *  - import x from "./foo.js";
      *  - import {x} from '../bar';
@@ -90,34 +91,36 @@ export class NotebookKitController {
      *  - dynamic import("./foo.js")
      */
     private resolveRelativeImports(cellText: string, baseDir: string): string {
-        const toAbs = (rel: string): string => {
+        const CDN_PREFIX = "https://file+.vscode-resource.vscode-cdn.net/";
+
+        const toCdnUrl = (rel: string): string => {
             try {
                 const abs = path.resolve(baseDir, rel);
-                return abs;
+                const normalized = abs.replace(/\\/g, "/");
+                return `${CDN_PREFIX}${normalized}`;
             } catch {
-                return rel; // Fallback: leave unchanged on error
+                // On any error, return the original relative specifier unchanged
+                return rel;
             }
         };
 
         const transformLine = (line: string): string => {
-            if (!/(?:import|export)/.test(line)) return line;
+            if (!/(?:\bimport\b|\bexport\b)/.test(line)) return line;
 
             const patterns: RegExp[] = [
                 /(import\s+[^"'`\n]*?from\s+)(['"])(\.{1,2}\/[^'"`]+)(\2)/, // 0: import X from './rel'
                 /(export\s+[^"'`\n]*?from\s+)(['"])(\.{1,2}\/[^'"`]+)(\2)/, // 1: export { X } from './rel'
-                /(import\s+)(['"])(\.{1,2}\/[^'"`]+)(\2)/,                 // 2: import './rel'
-                /(\bimport\(\s*)(['"])(\.{1,2}\/[^'"`]+)(\2)(\s*\))/    // 3: dynamic import('./rel')
+                /(import\s+)(['"])(\.{1,2}\/[^'"`]+)(\2)/,                  // 2: import './rel'
+                /(\bimport\(\s*)(['"])(\.{1,2}\/[^'"`]+)(\2)(\s*\))/     // 3: dynamic import('./rel')
             ];
 
             patterns.forEach((re, idx) => {
                 line = line.replace(re, (m, p1, quote, rel, p4, p5) => {
-                    const abs = toAbs(rel);
-                    let relFromHere = path.relative(__dirname, abs).replace(/\\/g, "/");
-                    if (!relFromHere.startsWith(".")) relFromHere = `./${relFromHere}`;
+                    const url = toCdnUrl(rel);
                     if (idx === 3) {
-                        return `${p1}${quote}${relFromHere}${quote}${p5}`;
+                        return `${p1}${quote}${url}${quote}${p5}`;
                     }
-                    return `${p1}${quote}${relFromHere}${quote}`;
+                    return `${p1}${quote}${url}${quote}`;
                 });
             });
             return line;
@@ -125,7 +128,6 @@ export class NotebookKitController {
 
         // Process line-by-line to avoid crossing line boundaries with simple regex
         const lines = cellText.split(/\r?\n/);
-        const transformed = lines.map(transformLine).join("\n");
-        return transformed;
+        return lines.map(transformLine).join("\n");
     }
 }
