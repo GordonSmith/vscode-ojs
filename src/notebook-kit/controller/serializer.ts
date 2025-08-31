@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 import { JSDOM } from "jsdom";
+import { v4 as uuidv4 } from "uuid";
 import { TextDecoder, TextEncoder } from "util";
+import type { ohq } from "@hpcc-js/observablehq-compiler";
 import { type Notebook, type Cell, html2notebook, notebook2html } from "../compiler";
 import { observable2vscode, vscode2observable } from "../common/types";
 import { isObservableNotebook } from "../../util/htmlNotebookDetector";
@@ -32,6 +34,8 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
         const contentStr = this._textDecoder.decode(content);
         if (isObservableNotebook(contentStr)) {
             return this.deserializeObservableKitNotebook(contentStr);
+        } else {
+            return this.deserializeOJSNotebook(contentStr);
         }
     }
 
@@ -61,7 +65,7 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
                 language
             );
 
-            const metadata: any = { ...cell };
+            const metadata: Cell = { ...cell };
             if (metadata.pinned === undefined || metadata.pinned === null) {
                 metadata.pinned = false;
             }
@@ -104,6 +108,67 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
         };
 
         return notebook2html(notebook);
+    }
+
+    async deserializeOJSNotebook(content: string): Promise<vscode.NotebookData> {
+
+        let notebook: ohq.Notebook;
+        try {
+            notebook = {
+                id: uuidv4(),
+                ...JSON.parse(content)
+            };
+        } catch {
+            notebook = {
+                id: uuidv4(),
+                files: [],
+                nodes: []
+            } as unknown as ohq.Notebook;
+        }
+
+        const cells: vscode.NotebookCellData[] = [];
+
+        notebook.nodes?.forEach(node => {
+            let kind: vscode.NotebookCellKind;
+            let mode: string;
+            switch (node.mode) {
+                case "md":
+                    kind = vscode.NotebookCellKind.Markup;
+                    mode = "markdown";
+                    break;
+                case "ecl":
+                    kind = vscode.NotebookCellKind.Code;
+                    mode = "ecl";
+                    break;
+                case "js":
+                    kind = vscode.NotebookCellKind.Code;
+                    mode = "ojs";
+                    break;
+                default:
+                    kind = vscode.NotebookCellKind.Code;
+                    mode = node.mode;
+            }
+            const cellData = new vscode.NotebookCellData(node.mode === "md" ?
+                vscode.NotebookCellKind.Markup :
+                vscode.NotebookCellKind.Code, node.value, mode);
+
+            const metadata = {
+                id: node.id,
+                value: node.value,
+                mode: node.mode as any,
+                pinned: false,
+                hidden: false
+            };
+
+            cellData.metadata = metadata;
+            cells.push(cellData);
+        });
+
+        const notebookData = new vscode.NotebookData(cells);
+        notebookData.metadata = notebook;
+        notebookData.metadata.ojs = true;
+
+        return notebookData;
     }
 
 }
