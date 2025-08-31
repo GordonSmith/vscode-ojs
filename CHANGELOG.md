@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.46](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.45...observable-js-v0.4.46) (2025-08-31)
+
+
+### Bug Fixes
+
+* clean prod build missing xhr file ([7106694](https://github.com/GordonSmith/vscode-ojs/commit/71066946dfb6c7fcfe8aeeae22b514cce04f1c5c))
+
 ## [0.4.45](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.44...observable-js-v0.4.45) (2025-08-31)
 
 
