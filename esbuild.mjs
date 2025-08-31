@@ -3,7 +3,7 @@ import process from "node:process";
 import console from "node:console";
 
 import { problemMatcher, inlineCSS } from "@hpcc-js/esbuild-plugins";
-import { readFileSync, copyFileSync } from "node:fs";
+import { readFileSync, copyFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 
 const tsconfigNode = JSON.parse(readFileSync("./tsconfig.json", "utf8"));
@@ -46,6 +46,8 @@ const xhrSyncWorkerPlugin = {
         const workerSource = path.resolve("node_modules/jsdom/lib/jsdom/living/xhr/xhr-sync-worker.js");
         build.onStart(() => {
             try {
+                // Ensure the output directory exists before copying (production builds often start from a clean state)
+                mkdirSync(outputDirectory, { recursive: true });
                 copyFileSync(workerSource, path.join(outputDirectory, "xhr-sync-worker.js"));
             } catch {
                 // Ignore if jsdom not installed; worker not needed.
@@ -94,7 +96,6 @@ async function main(tsconfigRaw, entryPoint, platform, format, plugins = [], out
         // We intentionally do not suppress jsdom warnings; instead we rewrite resolution for the worker.
         plugins: [
             aliasPlugin,
-            ...(platform === "node" ? [xhrSyncWorkerPlugin] : []),
             ...plugins,
             problemMatcher(),
         ]
@@ -108,9 +109,8 @@ async function main(tsconfigRaw, entryPoint, platform, format, plugins = [], out
 }
 
 Promise.all([
-    main(tsconfigNode, "./src/extension.ts", "node", "cjs"),
+    main(tsconfigNode, "./src/extension.ts", "node", "cjs", [xhrSyncWorkerPlugin]),
     main(tsconfigBrowser, "./src/notebook/renderers/ojsRenderer.ts", "browser", "esm"),
-    // Inline CSS for observable-kit-renderer bundle only
     main(tsconfigBrowser, "./src/notebook-kit/renderers/observable-kit-renderer.ts", "browser", "esm", [inlineCSS()], "observable-kit-renderer"),
     main(tsconfigBrowser, "./src/webview.ts", "browser", "iife")
 ]).catch((e) => {
