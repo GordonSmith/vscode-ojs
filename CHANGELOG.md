@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.48](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.47...observable-js-v0.4.48) (2025-09-01)
+
+
+### Features
+
+* add `.definition.js` support ([9147654](https://github.com/GordonSmith/vscode-ojs/commit/9147654436fd6640810973db5fc0ad486d693134))
+
 ## [0.4.47](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.46...observable-js-v0.4.47) (2025-08-31)
 
 
