@@ -4,6 +4,7 @@ import { activate as notebookActivate } from "./notebook/index";
 import { activate as notebookKitActivate } from "./notebook-kit/index";
 import { activate as telemetryActivate, deactivate as telemetryDeactivate, reporter } from "./telemetry/index";
 import { HTMLNotebookDetector } from "./util/htmlNotebookDetector";
+import { runTests } from "./notebook-kit/renderers/test";
 
 let htmlNotebookDecorationProvider: HTMLNotebookDetector;
 
@@ -22,6 +23,8 @@ export function activate(context: vscode.ExtensionContext): void {
     );
 
     reporter.sendTelemetryEvent("initialized");
+
+    runTests();
 }
 
 export function deactivate(): void {

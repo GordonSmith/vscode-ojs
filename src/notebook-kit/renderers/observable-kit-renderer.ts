@@ -93,22 +93,22 @@ function renderCell(cell: Cell, cellSource: string = cell.value, hostElement: HT
 
 export const activate: ActivationFunction = context => {
     return {
-        renderOutputItem(outputItem, element) {
+        async renderOutputItem(outputItem, element) {
 
             const nbCell: NotebookCell = outputItem.json();
             for (const cell of nbCell.notebook.cells) {
                 if (cell.id !== nbCell.cell.id && !runtime.has(`cell_${cell.id}`)) {
-                    renderCell(cell);
+                    await renderCell(cell);
                 }
             }
-            renderCell(nbCell.cell, nbCell.cellText, element as HTMLDivElement);
+            await renderCell(nbCell.cell, nbCell.cellText, element as HTMLDivElement);
         },
 
-        disposeOutputItem(id?: string) {
+        async disposeOutputItem(id?: string) {
             if (id) {
-                runtime.remove(id);
+                await runtime.remove(id);
             } else {
-                runtime.removeAll();
+                await runtime.removeAll();
                 runtime = new NotebookRuntimeEx();
             }
         }

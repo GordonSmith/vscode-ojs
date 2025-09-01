@@ -13,11 +13,10 @@
     "watch": "notebooks preview --root docs",
     "notebooks": "notebooks",
     "update-major": "npx -y npm-check-updates -u",
-    "update": "npx -y npm-check-updates -u -t minor",
-    "extract-data": "node docs/reactive-demo/export-json.mjs"
+    "update": "npx -y npm-check-updates -u -t minor"
   },
   "devDependencies": {
     "@observablehq/notebook-kit": "1.2.0",
-    "rimraf": "^6.0.1"
+    "rimraf": "6.0.1"
   }
 }

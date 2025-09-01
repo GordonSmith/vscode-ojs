@@ -48,6 +48,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "acorn": "8.14.0",
     "@hpcc-js/esbuild-plugins": "1.5.0",
     "@hpcc-js/observable-shim": "3.1.0",
     "@hpcc-js/observablehq-compiler": "3.4.0",
@@ -263,6 +264,16 @@
       },
       {
         "category": "Observable Kit",
+        "command": "observable-kit.export",
+        "title": "Export",
+        "description": "Export the current ObservableHQ Notebook",
+        "icon": {
+          "dark": "./images/export-dark.svg",
+          "light": "./images/export.svg"
+        }
+      },
+      {
+        "category": "Observable Kit",
         "command": "observable-kit.notebook.setTitle",
         "title": "Title",
         "description": "Edit the notebook title metadata",
@@ -378,6 +389,10 @@
           "when": "resourceLangId == html"
         },
         {
+          "command": "observable-kit.export",
+          "when": "notebookType == notebook-kit"
+        },
+        {
           "command": "observable-kit.switchToNotebookView",
           "when": "resourceLangId == html"
         },
@@ -418,6 +433,11 @@
           "when": "resourceLangId == ojs || resourceLangId == omd",
           "command": "ojs.exportECL",
           "group": "navigation@990"
+        },
+        {
+          "when": "notebookType == notebook-kit",
+          "command": "observable-kit.export",
+          "group": "navigation@980"
         }
       ],
       "editor/title": [
@@ -440,6 +460,11 @@
           "when": "notebookType == notebook-kit",
           "command": "observable-kit.switchToTextView",
           "group": "navigation@999"
+        },
+        {
+          "when": "notebookType == notebook-kit",
+          "command": "observable-kit.export",
+          "group": "navigation@997"
         }
       ],
       "notebook/cell/title": [
@@ -552,6 +577,9 @@
         "selector": [
           {
             "filenamePattern": "*.html"
+          },
+          {
+            "filenamePattern": "*.definition.js"
           }
         ],
         "priority": "option"

@@ -44,6 +44,20 @@
 			],
 		},
 		{
+			"name": "Launch Client Kit D:",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"debugWebviews": true,
+			"args": [
+				"--extensionDevelopmentPath=${workspaceRoot}",
+				"D:\\reactive-demo"
+			],
+			"outFiles": [
+				"${workspaceFolder}/dist/**/*.js"
+			],
+		},
+		{
 			"name": "Launch Client with extensions",
 			"type": "extensionHost",
 			"request": "launch",

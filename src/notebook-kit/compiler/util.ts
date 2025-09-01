@@ -99,7 +99,7 @@ export async function obfuscatedImport(url: string) {
     return obfuscatedImportFunction(url);
 }
 
-function _constructFunction(body, bodyStr: string) {
+function _constructFunction(body: any, bodyStr: string, name?: string) {
     if (body.type !== "FunctionExpression" && body.type !== "FunctionDeclaration" && body.type !== "ArrowFunctionExpression") {
         throw new Error(`Unsupported function type: ${body.type}`);
     }
@@ -117,18 +117,38 @@ function _constructFunction(body, bodyStr: string) {
     const inner = isBlock
         ? bodyStr.slice(start + 1, end - 1)
         : `return ${bodyStr.slice(start, end)}`;
-    return func(params, inner);
+    // If a name is provided, build a true named function expression for reliable naming.
+    if (name) {
+        // Sanitize to a valid identifier; fallback to underscored name when necessary.
+        const sanitize = (n: string): string => {
+            let s = n.replace(/[^A-Za-z0-9_$]/g, "_");
+            if (!/^[A-Za-z_$]/.test(s)) s = "_" + s;
+            return s;
+        };
+        const id = sanitize(name);
+        const asyncKw = body.async ? "async " : "";
+        const genMark = body.generator ? "*" : "";
+        const src = `return ${asyncKw}function${genMark} ${id}(${params}) {\n${inner}\n}`;
+        // Use a plain Function wrapper to evaluate the named function expression.
+        const builtNamed = (new Function(src)()) as AnyFunction;
+        // Expose the intended display name even if sanitization changed the identifier.
+        try { (builtNamed as any).displayName = name; } catch { /* noop */ }
+        return builtNamed;
+    }
+
+    const built = func(params, inner) as AnyFunction;
+    return built;
 }
 
-export function constructFunction(bodyStr: string) {
+export function constructFunction(bodyStr: string, name?: string) {
     const { body } = parseJavaScript(bodyStr);
     if (body.type === "Program") {
         if (body.body.length !== 1) {
             throw new Error(`Expected a single function, but found ${body.body.length} statements`);
         }
-        return _constructFunction(body.body[0], bodyStr);
+        return _constructFunction(body.body[0], bodyStr, name);
     }
-    return _constructFunction(body, bodyStr);
+    return _constructFunction(body, bodyStr, name);
 }
 
 export const html2notebook = (html: string): Notebook => deserialize(html);

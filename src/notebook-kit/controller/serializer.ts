@@ -3,9 +3,10 @@ import { JSDOM } from "jsdom";
 import { v4 as uuidv4 } from "uuid";
 import { TextDecoder, TextEncoder } from "util";
 import type { ohq } from "@hpcc-js/observablehq-compiler";
-import { type Notebook, type Cell, html2notebook, notebook2html } from "../compiler";
+import { type Notebook, type Cell, html2notebook, notebook2html, compileKit, notebook2js, js2notebook } from "../compiler";
 import { observable2vscode, vscode2observable } from "../common/types";
 import { isObservableNotebook } from "../../util/htmlNotebookDetector";
+import { serialize } from "v8";
 
 const { window } = new JSDOM();
 globalThis.document = window.document;
@@ -32,24 +33,39 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
         token: vscode.CancellationToken
     ): Promise<vscode.NotebookData> {
         const contentStr = this._textDecoder.decode(content);
+        let retVal;
         if (isObservableNotebook(contentStr)) {
-            return this.deserializeObservableKitNotebook(contentStr);
+            retVal = await this.deserializeObservableKitNotebook(contentStr);
+            retVal.metadata.type = "html";
         } else {
-            return this.deserializeOJSNotebook(contentStr);
+            retVal = await this.deserializeJSToObservableKit(contentStr);
+            retVal.metadata.type = "definition.js";
         }
+        return retVal;
     }
 
     async serializeNotebook(
         data: vscode.NotebookData,
         token: vscode.CancellationToken
     ): Promise<Uint8Array> {
-        const htmlContent = this.serializeToObservableKitFormat(data);
-        return this._textEncoder.encode(htmlContent);
+        switch (data.metadata?.type) {
+            case "html": {
+                const htmlContent = this.serializeToObservableKitFormat(data);
+                return this._textEncoder.encode(htmlContent);
+            }
+            case "definition.js": {
+                const jsContent = this.serializeToObservableKitJS(data);
+                return this._textEncoder.encode(jsContent);
+            }
+            default: {
+                // Optionally handle other types or fallback
+                return this._textEncoder.encode("");
+            }
+        }
+
     }
 
-    private deserializeObservableKitNotebook(content: string): vscode.NotebookData {
-
-        const notebook: Notebook = html2notebook(content);
+    private notebook2notebookData(notebook: Notebook): vscode.NotebookData {
         const cells: vscode.NotebookCellData[] = [];
 
         for (const cell of notebook.cells) {
@@ -82,7 +98,17 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
         return notebookData;
     }
 
-    private serializeToObservableKitFormat(data: vscode.NotebookData): string {
+    private deserializeObservableKitNotebook(content: string): vscode.NotebookData {
+        const notebook: Notebook = html2notebook(content);
+        return this.notebook2notebookData(notebook);
+    }
+
+    private async deserializeJSToObservableKit(content: string): Promise<vscode.NotebookData> {
+        const notebook = await js2notebook(content);
+        return this.notebook2notebookData(notebook);
+    }
+
+    private notebookData2notebook(data: vscode.NotebookData): Notebook {
         const cells: Cell[] = [];
         let cellIdCounter = 1;
 
@@ -107,7 +133,17 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
             cells
         };
 
+        return notebook;
+    }
+
+    private serializeToObservableKitFormat(data: vscode.NotebookData): string {
+        const notebook = this.notebookData2notebook(data);
         return notebook2html(notebook);
+    }
+
+    private serializeToObservableKitJS(data: vscode.NotebookData): string {
+        const notebook = this.notebookData2notebook(data);
+        return notebook2js(notebook);
     }
 
     async deserializeOJSNotebook(content: string): Promise<vscode.NotebookData> {
