@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.49](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.48...observable-js-v0.4.49) (2025-09-02)
+
+
+### Bug Fixes
+
+* cells overwritting eachother ([86a0209](https://github.com/GordonSmith/vscode-ojs/commit/86a020908c7af64097429025321caf2219224521))
+* serialization indentation ([86a0209](https://github.com/GordonSmith/vscode-ojs/commit/86a020908c7af64097429025321caf2219224521))
+
 ## [0.4.48](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.47...observable-js-v0.4.48) (2025-09-01)
 
 
