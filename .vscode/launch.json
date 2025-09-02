@@ -51,7 +51,7 @@
 			"debugWebviews": true,
 			"args": [
 				"--extensionDevelopmentPath=${workspaceRoot}",
-				"D:\\reactive-demo"
+				"D:\\reactive-notebook"
 			],
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"

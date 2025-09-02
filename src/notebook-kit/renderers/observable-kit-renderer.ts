@@ -28,12 +28,12 @@ class NotebookRuntimeEx extends NotebookRuntime {
     async add(cellId: string, definition: Definition, placeholderDiv: HTMLDivElement): Promise<void> {
         let state: DefineState | undefined = this.stateById.get(cellId);
         if (state) {
-            this.remove(cellId);
+            await this.remove(cellId);
         }
         state = { root: placeholderDiv, expanded: [], variables: [] };
         this.stateById.set(cellId, state);
         this.define(state, definition);
-        // await this.runtime._computeNow();
+        await this.runtime._computeNow();
     }
 
     async remove(cellId: string): Promise<void> {
@@ -42,7 +42,7 @@ class NotebookRuntimeEx extends NotebookRuntime {
         [...state.variables].forEach(v => v.delete());
         this.stateById.delete(cellId);
         state.root?.remove();
-        // await this.runtime._computeNow();
+        await this.runtime._computeNow();
     }
 
     async removeAll(): Promise<void> {
@@ -50,7 +50,7 @@ class NotebookRuntimeEx extends NotebookRuntime {
         for (const key of keys) {
             this.remove(key);
         }
-        // await this.runtime._computeNow();
+        await this.runtime._computeNow();
     }
 }
 
@@ -69,19 +69,19 @@ function renderCell(cell: Cell, cellSource: string = cell.value, hostElement: HT
             cells: [{ ...cell, value: cellSource }]
         };
 
-        const compiled = compileKit(notebook);
-        compiled.forEach((cell) => {
+        const definitions = compileKit(notebook);
+        definitions.forEach(async (def) => {
             const definition: Definition = {
                 id: cell.id,
-                body: (cell as any).body ?? (() => { }),
-                inputs: (cell as any).inputs,
-                outputs: (cell as any).outputs,
-                output: (cell as any).output,
-                autodisplay: (cell as any).autodisplay,
-                autoview: (cell as any).autoview,
-                automutable: (cell as any).automutable
+                body: (def as any).body ?? (() => { }),
+                inputs: (def as any).inputs,
+                outputs: (def as any).outputs,
+                output: (def as any).output,
+                autodisplay: (def as any).autodisplay,
+                autoview: (def as any).autoview,
+                automutable: (def as any).automutable
             };
-            runtime.add(`cell_${definition.id}`, definition, placeholder);
+            await runtime.add(`cell_${definition.id}`, definition, placeholder);
         });
     } catch (error) {
         placeholder.style.color = "red";
