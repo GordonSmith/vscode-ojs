@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.50](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.49...observable-js-v0.4.50) (2025-09-05)
+
+
+### Bug Fixes
+
+* push legacy naming for legacy gitpod support ([3fe863a](https://github.com/GordonSmith/vscode-ojs/commit/3fe863a732effbaa5cc7189ea150d7d0d8361a8e))
+
 ## [0.4.49](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.48...observable-js-v0.4.49) (2025-09-02)
 
 
