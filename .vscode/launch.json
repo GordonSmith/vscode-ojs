@@ -44,14 +44,14 @@
 			],
 		},
 		{
-			"name": "Launch Client Kit D:",
+			"name": "Launch Client Kit G:",
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"debugWebviews": true,
 			"args": [
 				"--extensionDevelopmentPath=${workspaceRoot}",
-				"D:\\reactive-notebook"
+				"G:\\reactive-notebook"
 			],
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"

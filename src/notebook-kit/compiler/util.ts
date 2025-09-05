@@ -1,6 +1,8 @@
-import { type Notebook, type Cell, toCell, toNotebook, parseJavaScript, serialize, deserialize } from "@observablehq/notebook-kit";
+import { type Notebook, type Cell, parseJavaScript, serialize, deserialize, toNotebook, toCell } from "@observablehq/notebook-kit";
+import { type Definition } from "@observablehq/notebook-kit/runtime";
 
-export type { Notebook, Cell };
+export type { Notebook, Cell, Definition };
+export { toNotebook, toCell };
 
 // Shared function constructor utilities to avoid duplication between util modules.
 

@@ -29,35 +29,14 @@
     })
 
   </script>
-  <script id="1" type="module">
-    Plot.plot({
-      x: { label: null },
-      y: { percent: true },
-      marks: [
-        Plot.barY(data, { x: "letter", y: "frequency", fillOpacity: 0.2 }),
-        Plot.tickY(data, { x: "letter", y: "frequency" }),
-        Plot.ruleY([0]),
-        (index, scales, channels, dimensions, context) => {
-          const x1 = dimensions.marginLeft;
-          const x2 = dimensions.width - dimensions.marginRight;
-          const y1 = 0;
-          const y2 = dimensions.height;
-          const brushed = (event) => setStartEnd(event.selection?.map(scales.x.invert));
-          const brush = d3.brushX().extent([[x1, y1], [x2, y2]]).on("brush end", brushed);
-          return d3.create("svg:g").call(brush).node();
-        }
-      ]
-    })
-
-  </script>
-  <script id="4" type="module">
+  <script id="5" type="module">
     const startEnd = Mutable(null);
     const setStartEnd = (se) => startEnd.value = se;
   </script>
-  <script id="5" type="module">
+  <script id="6" type="module">
     const data = FileAttachment("./data/alphabet.csv").csv({ typed: true }).then(display);
   </script>
-  <script id="6" type="module">
+  <script id="7" type="module">
     const calls = Object.keys(phonesTimeLineData.events).map((key) => {
       const row = phonesTimeLineData.events[key];
       const caller = phonesTimeLineData.entities[row.entityIds[0]];
@@ -77,31 +56,31 @@
     };
     display(callRange);
   </script>
-  <script id="7" type="module">
+  <script id="8" type="module">
     import { test } from "./lib.js";
 
     const xxx = test();
     display(xxx);
   </script>
-  <script id="8" type="text/markdown">
+  <script id="9" type="text/markdown">
     ---
     ## Phones timeline
   </script>
-  <script id="9" type="module" pinned="">
+  <script id="10" type="module" pinned="">
     const phonesTimeLineData = await FileAttachment("./data/phonesTimeLineData.json").json();
     display(phonesTimeLineData);
   </script>
-  <script id="10" type="module">
+  <script id="11" type="module">
     md`## Zoomable Timeline of Calls (${callRange.start.toLocaleDateString()} - ${callRange.end.toLocaleDateString()})`
   </script>
-  <script id="11" type="application/vnd.observable.javascript">
+  <script id="12" type="application/vnd.observable.javascript">
     chart.element
   </script>
-  <script id="12" type="module">
+  <script id="13" type="module">
     const timeBarData = await FileAttachment("./data/timeBarData.json").json();
     display(timeBarData);
   </script>
-  <script id="13" type="module">
+  <script id="14" type="module">
     function renderCalls(rootNode, scaleX) {
       const callUpdate = rootNode.selectAll(".call").data(calls);
       const callEnter = callUpdate.enter().append("line")
@@ -119,20 +98,20 @@
         .text((d, i) => d.id);
     }
   </script>
-  <script id="14" type="module">
+  <script id="15" type="module">
     const adjacencyList = await FileAttachment("./data/adjacencyList.json").json();
     display(adjacencyList);
   </script>
-  <script id="15" type="text/markdown">
+  <script id="16" type="text/markdown">
     ---
 
     ## Entities
   </script>
-  <script id="16" type="module">
+  <script id="17" type="module">
     const entityLabelToIdDict = await FileAttachment("./data/entityLabelToIdDict.json").json();
     display(entityLabelToIdDict);
   </script>
-  <script id="17" type="module">
+  <script id="18" type="module">
     // Create a two-way dictionary from entityLabelToIdDict
     const idToEntityLabelDict = {};
     for (const [label, id] of Object.entries(entityLabelToIdDict)) {
@@ -140,31 +119,31 @@
     }
 
   </script>
-  <script id="18" type="text/markdown">
+  <script id="19" type="text/markdown">
     ---
     ## Calls
 
   </script>
-  <script id="19" type="module">
+  <script id="20" type="module">
     const groupToChartIdsDict = await FileAttachment("./data/groupToChartIdsDict.json").json();
     display(groupToChartIdsDict);
     const phonesChartData = await FileAttachment("./data/phonesChartData.json").json();
     display(phonesChartData);
   </script>
-  <script id="20" type="text/markdown">
+  <script id="21" type="text/markdown">
     ---
     ## Utils
   </script>
-  <script id="21" type="application/vnd.observable.javascript">
+  <script id="22" type="application/vnd.observable.javascript">
     Inputs.button("Reset zoom", { reduce: chart.reset })
   </script>
-  <script id="22" type="application/vnd.observable.javascript">
+  <script id="23" type="application/vnd.observable.javascript">
     viewof years = Inputs.range([1, 20], { value: 10, step: 1, label: "Years" })
   </script>
-  <script id="23" type="application/vnd.observable.javascript" hidden="">
+  <script id="24" type="application/vnd.observable.javascript" hidden="">
     chart = Timeline(scaleX, margin, 240)
   </script>
-  <script id="24" type="application/vnd.observable.javascript">
+  <script id="25" type="application/vnd.observable.javascript">
     function Timeline(scaleX, margin, height = 240) {
       let axis = {};
       let nodes = {};
@@ -391,7 +370,7 @@
       return setup();
     }
   </script>
-  <script id="25" type="module" hidden="">
+  <script id="26" type="module" hidden="">
     function zoomPlugin(svg, zoomed) {
       const zoom = d3.zoom()
         .scaleExtent(zoomScaleExtent)
@@ -423,7 +402,7 @@
       };
     }
   </script>
-  <script id="26" type="module">
+  <script id="27" type="module">
     function getDate(date) {
       return new Date(date.toISOString().split('T')[0]);
     }
@@ -436,31 +415,31 @@
 
     const scaleX = d3.scaleUtc().domain([nowDate, untilDate]).range([margin.left, width - margin.right]);
   </script>
-  <script id="27" type="application/vnd.observable.javascript" pinned="">
+  <script id="28" type="application/vnd.observable.javascript" pinned="">
     scaleX.domain()
   </script>
-  <script id="28" type="module" hidden="">
+  <script id="29" type="module" hidden="">
     function getDays(a, b) { return Math.abs(a - b) / MS_PER_DAY; }
   </script>
-  <script id="29" type="application/vnd.observable.javascript" hidden="">
+  <script id="30" type="application/vnd.observable.javascript" hidden="">
     days = getDays(...scaleX.domain())
   </script>
-  <script id="30" type="application/vnd.observable.javascript" hidden="">
+  <script id="31" type="application/vnd.observable.javascript" hidden="">
     zoomScaleExtent = [1, Math.round(days)]
   </script>
-  <script id="31" type="application/vnd.observable.javascript">
+  <script id="32" type="application/vnd.observable.javascript">
     margin = ({ top: 80, right: 20, bottom: 20, left: 20 });
   </script>
-  <script id="32" type="application/vnd.observable.javascript">
+  <script id="33" type="application/vnd.observable.javascript">
     MS_PER_DAY = 24 * MS_PER_HOUR;
   </script>
-  <script id="33" type="application/vnd.observable.javascript">
+  <script id="34" type="application/vnd.observable.javascript">
     MS_PER_HOUR = 60 * 60 * 1000;
   </script>
-  <script id="34" type="application/vnd.observable.javascript">
+  <script id="35" type="application/vnd.observable.javascript">
     MS_PER_YEAR = 365.24 * MS_PER_DAY; // include leap year
   </script>
-  <script id="35" type="application/vnd.observable.javascript">
+  <script id="36" type="application/vnd.observable.javascript">
     html`
     <style type="text/css">
       .timeline {

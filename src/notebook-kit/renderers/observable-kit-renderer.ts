@@ -1,6 +1,6 @@
 import type { ActivationFunction } from "vscode-notebook-renderer";
-import { type DefineState, type Definition, NotebookRuntime, observe } from "@observablehq/notebook-kit/runtime";
-import { Cell, compileKit, type Notebook } from "../compiler";
+import { NotebookRuntime } from "../compiler/runtime";
+import { type Definition, Cell, compileCell } from "../compiler";
 import { NotebookCell } from "../common/types";
 
 import "@observablehq/notebook-kit/global.css";
@@ -11,97 +11,69 @@ import "@observablehq/notebook-kit/index.css";
 import "@observablehq/notebook-kit/syntax-dark.css";
 import "@observablehq/notebook-kit/abstract-dark.css";
 import "@observablehq/notebook-kit/theme-slate.css";
+import "./observable-kit-renderer.css";
 
-class NotebookRuntimeEx extends NotebookRuntime {
+class NotebookRuntimeEx {
 
-    stateById = new Map<string, DefineState>();
-    observeById = new Map<string, typeof observe>();
+    vscodeCell2Cell = new Map<string, number>();
+    runtime = new NotebookRuntime();
 
     constructor() {
-        super();
     }
 
-    has(cellId: string): boolean {
-        return this.stateById.has(cellId);
+    has(id: string) {
+        return this.vscodeCell2Cell.has(id);
     }
 
-    async add(cellId: string, definition: Definition, placeholderDiv: HTMLDivElement): Promise<void> {
-        let state: DefineState | undefined = this.stateById.get(cellId);
-        if (state) {
-            await this.remove(cellId);
+    async add(id: string, definition: Definition) {
+        if (this.vscodeCell2Cell.has(id)) {
+            return this.runtime.update(definition);
         }
-        state = { root: placeholderDiv, expanded: [], variables: [] };
-        this.stateById.set(cellId, state);
-        this.define(state, definition);
-        await this.runtime._computeNow();
+        this.vscodeCell2Cell.set(id, definition.id);
+        return this.runtime.add(definition);
     }
 
-    async remove(cellId: string): Promise<void> {
-        const state = this.stateById.get(cellId);
-        if (!state) return;
-        [...state.variables].forEach(v => v.delete());
-        this.stateById.delete(cellId);
-        state.root?.remove();
-        await this.runtime._computeNow();
-    }
-
-    async removeAll(): Promise<void> {
-        const keys = [...this.stateById.keys()];
-        for (const key of keys) {
-            this.remove(key);
+    async remove(id: string) {
+        if (this.vscodeCell2Cell.has(id)) {
+            const cellId = this.vscodeCell2Cell.get(id);
+            this.vscodeCell2Cell.delete(id);
+            return this.runtime.remove(cellId);
         }
-        await this.runtime._computeNow();
+    }
+
+    async removeAll() {
+        this.runtime.removeAll();
+        this.runtime = new NotebookRuntime();
     }
 }
 
-let runtime = new NotebookRuntimeEx();
+const runtime = new NotebookRuntimeEx();
 
 function renderCell(cell: Cell, cellSource: string = cell.value, hostElement: HTMLElement = document.body) {
-    const id = `cell_placeholder_${cell.id}`;
-    const placeholder = (hostElement?.querySelector(`#${id}`) as HTMLDivElement | null) ?? document.createElement("div");
-    placeholder.className = "observablehq observablehq--cell";
-    placeholder.id = id;
-    try {
-        const notebook: Notebook = {
-            title: "Untitled",
-            theme: "slate",
-            readOnly: true,
-            cells: [{ ...cell, value: cellSource }]
-        };
-
-        const definitions = compileKit(notebook);
-        definitions.forEach(async (def) => {
-            const definition: Definition = {
-                id: cell.id,
-                body: (def as any).body ?? (() => { }),
-                inputs: (def as any).inputs,
-                outputs: (def as any).outputs,
-                output: (def as any).output,
-                autodisplay: (def as any).autodisplay,
-                autoview: (def as any).autoview,
-                automutable: (def as any).automutable
-            };
-            await runtime.add(`cell_${definition.id}`, definition, placeholder);
-        });
-    } catch (error) {
-        placeholder.style.color = "red";
-        const message = error instanceof Error ? error.message : String(error);
-        placeholder.textContent = `Renderer error: ${message}`;
-    }
-    hostElement?.appendChild(placeholder);
+    const definitions = compileCell({
+        ...cell,
+        value: cellSource
+    });
+    definitions.forEach(async (def) => {
+        const observableDiv = await runtime.add(`cell_${def.id}`, def);
+        hostElement?.appendChild(observableDiv);
+    });
 }
 
 export const activate: ActivationFunction = context => {
     return {
         async renderOutputItem(outputItem, element) {
-
             const nbCell: NotebookCell = outputItem.json();
             for (const cell of nbCell.notebook.cells) {
                 if (cell.id !== nbCell.cell.id && !runtime.has(`cell_${cell.id}`)) {
-                    await renderCell(cell);
+                    await renderCell({
+                        ...cell,
+                        hidden: false,
+                        pinned: false,
+                    });
                 }
             }
-            await renderCell(nbCell.cell, nbCell.cellText, element as HTMLDivElement);
+            await renderCell({ ...nbCell.cell, hidden: false, pinned: false }, nbCell.cellText, element as HTMLDivElement);
         },
 
         async disposeOutputItem(id?: string) {
@@ -109,7 +81,6 @@ export const activate: ActivationFunction = context => {
                 await runtime.remove(id);
             } else {
                 await runtime.removeAll();
-                runtime = new NotebookRuntimeEx();
             }
         }
     };

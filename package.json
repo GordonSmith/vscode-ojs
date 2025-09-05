@@ -46,25 +46,23 @@
     "update-major": "npx -y npm-check-updates -u",
     "update": "npx -y npm-check-updates -u -t minor"
   },
-  "dependencies": {},
   "devDependencies": {
-    "acorn": "8.14.0",
     "@hpcc-js/esbuild-plugins": "1.5.0",
     "@hpcc-js/observable-shim": "3.1.0",
-    "@hpcc-js/observablehq-compiler": "3.4.0",
+    "@hpcc-js/observablehq-compiler": "3.5.1",
     "@hpcc-js/util": "3.3.10",
     "@observablehq/inspector": "5.0.1",
     "@observablehq/notebook-kit": "1.2.0",
     "@observablehq/runtime": "5.9.9",
     "@observablehq/stdlib": "5.8.8",
     "@types/mocha": "10.0.10",
-    "@types/node": "24.3.0",
+    "@types/node": "24.3.1",
     "@types/vscode": "1.102.0",
     "@types/vscode-notebook-renderer": "1.72.4",
-    "globals": "16.3.0",
     "@vscode/extension-telemetry": "1.0.0",
-    "@vscode/vsce": "3.6.0",
     "@vscode/test-electron": "2.5.2",
+    "@vscode/vsce": "3.6.0",
+    "acorn": "8.15.0",
     "acorn-walk": "8.3.4",
     "assert": "2.1.0",
     "browserify-zlib": "0.2.0",
@@ -73,10 +71,12 @@
     "esbuild-copy-static-files": "0.1.0",
     "esbuild-plugin-text-replace": "1.3.0",
     "esbuild-plugin-umd-wrapper": "3.0.0",
-    "eslint": "9.34.0",
+    "eslint": "9.35.0",
     "eslint-plugin-react-hooks": "5.2.0",
+    "eslint-plugin-unused-imports": "^4.2.0",
+    "globals": "16.3.0",
     "jsdom": "26.1.0",
-    "mocha": "11.7.1",
+    "mocha": "11.7.2",
     "node-fetch": "3.3.2",
     "npm-run-all": "4.1.5",
     "os-browserify": "0.3.0",
@@ -85,7 +85,7 @@
     "stream-browserify": "3.0.0",
     "tslib": "2.8.1",
     "typescript": "5.9.2",
-    "typescript-eslint": "8.41.0",
+    "typescript-eslint": "8.42.0",
     "uuid": "11.1.0",
     "vitest": "^3.2.4"
   },
@@ -390,15 +390,15 @@
         },
         {
           "command": "observable-kit.export",
-          "when": "notebookType == notebook-kit"
+          "when": "notebookType == notebook-kit-default || notebookType == notebook-kit-option"
         },
         {
           "command": "observable-kit.switchToNotebookView",
-          "when": "resourceLangId == html"
+          "when": "resourceLangId == html || resourceLangId == javascript"
         },
         {
           "command": "observable-kit.switchToTextView",
-          "when": "notebookType == notebook-kit"
+          "when": "notebookType == notebook-kit-default || notebookType == notebook-kit-option"
         }
       ],
       "explorer/context": [
@@ -435,7 +435,7 @@
           "group": "navigation@990"
         },
         {
-          "when": "notebookType == notebook-kit",
+          "when": "notebookType == notebook-kit-default || notebookType == notebook-kit-option",
           "command": "observable-kit.export",
           "group": "navigation@980"
         }
@@ -452,17 +452,17 @@
           "group": "navigation@998"
         },
         {
-          "when": "resourceLangId == html && observable-kit.isObservableNotebook",
+          "when": "(resourceLangId == html || resourceLangId == javascript) && observable-kit.isObservableNotebook",
           "command": "observable-kit.switchToNotebookView",
           "group": "navigation@999"
         },
         {
-          "when": "notebookType == notebook-kit",
+          "when": "notebookType == notebook-kit-default || notebookType == notebook-kit-option",
           "command": "observable-kit.switchToTextView",
           "group": "navigation@999"
         },
         {
-          "when": "notebookType == notebook-kit",
+          "when": "notebookType == notebook-kit-default || notebookType == notebook-kit-option",
           "command": "observable-kit.export",
           "group": "navigation@997"
         }
@@ -480,44 +480,44 @@
         },
         {
           "command": "observable-kit.cell.pin",
-          "when": "notebookType == notebook-kit && !observable-kit.currentCellPinned",
+          "when": "(notebookType == notebook-kit-default || notebookType == notebook-kit-option) && !observable-kit.currentCellPinned",
           "group": "inline@100"
         },
         {
           "command": "observable-kit.cell.unpin",
-          "when": "notebookType == notebook-kit && observable-kit.currentCellPinned",
+          "when": "(notebookType == notebook-kit-default || notebookType == notebook-kit-option) && observable-kit.currentCellPinned",
           "group": "inline@100"
         },
         {
           "command": "observable-kit.cell.hide",
-          "when": "notebookType == notebook-kit && !observable-kit.currentCellHidden",
+          "when": "(notebookType == notebook-kit-default || notebookType == notebook-kit-option) && !observable-kit.currentCellHidden",
           "group": "inline@101"
         },
         {
           "command": "observable-kit.cell.show",
-          "when": "notebookType == notebook-kit && observable-kit.currentCellHidden",
+          "when": "(notebookType == notebook-kit-default || notebookType == notebook-kit-option) && observable-kit.currentCellHidden",
           "group": "inline@101"
         }
       ],
       "notebook/toolbar": [
         {
           "command": "observable-kit.notebook.setTitle",
-          "when": "notebookType == notebook-kit",
+          "when": "notebookType == notebook-kit-default || notebookType == notebook-kit-option",
           "group": "navigation@100"
         },
         {
           "command": "observable-kit.notebook.setTheme",
-          "when": "notebookType == notebook-kit",
+          "when": "notebookType == notebook-kit-default || notebookType == notebook-kit-option",
           "group": "navigation@101"
         },
         {
           "command": "observable-kit.notebook.setReadOnly",
-          "when": "notebookType == notebook-kit && !observable-kit.notebook.readOnly",
+          "when": "(notebookType == notebook-kit-default || notebookType == notebook-kit-option) && !observable-kit.notebook.readOnly",
           "group": "navigation@102"
         },
         {
           "command": "observable-kit.notebook.setReadWrite",
-          "when": "notebookType == notebook-kit && observable-kit.notebook.readOnly",
+          "when": "(notebookType == notebook-kit-default || notebookType == notebook-kit-option) && observable-kit.notebook.readOnly",
           "group": "navigation@102"
         }
       ]
@@ -571,15 +571,29 @@
         ]
       },
       {
-        "id": "notebook-kit",
-        "type": "notebook-kit",
+        "id": "notebook-kit-default",
+        "type": "notebook-kit-default",
+        "displayName": "ObservableHQ Notebook",
+        "selector": [
+          {
+            "filenamePattern": "*.observable.html"
+          },
+          {
+            "filenamePattern": "*.observable.js"
+          }
+        ],
+        "priority": "default"
+      },
+      {
+        "id": "notebook-kit-option",
+        "type": "notebook-kit-option",
         "displayName": "ObservableHQ Notebook",
         "selector": [
           {
             "filenamePattern": "*.html"
           },
           {
-            "filenamePattern": "*.definition.js"
+            "filenamePattern": "*.js"
           }
         ],
         "priority": "option"

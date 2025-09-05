@@ -3,10 +3,9 @@ import { JSDOM } from "jsdom";
 import { v4 as uuidv4 } from "uuid";
 import { TextDecoder, TextEncoder } from "util";
 import type { ohq } from "@hpcc-js/observablehq-compiler";
-import { type Notebook, type Cell, html2notebook, notebook2html, compileKit, notebook2js, js2notebook } from "../compiler";
+import { type Notebook, type Cell, html2notebook, notebook2html, notebook2js, js2notebook } from "../compiler";
 import { observable2vscode, vscode2observable } from "../common/types";
-import { isObservableNotebook } from "../../util/htmlNotebookDetector";
-import { serialize } from "v8";
+import { isObservableJSNotebook } from "../common/notebook-detector";
 
 const { window } = new JSDOM();
 globalThis.document = window.document;
@@ -34,12 +33,12 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
     ): Promise<vscode.NotebookData> {
         const contentStr = this._textDecoder.decode(content);
         let retVal;
-        if (isObservableNotebook(contentStr)) {
+        if (isObservableJSNotebook(contentStr)) {
+            retVal = await this.deserializeJSToObservableKit(contentStr);
+            retVal.metadata.type = "javascript";
+        } else {
             retVal = await this.deserializeObservableKitNotebook(contentStr);
             retVal.metadata.type = "html";
-        } else {
-            retVal = await this.deserializeJSToObservableKit(contentStr);
-            retVal.metadata.type = "definition.js";
         }
         return retVal;
     }
@@ -53,7 +52,7 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
                 const htmlContent = this.serializeToObservableKitFormat(data);
                 return this._textEncoder.encode(htmlContent);
             }
-            case "definition.js": {
+            case "javascript": {
                 const jsContent = this.serializeToObservableKitJS(data);
                 return this._textEncoder.encode(jsContent);
             }
@@ -81,20 +80,12 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
                 language
             );
 
-            const metadata: Cell = { ...cell };
-            if (metadata.pinned === undefined || metadata.pinned === null) {
-                metadata.pinned = false;
-            }
-            if (metadata.hidden === undefined || metadata.hidden === null) {
-                metadata.hidden = false;
-            }
-            cellData.metadata = metadata;
+            cellData.metadata = cell;
             cells.push(cellData);
         }
 
         const notebookData = new vscode.NotebookData(cells);
         notebookData.metadata = notebook;
-
         return notebookData;
     }
 
@@ -188,22 +179,10 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
                 vscode.NotebookCellKind.Markup :
                 vscode.NotebookCellKind.Code, node.value, mode);
 
-            const metadata = {
-                id: node.id,
-                value: node.value,
-                mode: node.mode as any,
-                pinned: false,
-                hidden: false
-            };
-
-            cellData.metadata = metadata;
             cells.push(cellData);
         });
 
         const notebookData = new vscode.NotebookData(cells);
-        notebookData.metadata = notebook;
-        notebookData.metadata.ojs = true;
-
         return notebookData;
     }
 
