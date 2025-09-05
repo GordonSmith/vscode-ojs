@@ -57,6 +57,8 @@ jobs:
         run: |
           npm ci
           npm run package
+          cp observable-js.vsix gordonsmith.observable-js.vsix
+          gh release upload ${TAG_NAME} gordonsmith.observable-js.vsix 
           mv observable-js.vsix ${TAG_NAME}.vsix
           gh release upload ${TAG_NAME} ${TAG_NAME}.vsix
           npx vsce publish --packagePath ${TAG_NAME}.vsix
