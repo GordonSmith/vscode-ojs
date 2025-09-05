@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.51](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.50...observable-js-v0.4.51) (2025-09-05)
+
+
+### Bug Fixes
+
+* reworked cell rendering logic ([0abbaa1](https://github.com/GordonSmith/vscode-ojs/commit/0abbaa181c74f66791a2c0a6965c0af31497c14e))
+
 ## [0.4.50](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.49...observable-js-v0.4.50) (2025-09-05)
 
 
