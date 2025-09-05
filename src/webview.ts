@@ -4,8 +4,6 @@ import { Inspector } from "@observablehq/inspector";
 import { compile, omd2notebook, ojs2notebook } from "@hpcc-js/observablehq-compiler";
 import { hashSum, scopedLogger } from "@hpcc-js/util";
 
-import "@hpcc-js/observablehq-compiler/src/index.css";
-
 const logger = scopedLogger("src/webview.ts");
 
 export interface Message {

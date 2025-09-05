@@ -3,6 +3,7 @@ import js from "@eslint/js";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
+import unusedImports from "eslint-plugin-unused-imports";
 
 export default [
     // Ignore generated sources
@@ -26,7 +27,8 @@ export default [
     {
         files: ["**/*.{js,ts,tsx}"],
         plugins: {
-            "react-hooks": reactHooks
+            "react-hooks": reactHooks,
+            "unused-imports": unusedImports
         },
         languageOptions: {
             ecmaVersion: "latest",
@@ -58,6 +60,8 @@ export default [
             "no-unexpected-multiline": "off",
             "no-extra-boolean-cast": "off",
             "no-self-assign": "off",
+            // Flag unused imports
+            "unused-imports/no-unused-imports": "error",
 
             "no-multiple-empty-lines": ["error", { max: 1 }],
             "no-console": [1, { allow: ["info", "warn", "error"] }],

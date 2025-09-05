@@ -1,6 +1,6 @@
 import type { ohq } from "@hpcc-js/observablehq-compiler";
 
-import { NotebookSerializer, CancellationToken, NotebookData, NotebookCellData, NotebookCellKind, NotebookCell, Uri, NotebookCellOutput, NotebookCellOutputItem, NotebookRange, NotebookDocument } from "vscode";
+import { NotebookSerializer, CancellationToken, NotebookData, NotebookCellData, NotebookCellKind, NotebookCell, Uri, NotebookCellOutput, NotebookCellOutputItem, NotebookDocument } from "vscode";
 import { v4 as uuidv4 } from "uuid";
 import { TextDecoder, TextEncoder } from "util";
 import { OJSCell, OJSOutput, WUOutput } from "./ojsOutput";

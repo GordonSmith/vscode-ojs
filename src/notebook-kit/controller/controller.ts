@@ -4,15 +4,17 @@ import { OBSERVABLE_KIT_MIME, vscode2observable, NotebookCell } from "../common/
 import path from "node:path";
 
 export class NotebookKitController {
-    readonly controllerId = "observable-kit-kernel";
-    readonly notebookType = "notebook-kit";
+    readonly controllerId: string;
+    readonly notebookType: string;
     readonly label = "ObservableHQ Notebook";
     readonly supportedLanguages = Object.keys(vscode2observable);
 
     private readonly _controller: vscode.NotebookController;
     private _executionOrder = 0;
 
-    constructor() {
+    constructor(notebookType: string) {
+        this.controllerId = `${notebookType}-kernel`;
+        this.notebookType = notebookType;
         this._controller = vscode.notebooks.createNotebookController(
             this.controllerId,
             this.notebookType,

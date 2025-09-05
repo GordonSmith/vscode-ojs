@@ -1,6 +1,5 @@
-import { omd2notebook, ojs2notebook, ohq } from "@hpcc-js/observablehq-compiler";
-import { hashSum } from "@hpcc-js/util";
 import * as vscode from "vscode";
+import { omd2notebook, ojs2notebook, ohq } from "@hpcc-js/observablehq-compiler";
 import type { Value } from "../webview";
 import { diagnostic } from "./diagnostic";
 

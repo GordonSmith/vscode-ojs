@@ -77,63 +77,73 @@
             "id": 0,
             "name": "",
             "value": "# Sample Cell Types ",
-            "mode": "md"
+            "mode": "md",
+            "outputs": []
         },
         {
             "id": 1,
             "name": "",
-            "value": "a = 42;\r\n",
-            "mode": "js"
+            "value": "const a = 42;\r\n",
+            "mode": "javascript",
+            "outputs": []
         },
         {
             "id": 2,
             "name": "",
             "value": "b = 2",
-            "mode": "js"
+            "mode": "js",
+            "outputs": []
         },
         {
             "id": 3,
             "name": "",
             "value": "mol = a + b",
-            "mode": "js"
+            "mode": "js",
+            "outputs": []
         },
         {
             "id": 4,
             "name": "",
             "value": "# Markdown with Observable ${mol}",
-            "mode": "omd"
+            "mode": "omd",
+            "outputs": []
         },
         {
             "id": 5,
             "name": "",
             "value": "<h1>Hello ${mol}</h1>",
-            "mode": "html"
+            "mode": "html",
+            "outputs": []
         },
         {
             "id": 6,
             "name": "",
             "value": "<svg height=\"100\" width=\"100\">\r\n  <circle cx=\"50\" cy=\"50\" r=${mol} stroke=\"black\" stroke-width=\"3\" fill=\"red\" />\r\n</svg> ",
-            "mode": "svg"
+            "mode": "svg",
+            "outputs": []
         },
         {
             "id": 7,
             "name": "",
             "value": "f(x) = \\int_{-\\infty}^\\infty\r\n    ${mol}\\hat f(\\xi)\\,e^{2 \\pi i \\xi x}\r\n    \\,d\\xi",
-            "mode": "tex"
+            "mode": "tex",
+            "outputs": []
         },
         {
             "id": 8,
             "name": "",
             "value": "gantt\r\ndateFormat YYYY-MM-DD\r\ntitle Adding GANTT diagram to mermaid\r\nexcludes weekdays 2014-01-10\r\n\r\nsection A section\r\nCompleted task :done, des1, 2014-01-06,2014-01-08\r\nActive task :active, des2, 2014-01-09, 3d\r\nFuture task : des3, after des2, 5d\r\nFuture task2 ${mol}: des4, after des3, 5d\r\n",
-            "mode": "mermaid"
+            "mode": "mermaid",
+            "outputs": []
         },
         {
             "id": 9,
+            "name": "",
             "value": "digraph G {\r\n  subgraph cluster_0 {\r\n    style=filled;\r\n    color=lightgrey;\r\n    node [style=filled,color=white];\r\n    a0 -> a1 -> a2 -> a3;\r\n    label = \"process #1\";\r\n  }\r\n  subgraph cluster_1 {\r\n    node [style=filled];\r\n    b0 -> b1 -> b2 -> b3;\r\n    label = \"process #2\";\r\n    color=blue\r\n  }\r\n  start -> a0;\r\n  start -> b0;\r\n  a1 -> b3;\r\n  b2 -> a3;\r\n  a3 -> a0;\r\n  a3 -> end;\r\n  b3 -> end;\r\n  start [shape=Mdiamond];\r\n  end [shape=Msquare];\r\n}\r\n",
             "pinned": true,
             "mode": "dot",
             "data": null,
-            "name": ""
+            "outputs": []
         }
     ],
     "resolutions": []
