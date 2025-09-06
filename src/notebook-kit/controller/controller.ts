@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { type Notebook, type Cell, resetCellIDs, toCell } from "../compiler";
+import { type Notebook, type Cell, toCell } from "../compiler";
 import { OBSERVABLE_KIT_MIME, vscode2observable, NotebookCell } from "../common/types";
 
 export class NotebookKitController {
@@ -65,6 +65,7 @@ export class NotebookKitController {
     // Need unique cell IDs for copy+paste cells
     private _tmpID = 500000;
     private async executeCellContent(cell: vscode.NotebookCell, notebook: vscode.NotebookDocument): Promise<vscode.NotebookCellOutput | undefined> {
+        // const stuff = await fetch("https://api.observablehq.com/search?query=3d+plot&sort=relevance&direction=desc&page=1").then(response => response.json());
         const cellText = cell.document.getText();
         const outputData: NotebookCell = {
             notebook: notebook.metadata as Notebook,

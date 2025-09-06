@@ -68,21 +68,21 @@ export const activate: ActivationFunction = context => {
             const nbCell: NotebookCell = outputItem.json();
             for (const cell of nbCell.notebook.cells) {
                 if (cell.id !== nbCell.cell.id && !runtime.has(`cell_${cell.id}`)) {
-                    await renderCell({
+                    renderCell({
                         ...cell,
                         hidden: false,
                         pinned: false,
                     });
                 }
             }
-            await renderCell({ ...nbCell.cell, hidden: false, pinned: false }, nbCell.cellText, element as HTMLDivElement);
+            renderCell({ ...nbCell.cell, hidden: false, pinned: false }, nbCell.cellText, element as HTMLDivElement);
         },
 
-        async disposeOutputItem(id?: string) {
+        disposeOutputItem(id?: string) {
             if (id) {
-                await runtime.remove(id);
+                runtime.remove(id);
             } else {
-                await runtime.removeAll();
+                runtime.removeAll();
             }
         }
     };
