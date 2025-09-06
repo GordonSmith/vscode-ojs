@@ -3,7 +3,7 @@ import { JSDOM } from "jsdom";
 import { v4 as uuidv4 } from "uuid";
 import { TextDecoder, TextEncoder } from "util";
 import type { ohq } from "@hpcc-js/observablehq-compiler";
-import { type Notebook, type Cell, html2notebook, notebook2html, notebook2js, js2notebook } from "../compiler";
+import { type Notebook, type Cell, html2notebook, notebook2html, notebook2js, js2notebook, resetCellIDs } from "../compiler";
 import { observable2vscode, vscode2observable } from "../common/types";
 import { isObservableJSNotebook } from "../common/notebook-detector";
 
@@ -27,33 +27,27 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
         return serializer;
     }
 
-    async deserializeNotebook(
-        content: Uint8Array,
-        token: vscode.CancellationToken
-    ): Promise<vscode.NotebookData> {
+    async deserializeNotebook(content: Uint8Array, token: vscode.CancellationToken): Promise<vscode.NotebookData> {
         const contentStr = this._textDecoder.decode(content);
         let retVal;
         if (isObservableJSNotebook(contentStr)) {
-            retVal = await this.deserializeJSToObservableKit(contentStr);
+            retVal = await this.deserializeJSToNotebookData(contentStr);
             retVal.metadata.type = "javascript";
         } else {
-            retVal = await this.deserializeObservableKitNotebook(contentStr);
+            retVal = await this.deserializeHTMLToNotebookData(contentStr);
             retVal.metadata.type = "html";
         }
         return retVal;
     }
 
-    async serializeNotebook(
-        data: vscode.NotebookData,
-        token: vscode.CancellationToken
-    ): Promise<Uint8Array> {
+    async serializeNotebook(data: vscode.NotebookData, token: vscode.CancellationToken): Promise<Uint8Array> {
         switch (data.metadata?.type) {
             case "html": {
-                const htmlContent = this.serializeToObservableKitFormat(data);
+                const htmlContent = this.serializeToHTML(data);
                 return this._textEncoder.encode(htmlContent);
             }
             case "javascript": {
-                const jsContent = this.serializeToObservableKitJS(data);
+                const jsContent = this.serializeToJS(data);
                 return this._textEncoder.encode(jsContent);
             }
             default: {
@@ -65,6 +59,7 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
     }
 
     private notebook2notebookData(notebook: Notebook): vscode.NotebookData {
+        resetCellIDs(notebook);
         const cells: vscode.NotebookCellData[] = [];
 
         for (const cell of notebook.cells) {
@@ -89,12 +84,12 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
         return notebookData;
     }
 
-    private deserializeObservableKitNotebook(content: string): vscode.NotebookData {
+    private deserializeHTMLToNotebookData(content: string): vscode.NotebookData {
         const notebook: Notebook = html2notebook(content);
         return this.notebook2notebookData(notebook);
     }
 
-    private async deserializeJSToObservableKit(content: string): Promise<vscode.NotebookData> {
+    private async deserializeJSToNotebookData(content: string): Promise<vscode.NotebookData> {
         const notebook = await js2notebook(content);
         return this.notebook2notebookData(notebook);
     }
@@ -127,13 +122,15 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
         return notebook;
     }
 
-    private serializeToObservableKitFormat(data: vscode.NotebookData): string {
+    private serializeToHTML(data: vscode.NotebookData): string {
         const notebook = this.notebookData2notebook(data);
+        resetCellIDs(notebook);
         return notebook2html(notebook);
     }
 
-    private serializeToObservableKitJS(data: vscode.NotebookData): string {
+    private serializeToJS(data: vscode.NotebookData): string {
         const notebook = this.notebookData2notebook(data);
+        resetCellIDs(notebook);
         return notebook2js(notebook);
     }
 

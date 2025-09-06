@@ -9,7 +9,9 @@ export const vscode2observable: Record<string, Cell["mode"]> = {
     "html": "html",
     "tex": "tex",
     "sql": "sql",
-    "dot": "dot"
+    "dot": "dot",
+    "node": "node",
+    "python": "python"
 };
 
 export const observable2vscode: Record<Cell["mode"], string> = {
@@ -19,7 +21,9 @@ export const observable2vscode: Record<Cell["mode"], string> = {
     "html": "html",
     "tex": "tex",
     "sql": "sql",
-    "dot": "dot"
+    "dot": "dot",
+    "node": "node",
+    "python": "python"
 };
 
 export interface NotebookCell {

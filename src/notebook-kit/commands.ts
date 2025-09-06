@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { NOTEBOOK_THEMES } from "./common/types";
 import { isObservableNotebook, isObservableHTMLNotebook } from "./common/notebook-detector";
-import { html2notebook, type Notebook, notebook2js } from "./compiler";
+import { DECL, html2notebook, type Notebook, notebook2js } from "./compiler";
 import { isNotebookKitType } from "./common/notebook-detector";
 
 export class Commands {
@@ -113,22 +113,24 @@ export class Commands {
                 return;
             }
 
-            const path = targetUri.path.toLowerCase().endsWith(".observable.html") ? targetUri.path.slice(0, -5) + ".js" :
+            const jsPath = targetUri.path.toLowerCase().endsWith(".observable.html") ? targetUri.path.slice(0, -5) + ".js" :
                 targetUri.path.toLowerCase().endsWith(".html") ? targetUri.path.slice(0, -5) + ".observable.js" :
                     undefined;
-            if (!path) return;
+            if (!jsPath) return;
 
-            const defaultJsUri = targetUri.with({ path });
+            const jsUri = targetUri.with({ path: jsPath });
             const saveUri = await vscode.window.showSaveDialog({
-                defaultUri: defaultJsUri,
+                defaultUri: jsUri,
                 saveLabel: "Export to JS"
             });
             if (!saveUri) return;
 
-            // Also offer to export compiled definitions as a JS module
             try {
                 const compiledJs = notebook2js(notebook);
                 await vscode.workspace.fs.writeFile(saveUri, new TextEncoder().encode(compiledJs));
+                const declPath = jsPath.replace(/\.observable\.js$/, ".observable.d.ts");
+                const declUri = jsUri.with({ path: declPath });
+                await vscode.workspace.fs.writeFile(declUri, new TextEncoder().encode(DECL));
             } catch (err) {
                 // If compilation fails, surface an info message but still succeed in main export
                 vscode.window.showWarningMessage("Export failed: " + err);

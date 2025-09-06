@@ -3,19 +3,22 @@ import { type Notebook, type Cell, transpile } from "@observablehq/notebook-kit"
 import { type Definition } from "@observablehq/notebook-kit/runtime";
 import { constructFunction } from "./util";
 
+export { Notebook, Cell };
+
 export interface CompileKitOptions {
     inline?: boolean;
+    resolveLocalImports?: boolean;
 }
 
-export function compileCell(cell: Cell, options: CompileKitOptions = { inline: true }): Definition[] {
+export function compileCell(cell: Cell, { inline = true, resolveLocalImports = false }: CompileKitOptions = {}): Definition[] {
     const retVal: Definition[] = [];
     const sourceIDOffset = 1000000;
     try {
-        const compiled = transpile(cell);
+        const compiled = transpile(cell, { resolveLocalImports });
         retVal.push({
             id: cell.id,
             ...compiled,
-            body: options.inline ? constructFunction(compiled.body, `cell_${cell.id}`) : compiled.body,
+            body: inline ? constructFunction(compiled.body, `cell_${cell.id}`) : compiled.body,
         });
         if (cell.pinned) {
             const compiled = transpile({
@@ -29,7 +32,7 @@ ${cell.value}
             retVal.push({
                 id: sourceIDOffset + cell.id,
                 ...compiled,
-                body: options.inline ? constructFunction(compiled.body, `cell_source_${sourceIDOffset + cell.id}`) : compiled.body,
+                body: inline ? constructFunction(compiled.body, `cell_source_${sourceIDOffset + cell.id}`) : compiled.body,
             });
         }
     } catch (error) {
@@ -38,10 +41,10 @@ ${cell.value}
     return retVal;
 }
 
-export function compileNotebook(notebook: Notebook, options: CompileKitOptions = { inline: true }): Definition[] {
+export function compileNotebook(notebook: Notebook, { inline = true, resolveLocalImports = false }: CompileKitOptions = {}): Definition[] {
     const retVal: Definition[] = [];
     for (const cell of notebook.cells) {
-        const cellDefs = compileCell(cell, options);
+        const cellDefs = compileCell(cell, { inline, resolveLocalImports });
         retVal.push(...cellDefs);
     }
     return retVal;

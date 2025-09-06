@@ -49,15 +49,17 @@ class NotebookRuntimeEx {
 
 const runtime = new NotebookRuntimeEx();
 
-function renderCell(cell: Cell, cellSource: string = cell.value, hostElement: HTMLElement = document.body) {
+async function renderCell(cell: Cell, cellSource: string = cell.value, hostElement: HTMLElement = document.body) {
     const definitions = compileCell({
         ...cell,
         value: cellSource
-    });
-    definitions.forEach(async (def) => {
+    }, { resolveLocalImports: true });
+    await Promise.all(definitions.map(async (def) => {
         const observableDiv = await runtime.add(`cell_${def.id}`, def);
-        hostElement?.appendChild(observableDiv);
-    });
+        if (observableDiv.parentElement !== hostElement) {
+            hostElement.appendChild(observableDiv);
+        }
+    }));
 }
 
 export const activate: ActivationFunction = context => {
