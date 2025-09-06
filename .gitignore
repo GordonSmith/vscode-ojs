@@ -3,6 +3,8 @@
 /lib*
 /node_modules
 /types
+/samples/d3/data/*
+/samples/plot/data/*
 .vscode-test
 *.vsix
 *.log
