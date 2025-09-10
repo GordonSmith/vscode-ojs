@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.53](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.52...observable-js-v0.4.53) (2025-09-10)
+
+
+### Bug Fixes
+
+* Bump versions (security) ([7340656](https://github.com/GordonSmith/vscode-ojs/commit/734065601d13cc1b67d73433b51c09b21a29c38a))
+
 ## [0.4.52](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.51...observable-js-v0.4.52) (2025-09-06)
 
 
