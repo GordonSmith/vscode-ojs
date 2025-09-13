@@ -43,6 +43,20 @@
 			],
 		},
 		{
+			"name": "Launch Client Refs NotebookKit:",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"debugWebviews": true,
+			"args": [
+				"--extensionDevelopmentPath=${workspaceRoot}",
+				"${workspaceRoot}/refs/notebook-kit/docs"
+			],
+			"outFiles": [
+				"${workspaceFolder}/dist/**/*.js"
+			],
+		},
+		{
 			"name": "Launch Client with extensions",
 			"type": "extensionHost",
 			"request": "launch",

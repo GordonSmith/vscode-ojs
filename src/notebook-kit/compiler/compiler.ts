@@ -8,9 +8,10 @@ export { Notebook, Cell };
 export interface CompileKitOptions {
     inline?: boolean;
     resolveLocalImports?: boolean;
+    includePinned?: boolean;
 }
 
-export function compileCell(cell: Cell, { inline = true, resolveLocalImports = false }: CompileKitOptions = {}): Definition[] {
+export function compileCell(cell: Cell, { inline = true, resolveLocalImports = false, includePinned = true }: CompileKitOptions = {}): Definition[] {
     const retVal: Definition[] = [];
     const sourceIDOffset = 1000000;
     try {
@@ -20,7 +21,7 @@ export function compileCell(cell: Cell, { inline = true, resolveLocalImports = f
             ...compiled,
             body: inline ? constructFunction(compiled.body, `cell_${cell.id}`) : compiled.body,
         });
-        if (cell.pinned) {
+        if (includePinned && cell.pinned) {
             const compiled = transpile({
                 ...cell,
                 mode: "md",
@@ -32,7 +33,7 @@ ${cell.value}
             retVal.push({
                 id: sourceIDOffset + cell.id,
                 ...compiled,
-                body: inline ? constructFunction(compiled.body, `cell_source_${sourceIDOffset + cell.id}`) : compiled.body,
+                body: inline ? constructFunction(compiled.body, `cell_${sourceIDOffset + cell.id}`) : compiled.body,
             });
         }
     } catch (error) {

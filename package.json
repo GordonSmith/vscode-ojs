@@ -352,13 +352,25 @@
         "command": "observable-kit.cell.hide",
         "title": "Hide Cell",
         "description": "Hide this cell's output in the notebook",
-        "icon": "$(eye-closed)"
+        "icon": "$(eye)"
       },
       {
         "command": "observable-kit.cell.show",
         "title": "Show Cell",
         "description": "Show this cell's output in the notebook",
-        "icon": "$(eye)"
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "observable-kit.cell.setNodeMode",
+        "title": "Run in Node.js",
+        "description": "Set this JavaScript cell to run in Node.js mode",
+        "icon": "$(globe)"
+      },
+      {
+        "command": "observable-kit.cell.setJsMode",
+        "title": "Run in Browser JS",
+        "description": "Set this cell to run in browser JavaScript mode",
+        "icon": "$(terminal)"
       }
     ],
     "menus": {
@@ -497,6 +509,16 @@
           "command": "observable-kit.cell.show",
           "when": "(notebookType == notebook-kit-default || notebookType == notebook-kit-option) && observable-kit.currentCellHidden",
           "group": "inline@101"
+        },
+        {
+          "command": "observable-kit.cell.setNodeMode",
+          "when": "(notebookType == notebook-kit-default || notebookType == notebook-kit-option) && cellLangId == javascript && observable-kit.cellMode != node",
+          "group": "inline@102"
+        },
+        {
+          "command": "observable-kit.cell.setJsMode",
+          "when": "(notebookType == notebook-kit-default || notebookType == notebook-kit-option) && cellLangId == javascript && observable-kit.cellMode == node",
+          "group": "inline@102"
         }
       ],
       "notebook/toolbar": [

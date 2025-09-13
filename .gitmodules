@@ -1,0 +1,3 @@
+[submodule "refs/notebook-kit"]
+	path = refs/notebook-kit
+	url = https://github.com/observablehq/notebook-kit.git

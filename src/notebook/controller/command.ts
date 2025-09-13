@@ -18,6 +18,7 @@ export class Commands {
         ctx.subscriptions.push(vscode.window.onDidChangeNotebookEditorSelection(e => {
             const cell = e.notebookEditor.notebook.cellAt(e.selections[0]?.start);
             vscode.commands.executeCommand("setContext", "cellLangId", cell.document.languageId);
+            vscode.commands.executeCommand("setContext", "cellMode", cell.metadata.mode);
         }));
 
         // status bar provider
