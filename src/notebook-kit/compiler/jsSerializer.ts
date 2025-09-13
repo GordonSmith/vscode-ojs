@@ -31,7 +31,7 @@ const SUPPORTED_TAGS: ReadonlyArray<Cell["mode"]> = [
 ] as const;
 
 export function notebook2js(notebook: Notebook): string {
-    const compiled = compileNotebook(notebook);
+    const compiled = compileNotebook(notebook, { includePinned: false });
 
     const funcs: string[] = [];
     const defs: string[] = [];

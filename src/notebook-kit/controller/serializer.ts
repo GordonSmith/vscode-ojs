@@ -67,7 +67,10 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
                 ? vscode.NotebookCellKind.Markup
                 : vscode.NotebookCellKind.Code;
 
-            const language = observable2vscode[cell.mode] || "javascript";
+            let language = observable2vscode[cell.mode] || "javascript";
+            if (language === "node") {
+                language = "javascript";
+            }
 
             const cellData = new vscode.NotebookCellData(
                 cellKind,
@@ -100,7 +103,10 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
 
         for (const cell of data.cells) {
             const cellId = cell.metadata?.id ? parseInt(cell.metadata.id) : cellIdCounter++;
-            const mode = vscode2observable[cell.languageId] || "js";
+            let mode = vscode2observable[cell.languageId] || "js";
+            if (mode === "js" && cell.metadata.mode === "node") {
+                mode = "node";
+            }
             const pinned = cell.metadata?.pinned ?? false;
             const hidden = cell.metadata?.hidden ?? false;
 

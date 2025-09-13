@@ -29,6 +29,8 @@ export class Commands {
             vscode.commands.registerCommand("observable-kit.cell.unpin", Commands.unpinCell),
             vscode.commands.registerCommand("observable-kit.cell.hide", Commands.hideCell),
             vscode.commands.registerCommand("observable-kit.cell.show", Commands.showCell),
+            vscode.commands.registerCommand("observable-kit.cell.setNodeMode", Commands.setNodeMode),
+            vscode.commands.registerCommand("observable-kit.cell.setJsMode", Commands.setJsMode),
         );
 
         // Status bar item to show current notebook title (toolbar command text cannot be dynamic)
@@ -289,6 +291,7 @@ export class Commands {
             const isHidden: boolean = cell.metadata?.hidden === true;
             vscode.commands.executeCommand("setContext", "observable-kit.currentCellPinned", isPinned);
             vscode.commands.executeCommand("setContext", "observable-kit.currentCellHidden", isHidden);
+            vscode.commands.executeCommand("setContext", "observable-kit.cellMode", cell.metadata?.mode);
             Commands.setNotebookReadOnlyContext(editor.notebook.metadata?.readOnly === true);
         }
     }
@@ -628,9 +631,7 @@ export class Commands {
     }
 
     static async pinCell(cell: vscode.NotebookCell): Promise<void> {
-        if (!cell) {
-            return;
-        }
+        if (!cell) return;
 
         const edit = new vscode.WorkspaceEdit();
         const newMetadata = { ...cell.metadata, pinned: true };
@@ -638,14 +639,12 @@ export class Commands {
             vscode.NotebookEdit.updateCellMetadata(cell.index, newMetadata)
         ]);
 
-        await vscode.workspace.applyEdit(edit);
         await vscode.commands.executeCommand("setContext", "observable-kit.currentCellPinned", true);
+        await vscode.workspace.applyEdit(edit);
     }
 
     static async unpinCell(cell: vscode.NotebookCell): Promise<void> {
-        if (!cell) {
-            return;
-        }
+        if (!cell) return;
 
         const edit = new vscode.WorkspaceEdit();
         const newMetadata = { ...cell.metadata, pinned: false };
@@ -653,14 +652,12 @@ export class Commands {
             vscode.NotebookEdit.updateCellMetadata(cell.index, newMetadata)
         ]);
 
-        await vscode.workspace.applyEdit(edit);
         await vscode.commands.executeCommand("setContext", "observable-kit.currentCellPinned", false);
+        await vscode.workspace.applyEdit(edit);
     }
 
     static async hideCell(cell: vscode.NotebookCell): Promise<void> {
-        if (!cell) {
-            return;
-        }
+        if (!cell) return;
 
         const edit = new vscode.WorkspaceEdit();
         const newMetadata = { ...cell.metadata, hidden: true };
@@ -668,14 +665,12 @@ export class Commands {
             vscode.NotebookEdit.updateCellMetadata(cell.index, newMetadata)
         ]);
 
-        await vscode.workspace.applyEdit(edit);
         await vscode.commands.executeCommand("setContext", "observable-kit.currentCellHidden", true);
+        await vscode.workspace.applyEdit(edit);
     }
 
     static async showCell(cell: vscode.NotebookCell): Promise<void> {
-        if (!cell) {
-            return;
-        }
+        if (!cell) return;
 
         const edit = new vscode.WorkspaceEdit();
         const newMetadata = { ...cell.metadata, hidden: false };
@@ -683,8 +678,32 @@ export class Commands {
             vscode.NotebookEdit.updateCellMetadata(cell.index, newMetadata)
         ]);
 
-        await vscode.workspace.applyEdit(edit);
         await vscode.commands.executeCommand("setContext", "observable-kit.currentCellHidden", false);
+        await vscode.workspace.applyEdit(edit);
+    }
+
+    static async setNodeMode(cell: vscode.NotebookCell): Promise<void> {
+        if (!cell) return;
+
+        const edit = new vscode.WorkspaceEdit();
+        const newMetadata = { ...cell.metadata, mode: "node" };
+        edit.set(cell.notebook.uri, [
+            vscode.NotebookEdit.updateCellMetadata(cell.index, newMetadata)
+        ]);
+        await vscode.commands.executeCommand("setContext", "observable-kit.cellMode", "node");
+        await vscode.workspace.applyEdit(edit);
+    }
+
+    static async setJsMode(cell: vscode.NotebookCell): Promise<void> {
+        if (!cell) return;
+
+        const edit = new vscode.WorkspaceEdit();
+        const newMetadata = { ...cell.metadata, mode: "js" };
+        edit.set(cell.notebook.uri, [
+            vscode.NotebookEdit.updateCellMetadata(cell.index, newMetadata)
+        ]);
+        await vscode.commands.executeCommand("setContext", "observable-kit.cellMode", "js");
+        await vscode.workspace.applyEdit(edit);
     }
 }
 
