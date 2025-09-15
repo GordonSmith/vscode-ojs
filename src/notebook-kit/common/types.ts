@@ -11,7 +11,8 @@ export const vscode2observable: Record<string, Cell["mode"]> = {
     "sql": "sql",
     "dot": "dot",
     "node": "node",
-    "python": "python"
+    "python": "python",
+    "typescript": "ts"
 };
 
 export const observable2vscode: Record<Cell["mode"], string> = {
@@ -23,7 +24,8 @@ export const observable2vscode: Record<Cell["mode"], string> = {
     "sql": "sql",
     "dot": "dot",
     "node": "node",
-    "python": "python"
+    "python": "python",
+    "ts": "typescript"
 };
 
 export interface NotebookCell {

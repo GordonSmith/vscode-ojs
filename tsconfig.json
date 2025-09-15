@@ -28,6 +28,6 @@
     },
     "include": [
         "src/extension.ts",
-        "src/notebook-kit/renderers/observable-kit-renderer.ts"
+        "src/notebook-kit/renderers/renderer.ts"
     ]
 }

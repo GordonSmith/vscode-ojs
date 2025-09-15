@@ -1,6 +1,12 @@
 import * as vscode from "vscode";
+import { createWriteStream, existsSync } from "node:fs";
+import { mkdir, readFile } from "node:fs/promises";
+import { dirname, relative } from "node:path";
+import { getInterpreterCachePath, getInterpreterCommand } from "../../../refs/notebook-kit/src/interpreters";
+import { getInterpreterMethod, isInterpreter } from "../../../refs/notebook-kit/src/lib/interpreters";
 import { type Notebook, type Cell, toCell } from "../compiler";
 import { OBSERVABLE_KIT_MIME, vscode2observable, NotebookCell } from "../common/types";
+import { spawn } from "node:child_process";
 
 export class NotebookKitController {
     readonly controllerId: string;
@@ -72,6 +78,28 @@ export class NotebookKitController {
             cell: toCell({ id: this._tmpID++, ...cell.metadata as Cell }),
             cellText: cellText
         };
+        outputData.cell.mode = vscode2observable[cell.document.languageId];
+        if (isInterpreter(cell.metadata.mode)) {
+            const sourcePath = notebook.uri.fsPath;
+            const sourceDir = dirname(sourcePath);
+            const cachePath = await getInterpreterCachePath(sourcePath, cell.metadata.mode, cell.metadata.format, cellText);
+            if (!existsSync(cachePath)) {
+                await mkdir(dirname(cachePath), { recursive: true });
+                const [command, args] = getInterpreterCommand(cell.metadata.mode);
+                const child = spawn(command, args, { cwd: sourceDir });
+                child.stdin.end(cellText);
+                child.stderr.pipe(process.stderr);
+                child.stdout.pipe(createWriteStream(cachePath));
+                await new Promise((resolve, reject) => {
+                    child.on("error", reject);
+                    child.on("exit", resolve); // TODO check exit code
+                });
+            }
+            outputData.cell.mode = "js";
+            outputData.cellText = `FileAttachment(${JSON.stringify(relative(sourceDir, cachePath))})${getInterpreterMethod(outputData.cell.format)}`;
+            outputData.cell.value = outputData.cellText;
+        }
+
         return new vscode.NotebookCellOutput([
             vscode.NotebookCellOutputItem.json(outputData, OBSERVABLE_KIT_MIME)
         ]);

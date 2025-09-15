@@ -11,7 +11,7 @@ import "@observablehq/notebook-kit/index.css";
 import "@observablehq/notebook-kit/syntax-dark.css";
 import "@observablehq/notebook-kit/abstract-dark.css";
 import "@observablehq/notebook-kit/theme-slate.css";
-import "./observable-kit-renderer.css";
+import "./renderer.css";
 
 class NotebookRuntimeEx {
 
@@ -23,6 +23,15 @@ class NotebookRuntimeEx {
 
     has(id: string) {
         return this.vscodeCell2Cell.has(id);
+    }
+
+    empty(): boolean {
+        return this.vscodeCell2Cell.size === 0;
+    }
+
+    reset() {
+        this.vscodeCell2Cell.clear();
+        this.runtime = new NotebookRuntime();
     }
 
     async add(id: string, definition: Definition) {
@@ -81,6 +90,9 @@ export const activate: ActivationFunction = context => {
         disposeOutputItem(id?: string) {
             if (id) {
                 runtime.remove(id);
+                if (runtime.empty()) {
+                    runtime.reset();
+                }
             } else {
                 runtime.removeAll();
             }

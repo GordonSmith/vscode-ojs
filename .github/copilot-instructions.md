@@ -22,7 +22,7 @@ This repo is a VS Code extension that brings Observable notebooks and Observable
 
 - Bundling is driven by `esbuild.mjs` and targets:
   - Node: `src/extension.ts` → `dist/extension.js` (cjs)
-  - Browser: `src/notebook/renderers/ojsRenderer.ts` (esm), `src/notebook-kit/renderers/observable-kit-renderer.ts` (esm), and `src/webview.ts` (iife)
+  - Browser: `src/notebook/renderers/ojsRenderer.ts` (esm), `src/notebook-kit/renderers/renderer.ts` (esm), and `src/webview.ts` (iife)
 - Type generation:
   - Node types: `npm run gen-node-types` (tsconfig.json; declarationOnly)
   - Webview types: `npm run gen-webview-types` (tsconfig.webview.json; declarationOnly)
