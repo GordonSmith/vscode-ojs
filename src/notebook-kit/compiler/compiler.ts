@@ -5,13 +5,13 @@ import { constructFunction } from "./util";
 
 export { Notebook, Cell };
 
-export interface CompileKitOptions {
+export interface CompileCellOptions {
     inline?: boolean;
     resolveLocalImports?: boolean;
     includePinned?: boolean;
 }
 
-export function compileCell(cell: Cell, { inline = true, resolveLocalImports = false, includePinned = true }: CompileKitOptions = {}): Definition[] {
+export function compileCell(cell: Cell, { inline = true, resolveLocalImports = false, includePinned = true }: CompileCellOptions = {}): Definition[] {
     const retVal: Definition[] = [];
     const sourceIDOffset = 1000000;
     try {
@@ -42,10 +42,10 @@ ${cell.value}
     return retVal;
 }
 
-export function compileNotebook(notebook: Notebook, { inline = true, resolveLocalImports = false }: CompileKitOptions = {}): Definition[] {
+export function compileNotebook(notebook: Notebook, { inline = true, resolveLocalImports = false, includePinned = true }: CompileCellOptions = {}): Definition[] {
     const retVal: Definition[] = [];
     for (const cell of notebook.cells) {
-        const cellDefs = compileCell(cell, { inline, resolveLocalImports });
+        const cellDefs = compileCell(cell, { inline, resolveLocalImports, includePinned });
         retVal.push(...cellDefs);
     }
     return retVal;

@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { createWriteStream, existsSync } from "node:fs";
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import { dirname, relative } from "node:path";
 import { getInterpreterCachePath, getInterpreterCommand } from "../../../refs/notebook-kit/src/interpreters";
 import { getInterpreterMethod, isInterpreter } from "../../../refs/notebook-kit/src/lib/interpreters";
