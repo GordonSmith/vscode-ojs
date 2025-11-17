@@ -4,6 +4,7 @@ import { activate as notebookActivate } from "./notebook/index";
 import { activate as notebookKitActivate } from "./notebook-kit/index";
 import { activate as telemetryActivate, deactivate as telemetryDeactivate, reporter } from "./telemetry/index";
 import { runTests } from "./notebook-kit/renderers/test";
+import { toolsActivate } from "./ai/index";
 
 export function activate(context: vscode.ExtensionContext): void {
     performance.mark("extension-start");
@@ -12,6 +13,7 @@ export function activate(context: vscode.ExtensionContext): void {
     ojsActivate(context);
     notebookActivate(context);
     notebookKitActivate(context);
+    toolsActivate(context);
 
     reporter.sendTelemetryEvent("initialized");
 

@@ -20,9 +20,22 @@
 			"runtimeExecutable": "${execPath}",
 			"debugWebviews": true,
 			"args": [
-				"--disable-extensions",
 				"--extensionDevelopmentPath=${workspaceRoot}",
 				"${workspaceRoot}/samples"
+			],
+			"outFiles": [
+				"${workspaceFolder}/dist/**/*.js"
+			],
+		},
+		{
+			"name": "Launch Client (No Webview Debug)",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"debugWebviews": false,
+			"args": [
+				"--extensionDevelopmentPath=${workspaceRoot}",
+				"G:\\reactive-notebook"
 			],
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"
@@ -36,6 +49,7 @@
 			"debugWebviews": true,
 			"args": [
 				"--extensionDevelopmentPath=${workspaceRoot}",
+				"--profile=Data Science",
 				"G:\\reactive-notebook"
 			],
 			"outFiles": [

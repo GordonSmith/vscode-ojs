@@ -75,7 +75,7 @@ export class NotebookKitController {
         const cellText = cell.document.getText();
         const outputData: NotebookCell = {
             notebook: notebook.metadata as Notebook,
-            cell: toCell({ id: this._tmpID++, ...cell.metadata as Cell }),
+            cell: toCell({ id: this._tmpID + cell.index, ...cell.metadata as Cell }),
             cellText: cellText
         };
         outputData.cell.mode = vscode2observable[cell.document.languageId];

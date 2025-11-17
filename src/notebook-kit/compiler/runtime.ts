@@ -1,3 +1,4 @@
+import type { Variable } from "@observablehq/runtime";
 import { type Definition, type DefineState, NotebookRuntime as NotebookRuntimeBase } from "@observablehq/notebook-kit/runtime";
 
 import "@observablehq/notebook-kit/index.css";
@@ -21,6 +22,7 @@ export class NotebookRuntime extends NotebookRuntimeBase {
         if (this.stateById.has(definition.id)) {
             throw new Error(`Cell with id ${definition.id} already exists`);
         }
+        console.log("add", definition);
         const placeholderDiv = document.createElement("div");
         placeholderDiv.className = "observablehq observablehq--cell";
         const state = { root: placeholderDiv, expanded: [], variables: [] };
@@ -35,6 +37,7 @@ export class NotebookRuntime extends NotebookRuntimeBase {
         if (!state) {
             throw new Error(`Cell with id ${definition.id} does not exist`);
         }
+        console.log("update", definition);
         await this.clear(definition.id);
         this.define(state, definition);
         await this.runtime._computeNow();
@@ -47,10 +50,11 @@ export class NotebookRuntime extends NotebookRuntimeBase {
             throw new Error(`Cell with id ${cellId} does not exist`);
         }
         [...state.variables].forEach(v => v.delete());
+        console.log("clear", cellId);
         await this.runtime._computeNow();
         state.variables = [];
         state.expanded = [];
-        state.root.innerHTML = "";
+        // state.root.innerHTML = "";
     }
 
     async remove(cellId: number): Promise<void> {
@@ -58,6 +62,7 @@ export class NotebookRuntime extends NotebookRuntimeBase {
         if (!state) {
             throw new Error(`Cell with id ${cellId} does not exist`);
         }
+        console.log("remove", cellId);
         void this.clear(cellId);
         this.stateById.delete(cellId);
         state.root.remove();
