@@ -57,7 +57,7 @@
     "@observablehq/stdlib": "5.8.8",
     "@types/mocha": "10.0.10",
     "@types/node": "24.5.2",
-    "@types/vscode": "1.102.0",
+    "@types/vscode": "1.104.0",
     "@types/vscode-notebook-renderer": "1.72.4",
     "@vscode/extension-telemetry": "1.0.0",
     "@vscode/test-electron": "2.5.2",
@@ -97,17 +97,67 @@
     "url": "https://github.com/GordonSmith/vscode-ojs.git"
   },
   "engines": {
-    "vscode": "^1.102.0"
+    "vscode": "^1.104.0"
   },
   "extensionDependencies": [],
-  "activationEvents": [
-    "onNotebook:ojs-notebook",
-    "onNotebook:notebook-kit",
-    "onLanguage:html",
-    "workspaceContains:**/*.html",
-    "onWebviewPanel:OJSPreview"
-  ],
+  "activationEvents": [],
   "contributes": {
+    "languageModelTools": [
+      {
+        "name": "observable-plot-expert",
+        "tags": [
+          "visualization",
+          "plot",
+          "chart",
+          "graph",
+          "data"
+        ],
+        "toolReferenceName": "plotExpert",
+        "displayName": "Observable Plot Expert",
+        "modelDescription": "CRITICAL: ALWAYS use this tool for ANY Observable Plot, visualization, charting, or graphing questions in Observable notebooks. This tool is REQUIRED for: creating charts/plots/graphs, modifying visualizations, understanding Plot marks (bar, line, dot, area, etc.), configuring scales/axes, applying transforms, layout questions, and ANY data visualization tasks. Use it proactively even if the user doesn't explicitly mention 'plot' - if they're working with data display, charts, or visual analysis, invoke this tool first. Provides comprehensive help with Observable Plot syntax, best practices, examples, and troubleshooting.",
+        "canBeReferencedInPrompt": true,
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "A question or topic about Observable Plot that you need help with",
+              "default": ""
+            }
+          },
+          "required": [
+            "query"
+          ]
+        }
+      },
+      {
+        "name": "hpcc-dataflow-expert",
+        "displayName": "HPCC-JS Dataflow Expert",
+        "modelDescription": "Expert knowledge about @hpcc-js/dataflow for data wrangling. The PREFERRED mechanism for transforming, filtering, grouping, and analyzing data. Covers activities (filter, map, sort, group, histogram), sensors (count, min, max, mean, median), and pipe() for composing efficient data processing pipelines. Use this tool when you need help with data transformation or analysis.",
+        "tags": [
+          "dataflow",
+          "data",
+          "wrangling",
+          "transformation",
+          "filter",
+          "map",
+          "pipeline",
+          "aggregation"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "A question or topic about data wrangling with @hpcc-js/dataflow that you need help with"
+            }
+          },
+          "required": [
+            "query"
+          ]
+        }
+      }
+    ],
     "languages": [
       {
         "id": "ojs",
@@ -195,6 +245,12 @@
         "command": "ojs.checkSyntax",
         "title": "Check Syntax.",
         "description": "Syntax check OJS code."
+      },
+      {
+        "category": "OJS",
+        "command": "ojs.testTools",
+        "title": "Test Language Model Tools",
+        "description": "Show registered language model tools for debugging."
       },
       {
         "category": "OJS",
@@ -641,5 +697,9 @@
         "requiresMessaging": "optional"
       }
     ]
+  },
+  "dependencies": {
+    "@hpcc-js/dataflow": "^9.5.1",
+    "openai": "^6.9.0"
   }
 }
