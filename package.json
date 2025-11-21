@@ -427,6 +427,12 @@
         "title": "Run in Browser JS",
         "description": "Set this cell to run in browser JavaScript mode",
         "icon": "$(terminal)"
+      },
+      {
+        "command": "ojs.copilot.context",
+        "title": "OJS: Copy Copilot Notebook Context",
+        "category": "OJS",
+        "description": "Generate a summarized context of the active OJS / Observable notebook for Copilot Chat"
       }
     ],
     "menus": {
