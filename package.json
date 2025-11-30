@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "observable-js",
-  "version": "0.4.56",
+  "version": "0.4.57",
   "publisher": "GordonSmith",
   "displayName": "Observable JS",
   "description": "ObservableHQ Notebook + Notebook Kit 2.0 tools for VS Code: author .onb.html notebooks, switch between HTML/notebook views, edit legacy .ojsnb/.ojs/.omd files, preview, import/export, and build static sites.",
