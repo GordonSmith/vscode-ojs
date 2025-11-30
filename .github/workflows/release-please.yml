@@ -48,11 +48,13 @@ jobs:
           echo "package_name=${RELEASE_NAME%:*}" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v4
         with:
+          submodules: true
           ref: ${{ steps.event_details.outputs.tag_name }}
       - name: Add files and publish release
         env:
           GITHUB_TOKEN: ${{ github.token }}
           VSCE_PAT: ${{ secrets.VSCE_TOKEN }}
+          OVSX_PAT: ${{ secrets.OVSX_TOKEN }}
           TAG_NAME: ${{ steps.event_details.outputs.tag_name }}
         run: |
           npm ci
@@ -62,6 +64,7 @@ jobs:
           mv observable-js.vsix ${TAG_NAME}.vsix
           gh release upload ${TAG_NAME} ${TAG_NAME}.vsix
           npx vsce publish --packagePath ${TAG_NAME}.vsix
+          npx ovsx publish ${TAG_NAME}.vsix -p ${OVSX_TOKEN}
 
   label:
     needs: [publish]
@@ -73,6 +76,8 @@ jobs:
       repository-projects: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Add label to PR
         env:
           GITHUB_TOKEN: ${{ github.token }}
