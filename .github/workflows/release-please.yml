@@ -54,7 +54,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           VSCE_PAT: ${{ secrets.VSCE_TOKEN }}
-          OVSX_PAT: ${{ secrets.OVSX_TOKEN }}
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
           TAG_NAME: ${{ steps.event_details.outputs.tag_name }}
         run: |
           npm ci
@@ -64,7 +64,7 @@ jobs:
           mv observable-js.vsix ${TAG_NAME}.vsix
           gh release upload ${TAG_NAME} ${TAG_NAME}.vsix
           npx vsce publish --packagePath ${TAG_NAME}.vsix
-          npx ovsx publish ${TAG_NAME}.vsix -p ${OVSX_TOKEN}
+          npx ovsx publish ${TAG_NAME}.vsix -p ${OVSX_PAT}
 
   label:
     needs: [publish]
