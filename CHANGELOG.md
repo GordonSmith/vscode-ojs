@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.56](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.55...observable-js-v0.4.56) (2025-11-30)
+
+
+### Bug Fixes
+
+* rename OVSX_PAT env var ([a2b96c0](https://github.com/GordonSmith/vscode-ojs/commit/a2b96c007012354a4f60259152e6737ce3c09451))
+
 ## [0.4.55](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.54...observable-js-v0.4.55) (2025-11-30)
 
 
