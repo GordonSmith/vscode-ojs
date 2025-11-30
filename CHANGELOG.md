@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.57](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.56...observable-js-v0.4.57) (2025-11-30)
+
+
+### Bug Fixes
+
+* restructure release workflow for improved artifact publishing ([3cabccd](https://github.com/GordonSmith/vscode-ojs/commit/3cabccdb51d95296eddcd3bb02d7a69e0272fb31)), closes [#103](https://github.com/GordonSmith/vscode-ojs/issues/103)
+* update readme and description ([87df4ab](https://github.com/GordonSmith/vscode-ojs/commit/87df4ab1b0f6ab814df49a677a7bd356275bfd66))
+
 ## [0.4.56](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.55...observable-js-v0.4.56) (2025-11-30)
 
 
