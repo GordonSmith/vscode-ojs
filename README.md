@@ -17,11 +17,11 @@ This extension now supports the new **ObservableHQ Notebook 2.0** format! 🎉
 
 ### Quick Start with ObservableHQ Notebook
 
-1. Use Command Palette: "Observable Kit: Create New Notebook"
-2. Choose a name (e.g., `my-notebook`) - will create `my-notebook.onb.html`
-3. Start writing vanilla JavaScript with `display()` function
-4. Use "Observable Kit: Preview" to see live preview
-5. Use "Observable Kit: Build Static Site" for deployment
+1. Run the Command Palette entry **"Observable Kit: Observable Kit Notebook"** to scaffold a new notebook
+2. Choose a name (e.g., `my-notebook`) – the command creates `my-notebook.onb.html`
+3. Click **Switch to Notebook View** (toolbar button or command) to open the interactive editor and start writing vanilla JavaScript with `display()`
+4. Use **Switch to Text View** any time you want to edit the underlying HTML shell or metadata
+5. Run **Observable Kit: Build Static Site** when you are ready to produce deployable output
 
 ### HTML File Detection & View Switching
 
@@ -75,13 +75,13 @@ Once a file is open, you can switch between views using toolbar buttons:
 
 ## Recommended Extension Pack
 
-To get the full experience, it is recommended to install this extension as part of the [JavsaScript Notebook](https://marketplace.visualstudio.com/items?itemName=GordonSmith.js-notebook-extension-pack) extension pack.
+To get the full experience, install this extension as part of the [JavaScript Notebook](https://marketplace.visualstudio.com/items?itemName=GordonSmith.js-notebook-extension-pack) extension pack.
 
 ## Quick Start with ObservableHQ Notebook-Kit
 
 ![Demo GIF](./images/notebook-kit-demo.gif)
 
-1. Open a `notebook-kit`notebook (extension .html)
+1. Open a `notebook-kit` notebook (extension .html)
 2. Click "Switch to Notebook View" in the text toolbar.
 3. Edit, run and save your notebook.
 4. Optionally click "Switch to Text View" to go back to the HTML source.
@@ -110,7 +110,7 @@ To get the full experience, it is recommended to install this extension as part 
 
 ## Commands
 
-_All commands are prefixed with "OJS" and are available via the command palette or by default shortcut key mappings_
+_Legacy commands are prefixed with "OJS"; Notebook Kit commands appear under "Observable Kit" in the Command Palette_
 
 ### Legacy OJS Commands
 
@@ -137,7 +137,7 @@ _All commands are prefixed with "OJS" and are available via the command palette 
 
 ## Settings
 
-_All settings are prefixed with "ojs." and are available via `file -> preferneces -> settings` menu_
+_All settings are prefixed with "ojs." and are available via `File -> Preferences -> Settings`_
 
 | Setting                  | Default | Description                                             |
 | ------------------------ | :-----: | ------------------------------------------------------- |

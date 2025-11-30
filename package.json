@@ -4,7 +4,7 @@
   "version": "0.4.56",
   "publisher": "GordonSmith",
   "displayName": "Observable JS",
-  "description": "Interpreter for ObservableHQ Notebooks - Includes VS Code Notebooks with Observable, Observable \"Markdown\" files with embedded Observable (.omd) and Observable \"JavaScript\" files.",
+  "description": "ObservableHQ Notebook + Notebook Kit 2.0 tools for VS Code: author .onb.html notebooks, switch between HTML/notebook views, edit legacy .ojsnb/.ojs/.omd files, preview, import/export, and build static sites.",
   "icon": "images/ObservableJS.png",
   "readme": "README.md",
   "categories": [
