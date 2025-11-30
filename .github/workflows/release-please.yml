@@ -25,7 +25,7 @@ jobs:
           config-file: .github/release-please-config.json
           manifest-file: .github/release-please-manifest.json
 
-  publish:
+  release-artifacts:
     needs: [release-please]
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
     runs-on: ubuntu-latest
@@ -50,11 +50,9 @@ jobs:
         with:
           submodules: true
           ref: ${{ steps.event_details.outputs.tag_name }}
-      - name: Add files and publish release
+      - name: Build VSIX and upload to release
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          VSCE_PAT: ${{ secrets.VSCE_TOKEN }}
-          OVSX_PAT: ${{ secrets.OVSX_PAT }}
           TAG_NAME: ${{ steps.event_details.outputs.tag_name }}
         run: |
           npm ci
@@ -63,11 +61,45 @@ jobs:
           gh release upload ${TAG_NAME} gordonsmith.observable-js.vsix 
           mv observable-js.vsix ${TAG_NAME}.vsix
           gh release upload ${TAG_NAME} ${TAG_NAME}.vsix
-          npx vsce publish --packagePath ${TAG_NAME}.vsix
-          npx ovsx publish ${TAG_NAME}.vsix -p ${OVSX_PAT}
+
+  publish-vsce:
+    needs: [release-please, release-artifacts]
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download VSIX asset
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ needs.release-artifacts.outputs.tag_name }}
+        run: gh release download ${TAG_NAME} --pattern "${TAG_NAME}.vsix"
+      - name: Publish to VS Code Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_TOKEN }}
+          TAG_NAME: ${{ needs.release-artifacts.outputs.tag_name }}
+        run: npx vsce publish --packagePath ${TAG_NAME}.vsix
+
+  publish-ovsx:
+    needs: [release-please, release-artifacts, publish-vsce]
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download VSIX asset
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ needs.release-artifacts.outputs.tag_name }}
+        run: gh release download ${TAG_NAME} --pattern "${TAG_NAME}.vsix"
+      - name: Publish to Open VSX Registry
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+          TAG_NAME: ${{ needs.release-artifacts.outputs.tag_name }}
+        run: npx ovsx publish ${TAG_NAME}.vsix -p ${OVSX_PAT}
 
   label:
-    needs: [publish]
+    needs: [publish-ovsx, release-artifacts]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -86,7 +118,7 @@ jobs:
           gh pr edit ${PR_NUMBER} --add-label 'autorelease: published'
 
   comments:
-    needs: [publish]
+    needs: [publish-ovsx, release-artifacts]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -97,9 +129,11 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ github.token }}
           comment-template: |
-            :tada: This change has been included in ${{ needs.publish.outputs.tag_name }} :tada:
+            :tada: This change has been included in ${{ needs.release-artifacts.outputs.tag_name }} :tada:
 
             The release is available on:
             - GitHub releases: {release_link}
+            - VS Code Marketplace: https://marketplace.visualstudio.com/items?itemName=gordonsmith.observable-js
+            - Open VSX Registry: https://open-vsx.org/extension/gordonsmith/observable-js
 
             Your **[release-please](https://github.com/googleapis/release-please)** bot :rocket::pray:
