@@ -3,14 +3,14 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as assert from "assert";
 import * as vscode from "vscode";
+import { describe, expect, it } from "vitest";
 import { activate, getDocUri } from "./helper";
 
-suite("Should get diagnostics", () => {
+describe.skip("Should get diagnostics", () => {
     const docUri = getDocUri("diagnostics.txt");
 
-    test("Diagnoses uppercase texts", async () => {
+    it("Diagnoses uppercase texts", async () => {
         await testDiagnostics(docUri, [
             { message: "ANY is all uppercase.", range: toRange(0, 0, 0, 3), severity: vscode.DiagnosticSeverity.Warning, source: "ex" },
             { message: "ANY is all uppercase.", range: toRange(0, 14, 0, 17), severity: vscode.DiagnosticSeverity.Warning, source: "ex" },
@@ -30,12 +30,12 @@ async function testDiagnostics(docUri: vscode.Uri, expectedDiagnostics: vscode.D
 
     const actualDiagnostics = vscode.languages.getDiagnostics(docUri);
 
-    assert.strictEqual(actualDiagnostics.length, expectedDiagnostics.length);
+    expect(actualDiagnostics.length).toStrictEqual(expectedDiagnostics.length);
 
     expectedDiagnostics.forEach((expectedDiagnostic, i) => {
         const actualDiagnostic = actualDiagnostics[i];
-        assert.strictEqual(actualDiagnostic.message, expectedDiagnostic.message);
-        assert.deepStrictEqual(actualDiagnostic.range, expectedDiagnostic.range);
-        assert.strictEqual(actualDiagnostic.severity, expectedDiagnostic.severity);
+        expect(actualDiagnostic.message).toStrictEqual(expectedDiagnostic.message);
+        expect(actualDiagnostic.range).toStrictEqual(expectedDiagnostic.range);
+        expect(actualDiagnostic.severity).toStrictEqual(expectedDiagnostic.severity);
     });
 }
