@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { omd2notebook, ojs2notebook, ohq } from "@hpcc-js/observablehq-compiler/node";
+import { omd2notebook, ojs2notebook, ohq } from "@hpcc-js/observablehq-compiler";
 import type { Value } from "../webview";
 import { diagnostic } from "./diagnostic";
 

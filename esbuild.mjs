@@ -77,7 +77,7 @@ async function main(tsconfigRaw, entryPoint, platform, format, plugins = [], out
     ];
 
     const external = platform === "node"
-        ? ["vscode", "fs", "path", "os", "jsdom"]
+        ? ["vscode", "fs", "path", "os"]
         : ["vscode", ...npmExternals];
 
     const ctx = await esbuild.context({

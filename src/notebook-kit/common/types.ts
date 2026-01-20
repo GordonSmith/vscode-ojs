@@ -12,7 +12,6 @@ export const vscode2observable: Record<string, Cell["mode"]> = {
     "dot": "dot",
     "node": "node",
     "python": "python",
-    "r": "r",
     "typescript": "ts"
 };
 
@@ -26,7 +25,6 @@ export const observable2vscode: Record<Cell["mode"], string> = {
     "dot": "dot",
     "node": "node",
     "python": "python",
-    "r": "r",
     "ts": "typescript"
 };
 

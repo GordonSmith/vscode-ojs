@@ -3,14 +3,14 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
+import * as assert from "assert";
 import * as vscode from "vscode";
-import { describe, expect, it } from "vitest";
 import { activate, getDocUri } from "./helper";
 
-describe.skip("Should do completion", () => {
+suite("Should do completion", () => {
     const docUri = getDocUri("completion.txt");
 
-    it("Completes JS/TS in txt file", async () => {
+    test("Completes JS/TS in txt file", async () => {
         await testCompletion(docUri, new vscode.Position(0, 0), {
             items: [
                 { label: "JavaScript", kind: vscode.CompletionItemKind.Text },
@@ -34,10 +34,10 @@ async function testCompletion(
         position
     )) as vscode.CompletionList;
 
-    expect(actualCompletionList.items.length).toBeGreaterThanOrEqual(2);
+    assert.ok(actualCompletionList.items.length >= 2);
     expectedCompletionList.items.forEach((expectedItem, i) => {
         const actualItem = actualCompletionList.items[i];
-        expect(actualItem.label).toStrictEqual(expectedItem.label);
-        expect(actualItem.kind).toStrictEqual(expectedItem.kind);
+        assert.strictEqual(actualItem.label, expectedItem.label);
+        assert.strictEqual(actualItem.kind, expectedItem.kind);
     });
 }
