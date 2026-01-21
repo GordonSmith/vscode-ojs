@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import fetch from "node-fetch";
 import { ohq } from "@hpcc-js/observable-shim";
-import { ojs2notebook, omd2notebook } from "@hpcc-js/observablehq-compiler";
+import { ojs2notebook, omd2notebook } from "@hpcc-js/observablehq-compiler/node";
 import { serializer } from "../notebook/controller/serializer";
 import { Diagnostic } from "./diagnostic";
 import { Meta } from "./meta";

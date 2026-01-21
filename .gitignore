@@ -1,6 +1,8 @@
 /dist
+/dist-test
 /grammar
 /lib*
+/out
 /node_modules
 /types
 /samples/d3/data/*
