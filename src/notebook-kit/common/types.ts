@@ -25,7 +25,8 @@ export const observable2vscode: Record<Cell["mode"], string> = {
     "dot": "dot",
     "node": "node",
     "python": "python",
-    "ts": "typescript"
+    "ts": "typescript",
+    "r": "r"
 };
 
 export interface NotebookCell {

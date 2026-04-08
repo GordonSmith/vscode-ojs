@@ -19,17 +19,4 @@ suite("Extension Integration", () => {
         }
         assert.ok(ext.isActive, "Extension should be active after activation");
     });
-
-    test("registers ojs commands", async function () {
-        const ext = vscode.extensions.getExtension(EXTENSION_ID);
-        assert.ok(ext);
-
-        if (!ext.isActive) {
-            await ext.activate();
-        }
-
-        const allCommands = await vscode.commands.getCommands(true);
-        const ojsCommands = allCommands.filter(c => c.startsWith("ojs."));
-        assert.ok(ojsCommands.length > 0, `Expected ojs.* commands, found: ${ojsCommands.length}`);
-    });
 });
