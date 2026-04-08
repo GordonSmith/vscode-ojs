@@ -37,6 +37,14 @@ const aliasPlugin = {
                 }
             }
         });
+
+        // For Node builds, use the /node subpath of @hpcc-js/observablehq-compiler
+        // which has a clean Node-compatible build without Rollup's broken require() stubs.
+        if (build.initialOptions.platform === "node") {
+            build.onResolve({ filter: /^@hpcc-js\/observablehq-compiler$/ }, () => {
+                return { path: path.resolve("node_modules/@hpcc-js/observablehq-compiler/dist/node/index.js") };
+            });
+        }
     }
 };
 
@@ -77,7 +85,7 @@ async function main(tsconfigRaw, entryPoint, platform, format, plugins = [], out
     ];
 
     const external = platform === "node"
-        ? ["vscode", "fs", "path", "os"]
+        ? ["vscode"]
         : ["vscode", ...npmExternals];
 
     const ctx = await esbuild.context({
