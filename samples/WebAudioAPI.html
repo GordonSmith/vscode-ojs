@@ -1,0 +1,24 @@
+<!doctype html>
+<notebook theme="air">
+    <title>Web Audio bug repro</title>
+    <script id="1" type="module">
+        const ctx = new AudioContext();
+        const status = document.createElement("div");
+        const btn = document.createElement("button");
+        btn.textContent = "Play 440Hz beep (500ms)";
+        btn.onclick = async () => {
+            await ctx.resume();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            gain.gain.value = 0.1; // reduce volume
+            osc.connect(gain).connect(ctx.destination);
+            osc.frequency.value = 440;
+            osc.start();
+            osc.stop(ctx.currentTime + 0.5); // 500 ms
+        };
+        const wrap = document.createElement("div");
+        wrap.appendChild(status);
+        wrap.appendChild(btn);
+        display(wrap);
+    </script>
+</notebook>
