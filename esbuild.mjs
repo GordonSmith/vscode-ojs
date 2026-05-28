@@ -2,9 +2,50 @@ import * as esbuild from "esbuild";
 import process from "node:process";
 import console from "node:console";
 
-import { problemMatcher, inlineCSS } from "@hpcc-js/esbuild-plugins";
 import { readFileSync, copyFileSync, mkdirSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
+import crypto from "node:crypto";
+
+function problemMatcher() {
+    return {
+        name: "problem-matcher",
+        setup(build) {
+            build.onStart(() => { console.log("[watch] build started"); });
+            build.onEnd((result) => {
+                result.errors.forEach(({ text, location }) => {
+                    console.error(`\u2718 [ERROR] ${text}`);
+                    console.error(`    ${location?.file}:${location?.line}:${location?.column}:`);
+                });
+                console.log("[watch] build finished");
+            });
+        }
+    };
+}
+
+function inlineCSS() {
+    return {
+        name: "inline-css",
+        setup(build) {
+            build.onLoad({ filter: /\.(css)$/ }, async (args) => {
+                if (build.initialOptions.platform === "browser") {
+                    const sourcePath = path.resolve(args.path);
+                    const hash = crypto.createHash("sha256").update(sourcePath).digest("hex").slice(0, 8);
+                    const sourceCSS = await readFile(sourcePath, { encoding: "utf8" });
+                    const sourceJS = `(function(){
+        if (!document.getElementById('${hash}')) {
+            var e = document.createElement('style');
+            e.id = '${hash}';
+            e.textContent = \`${sourceCSS.split("\\x25").join("\\x15")}\`;
+            document.head.appendChild(e);
+        }
+    })();`;
+                    return { contents: sourceJS, loader: "js" };
+                }
+            });
+        }
+    };
+}
 
 const tsconfigNode = JSON.parse(readFileSync("./tsconfig.json", "utf8"));
 const tsconfigBrowser = JSON.parse(readFileSync("./tsconfig.webview.json", "utf8"));
