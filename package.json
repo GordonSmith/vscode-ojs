@@ -49,7 +49,7 @@
     "update": "npx -y npm-check-updates -u -t minor"
   },
   "devDependencies": {
-    "@hpcc-js/esbuild-plugins": "1.8.10",
+    "@hpcc-js/esbuild-plugins": "1.9.4",
     "@hpcc-js/observable-shim": "3.1.0",
     "@hpcc-js/observablehq-compiler": "3.7.12",
     "@hpcc-js/util": "3.5.8",
@@ -89,7 +89,7 @@
     "typescript": "5.9.3",
     "typescript-eslint": "8.60.0",
     "uuid": "14.0.0",
-    "vite": "7.3.3",
+    "vite": "8.0.16",
     "vitest": "4.1.7"
   },
   "overrides": {
