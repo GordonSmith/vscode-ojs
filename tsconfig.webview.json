@@ -15,6 +15,7 @@
     "include": [
         "src/webview.tsx",
         "src/notebook/renderers/ojsRenderer.ts",
-        "src/notebook/renderers/wuRenderer.tsx"
+        "src/notebook/renderers/wuRenderer.tsx",
+        "src/types/**/*.d.ts"
     ]
 }

@@ -1,31 +1,40 @@
 <!doctype html>
-<notebook>
+<notebook theme="air">
   <title>hw</title>
-  <script id="1" type="text/markdown">
+  <script id="0" type="text/markdown">
     # Welcome to ObservableHQ Notebook
 
     This is a new notebook using the ObservableHQ Notebook format.
   </script>
-  <script id="2" type="module">
-    const message = "Hello, ObservableHQ Notebook!";
-    display(message);
+  <script id="1" type="text/x-typescript">
+    const message: string = "Hello, ObservableHQ Notebook!";
+    display(message as string);
   </script>
-  <script type="text/html">
+  <script id="2" type="text/html">
     <h1>Hello, <i>world</i>!</h1>
   </script>
-  <script type="application/sql" database="reporting">
-    SELECT * FROM customers
+  <script id="3" type="text/x-typescript">
+    const AMZN2 = FileAttachment("data/AMZN.csv").csv({typed: true});
   </script>
-  <script type="application/x-tex">
+  <script id="4" type="text/x-typescript">
+    const db = DuckDBClient.of({AMZN2});
+  </script>
+  <script id="5" type="application/sql" database="var:db" output="filteredAmzn">
+    SELECT * FROM AMZN2 WHERE "Date" > DATE '2015-01-01'
+  </script>
+  <script id="6" type="module" pinned="">
+    filteredAmzn
+  </script>
+  <script id="7" type="application/x-tex">
     int_{-infty}^{infty} e^{-x^2} dx = sqrt{pi}
   </script>
-  <script type="text/vnd.graphviz">
+  <script id="8" type="text/vnd.graphviz">
     digraph G {
         A -> B -> C;
         A -> C;
     }
   </script>
-  <script type="application/vnd.observable.javascript">
-    foo = 42
+  <script id="9" type="application/vnd.observable.javascript">
+    foo = 40 + 2
   </script>
 </notebook>

@@ -1,7 +1,8 @@
 import * as vscode from "vscode";
+import {  html2notebook, type Notebook } from "@hpcc-js/observablehq-compiler";
 import { NOTEBOOK_THEMES } from "./common/types";
 import { isObservableNotebook, isObservableHTMLNotebook } from "./common/notebook-detector";
-import { DECL, html2notebook, type Notebook, notebook2js } from "./compiler";
+import { DECL, notebook2js } from "./compiler";
 import { isNotebookKitType } from "./common/notebook-detector";
 
 export class Commands {
@@ -31,6 +32,8 @@ export class Commands {
             vscode.commands.registerCommand("observable-kit.cell.show", Commands.showCell),
             vscode.commands.registerCommand("observable-kit.cell.setNodeMode", Commands.setNodeMode),
             vscode.commands.registerCommand("observable-kit.cell.setJsMode", Commands.setJsMode),
+            vscode.commands.registerCommand("observable-kit.cell.setDatabase", Commands.setCellDatabase),
+            vscode.commands.registerCommand("observable-kit.cell.setOutput", Commands.setCellOutput),
         );
 
         // Status bar item to show current notebook title (toolbar command text cannot be dynamic)
@@ -292,6 +295,8 @@ export class Commands {
             vscode.commands.executeCommand("setContext", "observable-kit.currentCellPinned", isPinned);
             vscode.commands.executeCommand("setContext", "observable-kit.currentCellHidden", isHidden);
             vscode.commands.executeCommand("setContext", "observable-kit.cellMode", cell.metadata?.mode);
+            vscode.commands.executeCommand("setContext", "observable-kit.currentCellDatabase", cell.metadata?.database ?? "");
+            vscode.commands.executeCommand("setContext", "observable-kit.currentCellOutput", cell.metadata?.output ?? "");
             Commands.setNotebookReadOnlyContext(editor.notebook.metadata?.readOnly === true);
         }
     }
@@ -528,7 +533,7 @@ export class Commands {
 
     private static async setupPackageJson(workspaceFolder: vscode.WorkspaceFolder): Promise<void> {
         const packageJsonUri = vscode.Uri.joinPath(workspaceFolder.uri, "package.json");
-        let packageJson: any = {};
+        let packageJson: any;
 
         let exists = true;
         try {
@@ -566,7 +571,7 @@ export class Commands {
             packageJson.dependencies = {};
         }
 
-        packageJson.dependencies["@observablehq/notebook-kit"] = "^1.0.1";
+        packageJson.dependencies["@observablehq/notebook-kit"] = "^2.1.8";
 
         await vscode.workspace.fs.writeFile(packageJsonUri, new TextEncoder().encode(JSON.stringify(packageJson, null, 2)));
     }
@@ -703,6 +708,56 @@ export class Commands {
             vscode.NotebookEdit.updateCellMetadata(cell.index, newMetadata)
         ]);
         await vscode.commands.executeCommand("setContext", "observable-kit.cellMode", "js");
+        await vscode.workspace.applyEdit(edit);
+    }
+
+    static async setCellDatabase(cell: vscode.NotebookCell): Promise<void> {
+        if (!cell) return;
+
+        const current = cell.metadata?.database ?? "";
+        const value = await vscode.window.showInputBox({
+            value: current,
+            title: "SQL Database",
+            placeHolder: "e.g. var:db  (leave empty to remove)",
+            prompt: "Enter the database variable for this SQL cell"
+        });
+        if (value === undefined) return; // cancelled
+
+        const edit = new vscode.WorkspaceEdit();
+        const newMetadata = { ...cell.metadata };
+        if (value) {
+            newMetadata.database = value;
+        } else {
+            delete newMetadata.database;
+        }
+        edit.set(cell.notebook.uri, [
+            vscode.NotebookEdit.updateCellMetadata(cell.index, newMetadata)
+        ]);
+        await vscode.workspace.applyEdit(edit);
+    }
+
+    static async setCellOutput(cell: vscode.NotebookCell): Promise<void> {
+        if (!cell) return;
+
+        const current = cell.metadata?.output ?? "";
+        const value = await vscode.window.showInputBox({
+            value: current,
+            title: "Output Variable Name",
+            placeHolder: "e.g. results  (leave empty to remove)",
+            prompt: "Enter the output variable name for this SQL cell"
+        });
+        if (value === undefined) return; // cancelled
+
+        const edit = new vscode.WorkspaceEdit();
+        const newMetadata = { ...cell.metadata };
+        if (value) {
+            newMetadata.output = value;
+        } else {
+            delete newMetadata.output;
+        }
+        edit.set(cell.notebook.uri, [
+            vscode.NotebookEdit.updateCellMetadata(cell.index, newMetadata)
+        ]);
         await vscode.workspace.applyEdit(edit);
     }
 }

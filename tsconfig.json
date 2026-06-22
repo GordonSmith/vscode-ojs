@@ -28,6 +28,7 @@
     },
     "include": [
         "src/extension.ts",
-        "src/notebook-kit/renderers/renderer.ts"
+        "src/notebook-kit/renderers/renderer.ts",
+        "src/types/**/*.d.ts"
     ]
 }

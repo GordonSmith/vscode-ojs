@@ -46,6 +46,34 @@
                 "isDefault": true
             },
             "problemMatcher": []
+        },
+        {
+            "label": "web-extension-server",
+            "type": "shell",
+            "command": "npx",
+            "args": [
+                "@vscode/test-web",
+                "--browserType=chromium",
+                "."
+            ],
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^.*$"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "opening browser",
+                    "endsPattern": "web server running"
+                }
+            },
+            "presentation": {
+                "reveal": "always",
+                "group": "build"
+            },
+            "runOptions": {
+                "runOn": "folderOpen"
+            }
         }
     ]
 }

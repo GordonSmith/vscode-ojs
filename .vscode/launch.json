@@ -1,4 +1,9 @@
 // A launch configuration that compiles the extension and then opens it inside a new window
+// Web Extension Testing:
+//   1. Run "Web Extension Host + Chrome" compound config to start the web server and open browser
+//   2. This uses @vscode/test-web to serve the extension at http://localhost:3000
+//   3. Chrome DevTools will attach to allow debugging (press F12 in browser)
+//   NOTE: Requires extension to be web-compatible and built (npm run build)
 {
 	"version": "0.2.0",
 	"configurations": [
@@ -94,6 +99,14 @@
 			"outFiles": [
 				"${workspaceRoot}/client/out/test/**/*.js"
 			]
+		},
+		{
+			"name": "Launch Web Extension Host",
+			"type": "msedge",
+			"request": "attach",
+			"port": 9333,
+			"url": "http://localhost:3000",
+			"webRoot": "${workspaceFolder}"
 		}
 	],
 	"compounds": [
@@ -103,6 +116,13 @@
 				"Launch Client",
 				"Attach to Server"
 			]
+		},
+		{
+			"name": "Web Extension Host + Edge",
+			"configurations": [
+				"Launch Web Extension Host"
+			],
+			"preLaunchTask": "web-extension-server"
 		}
 	]
 }

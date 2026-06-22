@@ -1,5 +1,4 @@
-import { type Notebook, type Cell } from "./util";
-import { compileNotebook } from "./compiler";
+import { type Notebook, type Cell, compileNotebook } from "@hpcc-js/observablehq-compiler";
 import * as acorn from "acorn";
 import type { Node, Program, FunctionDeclaration, BlockStatement, ReturnStatement, TaggedTemplateExpression, Identifier, TemplateLiteral } from "acorn";
 

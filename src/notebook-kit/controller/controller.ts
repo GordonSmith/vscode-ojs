@@ -4,7 +4,7 @@ import { mkdir } from "node:fs/promises";
 import { dirname, relative } from "node:path";
 import { getInterpreterCachePath, getInterpreterCommand } from "../../../refs/notebook-kit/src/interpreters";
 import { getInterpreterMethod, isInterpreter } from "../../../refs/notebook-kit/src/lib/interpreters";
-import { type Notebook, type Cell, toCell } from "../compiler";
+import { type Notebook, type Cell, toCell } from "@hpcc-js/observablehq-compiler";
 import { OBSERVABLE_KIT_MIME, vscode2observable, NotebookCell } from "../common/types";
 import { spawn } from "node:child_process";
 

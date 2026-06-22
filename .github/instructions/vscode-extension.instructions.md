@@ -15,13 +15,13 @@ applyTo: "**"
 - Validate that the extension builds and runs in the VS Code Extension Host
 
 Repo-specific guidance:
-- Entry point `src/extension.ts` wires three subsystems: `ojs`, `notebook`, and `notebook-kit`, plus telemetry and an HTML notebook detector.
+- Entry point `src/extension.ts` wires three subsystems: `ojs` (classic OJS/OMD), `notebook` (`.ojsnb`), and `notebook-kit` (Observable Notebook Kit 2.0), plus telemetry. The HTML notebook detector lives inside the `notebook-kit` subsystem (`src/notebook-kit/common/notebook-detector.ts`).
 - Webview runtime code is bundled to `dist/webview.js` from `src/webview.ts` (IIFE). Use browser-safe imports only; do not import Node-only modules.
 - Observable imports: import `Runtime` from `@observablehq/runtime`, `Library` from `@observablehq/stdlib`, and `Inspector` from `@observablehq/inspector`.
 - Compiler stylesheet: import `@hpcc-js/observablehq-compiler/src/index.css` (note `src/` path). The `dist/` CSS is not present in the installed package.
-- If you change the webview or add renderers, wire new entry points in `esbuild.mjs` and update `localResourceRoots` in `src/ojs/preview.ts` if needed.
+- If you change the webview or add renderers, wire new entry points in `esbuild.mjs` and update `localResourceRoots` in `src/ojs/preview.ts` if needed. esbuild builds four bundles: `src/extension.ts` (node/cjs), `src/notebook/renderers/ojsRenderer.ts` (browser/esm), `src/notebook-kit/renderers/renderer.ts` (browser/esm → `dist/observable-kit-renderer.js`), and `src/webview.ts` (browser/iife).
 - Telemetry uses `@vscode/extension-telemetry` v1: instantiate `new TelemetryReporter(connectionString)` and dispose it on deactivate.
-- Linting is ESLint v9 flat config (`eslint.config.mjs`). Run `npm run lint`.
+- Linting is ESLint v10 flat config (`eslint.config.mjs`). Run `npm run lint`.
 - Build/watch: `npm run build` for a one-off build, `npm run build-ts-watch` for watch. Types are generated via `gen-node-types` and `gen-webview-types`.
 - Debugging: use the "Run Extension" launch to start an Extension Host; preview uses `getHtmlForWebview` in `src/ojs/preview.ts` to load `dist/webview.js`.
 

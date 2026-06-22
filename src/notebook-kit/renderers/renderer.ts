@@ -1,6 +1,6 @@
 import type { ActivationFunction } from "vscode-notebook-renderer";
-import { NotebookRuntime } from "../compiler/runtime";
-import { type Definition, Cell, compileCell } from "../compiler";
+import { type Definition, Cell, compileCell } from "@hpcc-js/observablehq-compiler";
+import { NotebookRuntime } from "@hpcc-js/observablehq-compiler/dist/runtime";
 import { NotebookCell } from "../common/types";
 
 import "@observablehq/notebook-kit/global.css";
@@ -58,6 +58,9 @@ class NotebookRuntimeEx {
 
 const runtime = new NotebookRuntimeEx();
 
+// Maps VS Code output item ID → the Observable cell key rendered by that item.
+const outputId2CellKey = new Map<string, string>();
+
 async function renderCell(cell: Cell, cellSource: string = cell.value, hostElement: HTMLElement = document.body) {
     const definitions = compileCell({
         ...cell,
@@ -69,12 +72,15 @@ async function renderCell(cell: Cell, cellSource: string = cell.value, hostEleme
             hostElement.appendChild(observableDiv);
         }
     }));
+    await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
 }
 
 export const activate: ActivationFunction = context => {
     return {
         async renderOutputItem(outputItem, element) {
             const nbCell: NotebookCell = outputItem.json();
+            const cellKey = `cell_${nbCell.cell.id}`;
+            outputId2CellKey.set(outputItem.id, cellKey);
             for (const cell of nbCell.notebook.cells) {
                 if (cell.id !== nbCell.cell.id && !runtime.has(`cell_${cell.id}`)) {
                     renderCell({
@@ -84,17 +90,22 @@ export const activate: ActivationFunction = context => {
                     });
                 }
             }
-            renderCell({ ...nbCell.cell, hidden: false, pinned: false }, nbCell.cellText, element as HTMLDivElement);
+            await renderCell({ ...nbCell.cell, hidden: false, pinned: false }, nbCell.cellText, element as HTMLDivElement);
         },
 
         disposeOutputItem(id?: string) {
             if (id) {
-                runtime.remove(id);
+                const cellKey = outputId2CellKey.get(id);
+                if (cellKey) {
+                    runtime.remove(cellKey);
+                    outputId2CellKey.delete(id);
+                }
                 if (runtime.empty()) {
                     runtime.reset();
                 }
             } else {
                 runtime.removeAll();
+                outputId2CellKey.clear();
             }
         }
     };

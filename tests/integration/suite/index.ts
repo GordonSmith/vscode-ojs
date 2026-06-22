@@ -1,6 +1,5 @@
 import { resolve } from "node:path";
 import { globSync } from "node:fs";
-
 // Patch globalThis.window BEFORE importing Mocha.
 // The VS Code Extension Host (Electron renderer process) defines `document`
 // but not `window`.  Mocha 11's utils.js uses `typeof document` to detect

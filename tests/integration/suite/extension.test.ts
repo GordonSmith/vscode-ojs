@@ -13,10 +13,16 @@ suite("Extension Integration", () => {
     test("extension activates successfully", async function () {
         const ext = vscode.extensions.getExtension(EXTENSION_ID);
         assert.ok(ext, `Extension ${EXTENSION_ID} should be installed`);
+        const extension = ext;
 
-        if (!ext.isActive) {
-            await ext.activate();
-        }
-        assert.ok(ext.isActive, "Extension should be active after activation");
+        await assert.doesNotReject(
+            Promise.resolve(extension.activate()),
+            "Extension activation should not reject"
+        );
+        assert.ok(extension.isActive, "Extension should be active after activation");
+        assert.ok(
+            extension.extensionPath.includes("vscode-ojs"),
+            `Expected development extension path, got '${extension.extensionPath}'`
+        );
     });
 });

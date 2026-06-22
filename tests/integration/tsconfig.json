@@ -3,6 +3,10 @@
         "target": "ES2022",
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
+        "types": [
+            "node",
+            "mocha"
+        ],
         "outDir": "../../out/tests/integration",
         "rootDir": ".",
         "strict": true,

@@ -1,15 +1,11 @@
 import * as vscode from "vscode";
-import { JSDOM } from "jsdom";
 import { v4 as uuidv4 } from "uuid";
 import { TextDecoder, TextEncoder } from "util";
 import type { ohq } from "@hpcc-js/observablehq-compiler";
-import { type Notebook, type Cell, html2notebook, notebook2html, notebook2js, js2notebook, resetCellIDs } from "../compiler";
+import { type Notebook, type Cell, html2notebook, notebook2html, resetCellIDs } from "@hpcc-js/observablehq-compiler";
+import { notebook2js, js2notebook } from "../compiler";
 import { observable2vscode, vscode2observable } from "../common/types";
 import { isObservableJSNotebook } from "../common/notebook-detector";
-
-const { window } = new JSDOM();
-globalThis.document = window.document;
-globalThis.DOMParser = window.DOMParser;
 
 let serializer: NotebookKitSerializer;
 
@@ -116,6 +112,9 @@ export class NotebookKitSerializer implements vscode.NotebookSerializer {
                 mode,
                 pinned,
                 hidden,
+                output: cell.metadata?.output,
+                database: cell.metadata?.database,
+                format: cell.metadata?.format,
                 since: undefined,
             });
         }
