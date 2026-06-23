@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.61](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.60...observable-js-v0.4.61) (2026-06-23)
+
+
+### Bug Fixes
+
+* update dependencies and improve notebook functionality ([e6b2099](https://github.com/GordonSmith/vscode-ojs/commit/e6b20990cf1260bf1c6d54f077aab37e0c166934))
+* update dependencies to latest versions ([7846ca9](https://github.com/GordonSmith/vscode-ojs/commit/7846ca90341cec94075ce0329df741bdff4ce7db))
+
 ## [0.4.60](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.59...observable-js-v0.4.60) (2026-04-08)
 
 
