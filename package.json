@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "observable-js",
-  "version": "0.4.61",
+  "version": "0.4.62",
   "publisher": "GordonSmith",
   "displayName": "Observable JS",
   "description": "An unofficial VS Code extension that wraps Observable's official notebook-kit to bring Observable Notebook 2.0 to VS Code: author .onb.html notebooks, switch between HTML/notebook views, edit legacy .ojsnb/.ojs/.omd files, preview, import/export, and build static sites.",

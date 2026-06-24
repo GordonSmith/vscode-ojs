@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.62](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.61...observable-js-v0.4.62) (2026-06-24)
+
+
+### Features
+
+* update download to target notebook-kit format ([7f170ad](https://github.com/GordonSmith/vscode-ojs/commit/7f170ada316d2a20e2cb4d1d933a873d9f41b648))
+
+
+### Bug Fixes
+
+* update README and package.json to reflect Observable Notebook terminology ([fa52a01](https://github.com/GordonSmith/vscode-ojs/commit/fa52a01197eb07e1c08bf26261933ca58ab1b0a3))
+
 ## [0.4.61](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.60...observable-js-v0.4.61) (2026-06-23)
 
 
