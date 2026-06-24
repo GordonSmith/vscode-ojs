@@ -4,7 +4,7 @@
   "version": "0.4.61",
   "publisher": "GordonSmith",
   "displayName": "Observable JS",
-  "description": "ObservableHQ Notebook + Notebook Kit 2.0 tools for VS Code: author .onb.html notebooks, switch between HTML/notebook views, edit legacy .ojsnb/.ojs/.omd files, preview, import/export, and build static sites.",
+  "description": "An unofficial VS Code extension that wraps Observable's official notebook-kit to bring Observable Notebook 2.0 to VS Code: author .onb.html notebooks, switch between HTML/notebook views, edit legacy .ojsnb/.ojs/.omd files, preview, import/export, and build static sites.",
   "icon": "images/ObservableJS.png",
   "readme": "README.md",
   "categories": [
@@ -14,8 +14,8 @@
     "Visualization"
   ],
   "tags": [
-    "ObservableHQ",
     "Observable",
+    "notebook-kit",
     "@observablehq/parser",
     "@observablehq/runtime",
     "@observablehq/inspector",
@@ -219,7 +219,7 @@
         "category": "OJS",
         "command": "ojs.import",
         "title": "Import notebook cells",
-        "description": "Imports notebook cells from ObservableHQ."
+        "description": "Imports notebook cells from Observable."
       },
       {
         "category": "OJS",
@@ -257,25 +257,25 @@
         "category": "Observable Kit",
         "command": "observable-kit.createNotebook",
         "title": "Observable Kit Notebook",
-        "description": "Create a new ObservableHQ Notebook notebook"
+        "description": "Create a new Observable Notebook notebook"
       },
       {
         "category": "Observable Kit",
         "command": "observable-kit.convertFromLegacy",
         "title": "Convert from Legacy Format",
-        "description": "Convert .ojsnb file to ObservableHQ Notebook format"
+        "description": "Convert .ojsnb file to Observable Notebook format"
       },
       {
         "category": "Observable Kit",
         "command": "observable-kit.setupWorkspace",
         "title": "Setup Workspace",
-        "description": "Setup ObservableHQ Notebook in current workspace"
+        "description": "Setup Observable Notebook in current workspace"
       },
       {
         "category": "Observable Kit",
         "command": "observable-kit.export",
         "title": "Export",
-        "description": "Export the current ObservableHQ Notebook",
+        "description": "Export the current Observable Notebook",
         "icon": {
           "dark": "./images/export-dark.svg",
           "light": "./images/export.svg"
@@ -626,7 +626,7 @@
       {
         "id": "notebook-kit-default",
         "type": "notebook-kit-default",
-        "displayName": "ObservableHQ Notebook",
+        "displayName": "Observable Notebook",
         "selector": [
           {
             "filenamePattern": "*.observable.html"
@@ -640,7 +640,7 @@
       {
         "id": "notebook-kit-option",
         "type": "notebook-kit-option",
-        "displayName": "ObservableHQ Notebook",
+        "displayName": "Observable Notebook",
         "selector": [
           {
             "filenamePattern": "*.html"
@@ -664,7 +664,7 @@
       },
       {
         "id": "observable-kit-renderer",
-        "displayName": "ObservableHQ Notebook Renderer",
+        "displayName": "Observable Notebook Renderer",
         "entrypoint": "./dist/observable-kit-renderer.js",
         "mimeTypes": [
           "application/observable-kit+json"

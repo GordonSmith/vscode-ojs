@@ -9,9 +9,9 @@ This extension pack includes a set of popular extensions for JavaScript Notebook
 
 ## Cell / Renderer Support
 
-- [JavaScript](https://www.javascript.com/) via [ObservableHQ JavaScript](https://observablehq.com/@observablehq/introduction-to-code?collection=@observablehq/notebook-fundamentals)
+- [JavaScript](https://www.javascript.com/) via [Observable JavaScript](https://observablehq.com/@observablehq/introduction-to-code?collection=@observablehq/notebook-fundamentals)
 - [Markdown](https://www.markdownguide.org/)
-- [ObservableHQ Markdown](https://observablehq.com/@observablehq/markdown-quick-reference?collection=@observablehq/notebook-fundamentals)
+- [Observable Markdown](https://observablehq.com/@observablehq/markdown-quick-reference?collection=@observablehq/notebook-fundamentals)
 - [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)
 - [SVG](https://developer.mozilla.org/en-US/docs/Web/SVG)
 - [GraphViz (DOT)](https://graphviz.org/)

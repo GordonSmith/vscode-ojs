@@ -1,11 +1,13 @@
-# ObservableHQ Notebook
+# Observable Notebook
 
 [![Pull Build Test](https://github.com/GordonSmith/vscode-ojs/actions/workflows/pull-build-test.yml/badge.svg)](https://github.com/GordonSmith/vscode-ojs/actions/workflows/pull-build-test.yml)
 ![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/GordonSmith.observable-js)
 
-## New: ObservableHQ Notebook 2.0 Support
+> **Note:** This is an unofficial, community-maintained VS Code extension. It is not affiliated with or endorsed by Observable. It wraps Observable's official [notebook-kit](https://observablehq.com/notebook-kit/) to bring Observable notebooks into VS Code.
 
-This extension now supports the new **ObservableHQ Notebook 2.0** format! 🎉
+## New: Observable Notebook 2.0 Support
+
+This extension now supports the new **Observable Notebook 2.0** format! 🎉
 
 ### Key Features
 
@@ -15,7 +17,7 @@ This extension now supports the new **ObservableHQ Notebook 2.0** format! 🎉
 - **Static Site Generation**: Build notebooks to static sites
 - **Backwards Compatibility**: Continue using existing `.ojsnb` format
 
-### Quick Start with ObservableHQ Notebook
+### Quick Start with Observable Notebook
 
 1. Run the Command Palette entry **"Observable Kit: Observable Kit Notebook"** to scaffold a new notebook
 2. Choose a name (e.g., `my-notebook`) – the command creates `my-notebook.onb.html`
@@ -33,7 +35,7 @@ When you open an HTML file, VS Code will:
 - **Regular HTML files**: Open in text editor by default
 - **Observable notebook files**: Show a choice dialog - "Select Editor for .html files" with options:
   - **Text Editor** (default HTML editor)
-  - **ObservableHQ Notebook** (interactive notebook view)
+  - **Observable Notebook** (interactive notebook view)
 
 **Seamless View Switching**:
 Once a file is open, you can switch between views using toolbar buttons:
@@ -58,14 +60,14 @@ Once a file is open, you can switch between views using toolbar buttons:
 - **Right-click menu**: Right-click HTML file in Explorer → "Observable Kit: Open HTML as Observable Notebook"
 - **Command Palette**: "Observable Kit: Convert HTML to Observable Notebook" (permanently renames to `.onb.html`)
 
-[Learn more about ObservableHQ Notebook →](https://observablehq.com/notebook-kit/)
+[Learn more about Observable Notebook →](https://observablehq.com/notebook-kit/)
 
 ## Supports
 
 - [JavaScript](https://www.javascript.com/)
-- [ObservableHQ JavaScript](https://observablehq.com/@observablehq/introduction-to-code?collection=@observablehq/notebook-fundamentals)
+- [Observable JavaScript](https://observablehq.com/@observablehq/introduction-to-code?collection=@observablehq/notebook-fundamentals)
 - [Markdown](https://www.markdownguide.org/)
-- [ObservableHQ Markdown](https://observablehq.com/@observablehq/markdown-quick-reference?collection=@observablehq/notebook-fundamentals)
+- [Observable Markdown](https://observablehq.com/@observablehq/markdown-quick-reference?collection=@observablehq/notebook-fundamentals)
 - [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)
 - [SQL](https://en.wikipedia.org/wiki/SQL)
 - [SVG](https://developer.mozilla.org/en-US/docs/Web/SVG)
@@ -77,7 +79,7 @@ Once a file is open, you can switch between views using toolbar buttons:
 
 To get the full experience, install this extension as part of the [JavaScript Notebook](https://marketplace.visualstudio.com/items?itemName=GordonSmith.js-notebook-extension-pack) extension pack.
 
-## Quick Start with ObservableHQ Notebook-Kit
+## Quick Start with Observable Notebook-Kit
 
 ![Demo GIF](./images/notebook-kit-demo.gif)
 
@@ -91,12 +93,12 @@ To get the full experience, install this extension as part of the [JavaScript No
 ![Demo GIF](./images/ojsDemoNotebook.gif)
 
 1. Select "OJS: Download Notebook" from command palette.
-2. Paste URL from ObservableHQ website, for Example: `https://observablehq.com/@observablehq/five-minute-introduction`
+2. Paste URL from Observable website, for Example: `https://observablehq.com/@observablehq/five-minute-introduction`
 3. Save file to known name and location (Note: Keep the default file extension of "ojsnb").
 4. In VS Code open the file.
 5. Click "Run All" in the notebook toolbar.
 
-## Quick Start with ObservableHQ JavaScript (.ojs) | Markdown (.omd)
+## Quick Start with Observable JavaScript (.ojs) | Markdown (.omd)
 
 ![Demo GIF](./images/ojsDemo.gif)
 
@@ -118,22 +120,22 @@ _Legacy commands are prefixed with "OJS"; Notebook Kit commands appear under "Ob
 | -------------------------- | :------: | --------------------------------------------------------------- |
 | OJS: Check Syntax          |    F7    | Syntax Check                                                    |
 | OJS: Preview Web Page      | Ctrl+K V | Preview notebook in an embedded Web Page                        |
-| OJS: Download Notebook     |          | Download notebook from ObservableHQ                             |
+| OJS: Download Notebook     |          | Download notebook from Observable                               |
 | OJS: Import Notebook Cells |          | Import published or shared notebook cells into current document |
 | OJS: Export to HTML        |          | Export as a self contained HTML file                            |
 | OJS: Export to ECL         |          | Export as a self contained ECL attribute                        |
 
-### ObservableHQ Notebook Commands
+### Observable Notebook Commands
 
 | Command                                             | Description                                                      |
 | --------------------------------------------------- | ---------------------------------------------------------------- |
-| Observable Kit: Create New Notebook                 | Create a new ObservableHQ Notebook HTML notebook                 |
-| Observable Kit: Preview                             | Preview notebook using ObservableHQ Notebook CLI                 |
+| Observable Kit: Create New Notebook                 | Create a new Observable Notebook HTML notebook                   |
+| Observable Kit: Preview                             | Preview notebook using Observable Notebook CLI                   |
 | Observable Kit: Build Static Site                   | Build static site from notebooks                                 |
 | Observable Kit: Convert from Legacy                 | Convert .ojsnb files to Observable Kit HTML format               |
-| Observable Kit: Convert HTML to Observable Notebook | Convert HTML file to ObservableHQ Notebook format (renames file) |
+| Observable Kit: Convert HTML to Observable Notebook | Convert HTML file to Observable Notebook format (renames file)   |
 | Observable Kit: Open HTML as Observable Notebook    | Open HTML file as Observable Notebook (temporary)                |
-| Observable Kit: Setup Workspace                     | Install and configure ObservableHQ Notebook                      |
+| Observable Kit: Setup Workspace                     | Install and configure Observable Notebook                        |
 
 ## Settings
 
@@ -214,10 +216,10 @@ ${JSON.stringify(cars, undefined, 2)}
 
 This extension would not have been possible without the following:
 
-- [ObservableHQ/parser](https://github.com/observablehq/parser)
-- [ObservableHQ/runtime](https://github.com/observablehq/runtime)
-- [ObservableHQ/inspector](https://github.com/observablehq/inspector)
-- [ObservableHQ/stdlib](https://github.com/observablehq/stdlib)
+- [observablehq/parser](https://github.com/observablehq/parser)
+- [observablehq/runtime](https://github.com/observablehq/runtime)
+- [observablehq/inspector](https://github.com/observablehq/inspector)
+- [observablehq/stdlib](https://github.com/observablehq/stdlib)
 - [@hpcc-js/observablehq-compiler](https://github.com/hpcc-systems/Visualization/tree/trunk/packages/observablehq-compiler)
 
 ## Recommended Extensions
