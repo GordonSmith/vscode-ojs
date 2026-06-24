@@ -1,0 +1,403 @@
+<!doctype html>
+<notebook theme="air">
+  <title>Notebooks 2.0 system guide</title>
+  <script id="0" type="text/markdown">
+    # Notebooks 2.0 system guide
+
+    Notebooks are interactive documents comprised of small programs called _cells_. The [user guide](https://new.observablehq.com/d/480a471b02ce8556) covers the visual interface; this guide covers writing code.
+
+    Cells can be written in TypeScript, JavaScript, Markdown, HTML, and other languages. Most logic is coded in TypeScript or JavaScript, while prose is typically written in Markdown.
+  </script>
+  <script id="1" type="module" pinned="">
+    const language = "JavaScript";
+
+    display(`This cell is ${language}.`);
+  </script>
+  <script id="2" type="text/markdown" pinned="">
+    This cell is _Markdown_.
+  </script>
+  <script id="3" type="text/html" pinned="">
+    And this cell is <i>HTML</i>.
+  </script>
+  <script id="4" type="text/markdown">
+    Notebooks are live: code runs when you load the notebook, showing the latest output. A saved notebook only stores cells’ source code, not its output. (Though you can capture and store additional data in file attachments.)
+  </script>
+  <script id="5" type="text/markdown" pinned="">
+    This cell ran at `${(new Date).toLocaleString("se")}`.
+  </script>
+  <script id="6" type="text/markdown">
+    Notebooks are reactive: cells run automatically like in a spreadsheet, re-running whenever referenced variables change. Reactivity makes it easier to implement interactive controls (or _inputs_), animations, and asynchronous operations such as loading data.
+  </script>
+  <script id="7" type="module" pinned="">
+    const x = view(Inputs.range([0, 100], { label: "x", step: 1 }));
+    const y = 2;
+  </script>
+  <script id="8" type="module" pinned="">
+    x ** y
+  </script>
+  <script id="9" type="text/markdown">
+    Top-level variables defined in JavaScript cells, such as `x` and `y` above, can be referenced in other cells. For Markdown, HTML, and other non-JavaScript cells, use dollar-curly expressions `$\{…}` to interpolate dynamic values.
+  </script>
+  <script id="10" type="text/markdown" pinned="">
+    The value of `x` is ${x}, and `y` is ${y}.
+  </script>
+  <script id="11" type="application/x-tex" pinned="">
+    ${x}^${y} = ${(x ** y).toLocaleString("en-US").replace(/,/g, "{,}")}
+  </script>
+  <script id="12" type="text/markdown">
+    ---
+    ## JavaScript
+    Use JavaScript cells to render charts, inputs, and other dynamic content. JavaScript cells can also declare top-level variables, say to load data or declare helper functions.
+
+    JavaScript cells come in two forms: expression cells and program cells. An expression cell contains a single JavaScript expression (note the lack of semicolon) and implicitly displays its value:
+  </script>
+  <script id="13" type="module" pinned="">
+    1 + 2
+  </script>
+  <script id="14" type="text/markdown">
+    A program cell, in contrast, contains statements (typically with semicolons) and declarations, and doesn't display anything by default:
+  </script>
+  <script id="15" type="module" pinned="">
+    const foo = 1 + 2;
+    const bar = 3 + 4;
+  </script>
+  <script id="16" type="text/markdown">
+    However, you can call `display` to display something:
+  </script>
+  <script id="17" type="module" pinned="">
+    const baz = 5 + 6;
+    display(foo + bar + baz);
+  </script>
+  <script id="18" type="text/markdown">
+    <aside>You can call <code>display</code> multiple times to display multiple things. When a cell re-runs, anything previously displayed will be cleared.</aside>
+
+    When displaying --- either implicitly or explicitly --- if the displayed value is a DOM node, it will be inserted directly into the page. Anything else is displayed using the _inspector_, which is useful for debugging. You can use the [DOM API](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model) to create content, though we recommend a library such as [Hypertext Literal](https://github.com/observablehq/htl), [Observable Plot](https://observablehq.com/plot/), or [D3](https://d3js.org).
+  </script>
+  <script id="19" type="module" pinned="">
+    function greeting(name) {
+      return html`Hello, <i>${name}</i>!`;
+    }
+  </script>
+  <script id="20" type="module" pinned="">
+    greeting("world")
+  </script>
+  <script id="21" type="module" pinned="">
+    Plot.lineY(AMZN, { x: "Date", y: "Close" }).plot({ y: { grid: true } })
+  </script>
+  <script id="22" type="text/markdown">
+    ---
+    ## How cells run
+  </script>
+  <script id="23" type="text/markdown">
+    When a top-level variable is defined as a promise, referencing cells will implicitly await the promise and only see the resolved value.
+  </script>
+  <script id="24" type="module" pinned="">
+    const delayed = new Promise((resolve) => setTimeout(() => resolve("hello"), 3000));
+  </script>
+  <script id="25" type="module" pinned="">
+    delayed
+  </script>
+  <script id="26" type="text/markdown">
+    When a top-level variable is defined as a generator, referencing cells will see only the latest yield value and will re-run whenever the generator yields a new value. This is typically used for interaction, animation, and live data.
+  </script>
+  <script id="27" type="module" pinned="">
+    const tick = (async function* () {
+      do {
+        yield new Date();
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      } while (true);
+    })();
+  </script>
+  <script id="28" type="module" pinned="">
+    tick
+  </script>
+  <script id="29" type="text/markdown">
+    The built-in `view` function displays the given input and returns a generator that yields the current value of the input.
+  </script>
+  <script id="30" type="module" pinned="">
+    const name = view(Inputs.text({ label: "Name" }));
+  </script>
+  <script id="31" type="text/markdown" pinned="">
+    Hello, ${name || "anonymous"}!
+  </script>
+  <script id="32" type="text/markdown">
+    If a cell should “clean up” before it runs again, use the `invalidation` promise to register a disposal hook. For example, below, the `invalidation` promise cancels the old animation frame when a new animation starts. Try clicking quickly:
+  </script>
+  <script id="33" type="module">
+    const clicks = view(Inputs.button("Click", { label: "Run cell" }));
+    const colors = ["#4269d0", "#efb118", "#ff725c", "#6cc5b0"];
+    const duration = 2000;
+  </script>
+  <script id="34" type="module" pinned="">
+    const canvas1 = display(html`<canvas width="${width}" height="30" style="max-width: 100%; height: 30px;"></canvas>`);
+  </script>
+  <script id="35" type="module" pinned="">
+    const context1 = canvas1.getContext("2d");
+    const color = colors[clicks % 4]; // cycle through colors on click
+    const start = performance.now(); // when the animation started
+
+    let frame = requestAnimationFrame(function tick(now) {
+      const t = Math.min(1, (now - start) / duration);
+      context1.fillStyle = color;
+      context1.fillRect(0, 0, t * canvas1.width, canvas1.height);
+      if (t < 1) frame = requestAnimationFrame(tick);
+    });
+
+    invalidation.then(() => cancelAnimationFrame(frame));
+  </script>
+  <script id="36" type="text/markdown">
+    ---
+    ## Loading files and data
+  </script>
+  <script id="37" type="text/markdown">
+    The built-in `FileAttachment` function references a file. It is typically used to load data. Add a file from the ${icon("files")} **Files** panel in the right sidebar.
+  </script>
+  <script id="38" type="module" pinned="">
+    const AMZN = FileAttachment("data/AMZN.csv").csv({ typed: true });
+  </script>
+  <script id="39" type="module" pinned="">
+    Inputs.table(AMZN)
+  </script>
+  <script id="40" type="text/markdown">
+    To load live data, you can use `fetch`, `WebSocket`, and other standard web APIs.
+  </script>
+  <script id="41" type="module" pinned="">
+    const world = fetch("https://cdn.jsdelivr.net/npm/world-atlas/land-110m.json")
+      .then((response) => response.ok ? response.json() : Promise.reject(response.status))
+      .then(display);
+  </script>
+  <script id="42" type="text/markdown">
+    To help load private data, you can load a workspace secret with `Secret("KEY_NAME")`. Public notebooks cannot see secrets; once a notebook is published, any secret in it will throw an error. Configure secrets in the old site’s workspace settings.
+  </script>
+  <script id="43" type="text/markdown">
+    Notebooks provide a built-in [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS) proxy, which lets you fetch data that would otherwise require a server. Enable the `proxy` option in `fetch`:
+
+    ```ts
+    const data = fetch(url, {proxy: true});
+    ```
+
+    Or in D3’s fetch wrappers:
+
+    ```ts
+    const data = d3.json(url, {proxy: true});
+    ```
+  </script>
+  <script id="44" type="text/markdown">
+    ---
+    ## Standard library
+  </script>
+  <script id="45" type="text/markdown">
+    The 2026 standard library includes a handful of additional built-ins:
+
+    - `display` - a function to display a value
+    - `view` - a function to display an input and return its value generator
+    - `invalidation` - a promise for disposing resources when a cell is re-run
+    - `visibility` - a promise to wait for a cell to become visible
+    - `width` - the current page width
+    - `now` - the current time
+  </script>
+  <script id="46" type="text/markdown">
+    A handful of recommended libraries (and sample datasets) are also available by default, including:
+    - `Inputs` - Observable Inputs
+    - `htl`, `html`, `svg` - Observable Hypertext Literal
+    - `Plot` - Observable Plot
+    - `d3` - D3.js
+    - `tex` - a tagged template literal for ${tex`\KaTeX`}
+    - `md` - a tagged template literal for Markdown
+    - `penguins` - the Palmer Archipelago penguins dataset
+  </script>
+  <script id="47" type="text/markdown">
+    Notebooks 2.0 use the 2026 standard library by default. Notebooks written with the old editor will use the [2018 standard library](https://github.com/observablehq/stdlib). You can switch versions at any time in the ${icon("dependencies")} **Dependencies** panel in the right sidebar. The new editor supports both versions, but the old editor can only use the old library. See our [guide to upgrading notebooks](https://new.observablehq.com/d/342634064e732825).
+  </script>
+  <script id="48" type="text/markdown">
+    ---
+    ## Imports
+  </script>
+  <script id="49" type="text/markdown">
+    You can load packages from npm using an `npm:` module specifier prefix.
+  </script>
+  <script id="50" type="module" pinned="">
+    import he from "npm:he";
+
+    display(he.encode("foo © bar ≠ baz 𝌆 qux"));
+  </script>
+  <script id="51" type="text/markdown">
+    Or from an Observable notebook:
+  </script>
+  <script id="52" type="application/vnd.observable.javascript" pinned="">
+    import { chart } from "observable:@d3/radial-tree-component";
+  </script>
+  <script id="53" type="text/markdown">
+    Or from [JSR](https://jsr.io/):
+  </script>
+  <script id="54" type="module" pinned="">
+    import { PI } from "jsr:@luca/pi";
+    display(PI)
+  </script>
+  <script id="55" type="text/markdown">
+    Or from a URL, for example to retrieve a specific commit to Observable Plot:
+  </script>
+  <script id="56" type="module" pinned="">
+    import * as Plot from "https://esm.sh/gh/observablehq/plot@f26d844";
+    display(Plot)
+  </script>
+  <script id="57" type="text/markdown">
+    Or with import attributes, _e.g._ to load data as JSON:
+  </script>
+  <script id="58" type="module" pinned="">
+    import world from "npm:world-atlas/countries-110m.json" with {type: "json"};
+    display(world)
+  </script>
+  <script id="59" type="text/markdown">
+    Notebooks 2.0 no longer support the old editor’s idiosyncratic `import with` syntax, which allowed injecting symbols into the imported notebook. We recommend writing an explicit function you can import and pass parameters to.
+  </script>
+  <script id="60" type="text/markdown">
+    ---
+    ## Other cell modes
+    All cells ultimately talk to each other via JavaScript, but different modes offer different conveniences.
+  </script>
+  <script id="61" type="text/markdown">
+    ### TypeScript
+
+    A TypeScript cell functions almost exactly like a JavaScript cell, except that types are stripped when the cell runs. This makes code written in Observable more portable among other programming environments. Types are not currently checked.
+  </script>
+  <script id="62" type="text/x-typescript" pinned="">
+    const coolNumbers: number[] = [1, 1, -1, 5, 6, 3, 3, 3];
+    coolNumbers.push("3"); // this would be a type error
+    display(coolNumbers);
+  </script>
+  <script id="63" type="text/markdown">
+    ### Markdown
+    Markdown cells are typically used for prose, images, and other static content. Markdown is [CommonMark](https://commonmark.org/)-compliant, supports HTML in Markdown, automatic linkification, automatic typographic enhancements such as curly quotes and dashes, and automatic linking of headings.
+  </script>
+  <script id="64" type="text/markdown">
+    Use dollar-curly <code>$\{…}</code> expressions to interpolate dynamic JavaScript values into Markdown, including text, DOM nodes, and bits of dynamic Markdown.
+  </script>
+  <script id="65" type="text/markdown" pinned="">
+    Hello, ${atob("d29ybGQ=")}!
+  </script>
+  <script id="66" type="text/markdown">
+    ### HTML
+  </script>
+  <script id="67" type="text/markdown">
+    HTML cells are used similarly to Markdown cells, and also support dollar-curly <code>$\{…}</code> interpolation. Unlike Markdown cells, HTML cells automatically escape any interpolated values, providing additional safety when handling dynamic and user-specified content.
+  </script>
+  <script id="68" type="text/html" pinned="">
+    Interpolated values are considered text, ${"not <i>HTML</i>"}.
+  </script>
+  <script id="69" type="text/markdown">
+    ### SQL
+    SQL cells allow querying database clients
+  </script>
+  <script id="70" type="module" pinned="">
+    const db = DuckDBClient.of({ AMZN });
+  </script>
+  <script id="71" type="application/sql" pinned="" database="var:db">
+    SELECT * FROM AMZN WHERE "Date" > DATE '2015-01-01'
+  </script>
+  <script id="72" type="text/markdown">
+    ### TeX
+    Use the ${tex`\KaTeX`} library to represent mathematical equations:
+  </script>
+  <script id="73" type="application/x-tex">
+    g(x):=f^{L}(W^{L}f^{L-1}(W^{L-1}\cdots f^{1}(W^{1}x)\cdots ))
+  </script>
+  <script id="74" type="text/markdown">
+    You can also write the tagged template literal in JavaScript:
+  </script>
+  <script id="75" type="module" pinned="">
+    tex`x = y`
+  </script>
+  <script id="76" type="text/markdown">
+    ### DOT
+    DOT lets you define Graphviz diagrams:
+  </script>
+  <script id="77" type="text/vnd.graphviz" pinned="">
+    digraph HaberBosch {
+        rankdir=LR;
+        node [fontsize=9];
+        edge [fontsize=9];
+
+        compressor [label="Compressor"];
+        hx         [label="Heat\nexchanger"];
+        reactor    [label="Ammonia\nreactor"];
+        condenser  [label="Condenser"];
+
+        feed    [label="H2 + N2"];
+        nh3     [label="NH3 product"];
+        power   [label="Purge gas to\npower generation"];
+
+        feed       -> compressor;
+        compressor -> hx        [label="fresh feed"];
+        hx         -> reactor   [label="preheated feed"];
+        reactor    -> hx        [label="hot NH3 mixture"];
+        hx         -> condenser [label="cooled mixture"];
+        condenser  -> nh3;
+
+        condenser -> reactor [label="recycle", constraint=false];
+        reactor   -> power;
+    }
+  </script>
+  <script id="78" type="text/markdown">
+    You can also write the tagged template literal in JavaScript:
+  </script>
+  <script id="79" type="module" pinned="">
+    dot`digraph { rankdir=LR; a -> b; b -> c; a -> c; c -> b; }`
+  </script>
+  <script id="80" type="text/markdown">
+    ### Observable JavaScript
+    Observable JavaScript is what the old editor would call, simply, “JavaScript”. But it has certain idiosyncrasies that make it different from vanilla JavaScript. It is no longer the default, but we support it for backwards compatibility.
+
+    It declares variables with no leading `const`, `let`, or `var`:
+  </script>
+  <script id="81" type="application/vnd.observable.javascript" pinned="">
+    a = Math.PI
+  </script>
+  <script id="82" type="text/markdown">
+    You can make larger cells with a block of curly braces that returns a single value:
+  </script>
+  <script id="83" type="application/vnd.observable.javascript" pinned="">
+    b = {
+      return Math.PI * 2;
+    }
+  </script>
+  <script id="84" type="text/markdown">
+    Inputs use a special `viewof` keyword before the variable declaration:
+  </script>
+  <script id="85" type="application/vnd.observable.javascript" pinned="">
+    viewof c = Inputs.range()
+  </script>
+  <script id="86" type="text/markdown">
+    To learn more, see our guide to [upgrading to Notebooks 2.0](https://new.observablehq.com/d/342634064e732825).
+  </script>
+  <script id="87" type="text/markdown">
+    ---
+
+    ## Appendix
+
+    <style>
+
+      aside {
+      font: small var(--sans-serif);
+      color: var(--theme-foreground-muted);
+      max-width: 640px;
+    }
+
+    aside code {
+      font-size: inherit;
+    }
+
+    @media (min-width: calc(640px + 17rem)) {
+      aside {
+        float: right;
+        width: 12rem;
+      }
+    }
+
+    </style>
+  </script>
+  <script id="88" type="module">
+    import { keys, buttons } from "observable:@observablehq/keys"
+    import { icon } from "observable:@observablehq/icons";
+  </script>
+</notebook>

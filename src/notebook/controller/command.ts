@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
 import fetch from "node-fetch";
+import { notebook2html } from "@hpcc-js/observablehq-compiler";
+import { upgrade } from "../../util/document";
 import { serializer } from "./serializer";
 import { reporter } from "../../telemetry/index";
 
@@ -41,8 +43,9 @@ export class Commands {
             prompt: "URL", placeHolder: "https://observablehq.com/@user/notebook"
         });
         if (impUrl) {
+            const isNew = impUrl.indexOf("https://new.observablehq.com/") === 0;
             const isShared = impUrl.indexOf("https://observablehq.com/d") === 0;
-            const nb = await fetch(impUrl.replace(`https://observablehq.com/${isShared ? "d/" : ""}`, "https://api.observablehq.com/document/"), {
+            const nb = await fetch(impUrl.replace(`https://${isNew ? "new." : ""}observablehq.com/${isShared ? "d/" : ""}`, "https://api.observablehq.com/document/"), {
                 headers: {
                     origin: "https://observablehq.com",
                     referer: impUrl
@@ -51,13 +54,14 @@ export class Commands {
             if (nb) {
                 reporter.sendTelemetryEvent("command.download", { title: nb.title });
                 const saveUri = await vscode.window.showSaveDialog({
-                    defaultUri: vscode.Uri.file(`${nb.title}.ojsnb`),
+                    defaultUri: vscode.Uri.file(`${vscode.workspace.workspaceFolders?.[0].uri.fsPath}/${nb.title}.html`),
                     filters: {
-                        "OJS Notebook": ["ojsnb"]
+                        "notebook-kit": ["html"]
                     }
                 });
                 if (saveUri) {
-                    const buffer = Buffer.from(JSON.stringify(nb, undefined, 4));
+                    const html = notebook2html(upgrade(nb));
+                    const buffer = Buffer.from(html, "utf-8");
                     vscode.workspace.fs.writeFile(saveUri, buffer);
                 }
             }
@@ -88,4 +92,5 @@ export class Commands {
         }
     }
 }
+
 
