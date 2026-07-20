@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.63](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.62...observable-js-v0.4.63) (2026-07-20)
+
+
+### Bug Fixes
+
+* remove global polyfil ([56d319e](https://github.com/GordonSmith/vscode-ojs/commit/56d319e3f3a805ad5fcc072ec810a6f6f02678f9)), closes [#137](https://github.com/GordonSmith/vscode-ojs/issues/137)
+
 ## [0.4.62](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.61...observable-js-v0.4.62) (2026-06-24)
 
 
