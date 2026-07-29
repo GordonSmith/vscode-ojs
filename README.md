@@ -127,24 +127,27 @@ _Legacy commands are prefixed with "OJS"; Notebook Kit commands appear under "Ob
 
 ### Observable Notebook Commands
 
-| Command                                             | Description                                                      |
-| --------------------------------------------------- | ---------------------------------------------------------------- |
-| Observable Kit: Create New Notebook                 | Create a new Observable Notebook HTML notebook                   |
-| Observable Kit: Preview                             | Preview notebook using Observable Notebook CLI                   |
-| Observable Kit: Build Static Site                   | Build static site from notebooks                                 |
-| Observable Kit: Convert from Legacy                 | Convert .ojsnb files to Observable Kit HTML format               |
-| Observable Kit: Convert HTML to Observable Notebook | Convert HTML file to Observable Notebook format (renames file)   |
-| Observable Kit: Open HTML as Observable Notebook    | Open HTML file as Observable Notebook (temporary)                |
-| Observable Kit: Setup Workspace                     | Install and configure Observable Notebook                        |
+| Command                                             | Description                                                    |
+| --------------------------------------------------- | -------------------------------------------------------------- |
+| Observable Kit: Create New Notebook                 | Create a new Observable Notebook HTML notebook                 |
+| Observable Kit: Preview                             | Preview notebook using Observable Notebook CLI                 |
+| Observable Kit: Build Static Site                   | Build static site from notebooks                               |
+| Observable Kit: Convert from Legacy                 | Convert .ojsnb files to Observable Kit HTML format             |
+| Observable Kit: Convert HTML to Observable Notebook | Convert HTML file to Observable Notebook format (renames file) |
+| Observable Kit: Open HTML as Observable Notebook    | Open HTML file as Observable Notebook (temporary)              |
+| Observable Kit: Setup Workspace                     | Install and configure Observable Notebook                      |
 
 ## Settings
 
-_All settings are prefixed with "ojs." and are available via `File -> Preferences -> Settings`_
+Settings are available via `File -> Preferences -> Settings`.
 
-| Setting                  | Default | Description                                             |
-| ------------------------ | :-----: | ------------------------------------------------------- |
-| ojs.refreshPreviewOnSave |  true   | Refresh preview (if visible) when OJS document is saved |
-| ojs.showRuntimeValues    |  false  | Show runtime values as diagnostic info                  |
+| Setting                     | Default | Description                                             |
+| --------------------------- | :-----: | ------------------------------------------------------- |
+| ojs.refreshPreviewOnSave    |  true   | Refresh preview (if visible) when OJS document is saved |
+| ojs.showRuntimeValues       |  false  | Show runtime values as diagnostic info                  |
+| observableKit.format.enable |  true   | Format supported Observable Notebook Kit cells          |
+
+Detected raw Notebook Kit HTML files, including plain `*.html`, `*.onb.html`, and `*.observable.html` files, support VS Code's standard **Format Document** and format-on-save actions. JavaScript, TypeScript, Markdown, and HTML notebook cells also support **Format Cell** and **Format Notebook**. The formatter honors the editor's indentation and line-ending settings.
 
 ## Sample OJS File (myfile.ojs)
 
