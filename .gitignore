@@ -3,6 +3,7 @@
 /grammar
 /lib*
 /node_modules
+/out
 /types
 /samples/d3/data/*
 /samples/plot/data/*

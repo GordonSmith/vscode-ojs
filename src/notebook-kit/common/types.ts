@@ -22,6 +22,7 @@ export const observable2vscode: Record<Cell["mode"], string> = {
     "html": "html",
     "tex": "tex",
     "sql": "sql",
+    "sql.view": "sql",
     "dot": "dot",
     "node": "node",
     "python": "python",

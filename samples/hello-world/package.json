@@ -1,0 +1,22 @@
+{
+  "name": "hello-world",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rimraf docs/.observable",
+    "preview": "notebooks preview --root docs",
+    "build": "notebooks build --no-minify --root docs -- docs/*.html",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "update-major": "npx -y npm-check-updates -u",
+    "update": "npx -y npm-check-updates -u -t minor"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@observablehq/notebook-kit": "^2.2.0"
+  },
+  "devDependencies": {
+    "rimraf": "6.1.3"
+  }
+}

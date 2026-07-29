@@ -26,8 +26,24 @@
 			"debugWebviews": true,
 			"args": [
 				"--disable-extensions",
-				"--extensionDevelopmentPath=${workspaceRoot}",
-				"${workspaceRoot}/samples"
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"${workspaceFolder}/samples"
+			],
+			"outFiles": [
+				"${workspaceFolder}/dist/**/*.js"
+			],
+		},
+		{
+			"name": "hello-world project",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"preLaunchTask": "build",
+			"debugWebviews": true,
+			"args": [
+				"--disable-extensions",
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"${workspaceFolder}/samples/hello-world"
 			],
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"
@@ -38,9 +54,10 @@
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
+			"preLaunchTask": "build",
 			"debugWebviews": true,
 			"args": [
-				"--extensionDevelopmentPath=${workspaceRoot}",
+				"--extensionDevelopmentPath=${workspaceFolder}",
 				"G:\\reactive-notebook"
 			],
 			"outFiles": [
@@ -52,10 +69,11 @@
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
+			"preLaunchTask": "build",
 			"debugWebviews": true,
 			"args": [
-				"--extensionDevelopmentPath=${workspaceRoot}",
-				"${workspaceRoot}/refs/notebook-kit/docs"
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"${workspaceFolder}/refs/notebook-kit/docs"
 			],
 			"outFiles": [
 				"${workspaceFolder}/dist/**/*.js"
@@ -66,14 +84,15 @@
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
+			"preLaunchTask": "build",
 			"debugWebviews": true,
 			"args": [
-				"--extensionDevelopmentPath=${workspaceRoot}",
-				"${workspaceRoot}/samples"
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"${workspaceFolder}/samples"
 			],
 			"outFiles": [
-				"${workspaceRoot}/src/**/*.js",
-				"${workspaceRoot}/src/notebook/renderers/**/*.js"
+				"${workspaceFolder}/src/**/*.js",
+				"${workspaceFolder}/src/notebook/renderers/**/*.js"
 			],
 		},
 		{
