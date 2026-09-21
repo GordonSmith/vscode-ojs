@@ -1,0 +1,154 @@
+<!doctype html>
+<notebook theme="air">
+  <title>Graphviz - CGraph API</title>
+  <script id="0" type="text/markdown">
+    # Graphviz - CGraph API
+
+    _Examples of using the CGraph API to build a Graphviz Graph_
+
+    ## Hello World 
+
+    _Label will default to ID if not explicitly set_
+  </script>
+  <script id="1" type="module" pinned="">
+    const hw = gv.createGraph()
+      .addNode("Hello")
+      .addNode("World")
+      .addEdge("Hello", "World");
+
+    invalidation.then(() => {
+      gv.delete();
+    });
+  </script>
+  <script id="2" type="text/vnd.graphviz" pinned="">
+    ${hw.toDot()}
+  </script>
+  <script id="3" type="text/markdown">
+    ## Simple Attributes
+    _See [Graphviz docs](https://graphviz.org/doc/info/attrs.html) for attribute specific information_
+  </script>
+  <script id="4" type="module" pinned="">
+    const sa = gv.createGraph()
+      .addNode("A")
+      .setNodeAttr("A", "label", "Node A")
+      .setNodeAttr("A", "shape", "rect")
+      .addNode("B")
+      .setNodeAttr("B", "label", "Node B")
+      .setNodeAttr("B", "shape", "rect")
+      .addEdge("A", "B", "")
+      .setEdgeAttr("A", "B", "", "label", "a->b");
+
+    invalidation.then(() => {
+      sa.delete();
+    });
+  </script>
+  <script id="5" type="text/vnd.graphviz" pinned="">
+    ${sa.toDot()}
+  </script>
+  <script id="6" type="text/markdown">
+    ## Create With Attributes
+    _Easier one shot creation of nodes and edges_
+  </script>
+  <script id="7" type="module" pinned="">
+    const cwa = gv.createGraph("G")
+      .addNode("A", { label:"Node A", shape: "egg"})
+      .addNode("B", { label:"Node B", shape: "house"})
+      .addNode("C", { label:"Node C", shape: "circle"})
+      .addNode("D", { label:"Node D", shape: "hexagon"})
+      .addEdge("A",  "B", { label: "a->b" })
+      .addEdge("A", "C", { label: "a->c" })
+      .addEdge("B", "D", { label: "b->d" })
+      .addEdge("C", "D", { label: "c->d" })
+      .addEdge("D", "A");
+
+    invalidation.then(() => {
+      cwa.delete();
+    });
+  </script>
+  <script id="8" type="text/vnd.graphviz" pinned="">
+    ${cwa.toDot()}
+  </script>
+  <script id="9" type="text/markdown">
+    ## Subgraphs / Clusters
+
+    _Embedding nodes/edges within subgraph/clusters_
+  </script>
+  <script id="10" type="module" pinned="">
+    const main = gv.createGraph("G");
+    const sg1 = main.addSubgraph("c1", { label: "Subgraph A" })
+      .addNode("A", { label:"Node A", shape: "egg" })
+      .addNode("B", { label:"Node B", shape: "house" })
+      .addEdge("A",  "B", { label: "a->b" });
+    const sg2 = main.addSubgraph("c2", { label: "Subgraph B" })
+      .addNode("C", { label:"Node C", shape: "rect" })
+      .addNode("D", { label:"Node D", shape: "hexagon" })
+      .addEdge("C", "D", { label: "d->c" });
+    main
+      .addEdge("A", "C", { label: "a->c" })
+      .addEdge("B", "D", { label: "b->d" })
+      .addEdge("D", "A", { id:"D->A", style: "dashed", class: "running" });
+
+    invalidation.then(() => {
+      main.delete();
+    });
+  </script>
+  <script id="11" type="text/vnd.graphviz" pinned="">
+    ${main.toDot()}
+  </script>
+  <script id="12" type="text/markdown">
+    ## Bypass built-in dot renderer
+
+    _Alternativly bypass the Observable DOT rendering engine (it doesn't support html labels for example)_
+  </script>
+  <script id="13" type="module" pinned="">
+    html({raw: [main.layout()]})
+  </script>
+  <script id="14" type="text/markdown">
+    ## Render using @hpcc-js/graph
+
+    _Supports **zoom** (mouse wheel), **zoom to fit** (on double click), **selection**, styling etc._
+  </script>
+  <script id="15" type="text/html">
+    <div id="id_main" style="border: 1px solid lightGray;height: 480px"></div>
+  </script>
+  <script id="16" type="module">
+    display(selection);
+  </script>
+  <script id="17" type="module">
+    const selection = Mutable([]);
+    const setSelection = (_) => (selection.value = _);
+  </script>
+  <script id="18" type="module" pinned="">
+    const g = new GV.Widget()
+      .target("id_main")
+      .data(main)
+      .on("selectionChanged", () => {
+        setSelection(g.selection());
+      })
+      .render(w => {
+        w.setClass("complete", ["c1", "A", "B"]);
+        w.setClass("failed", ["c2", "C", "D"]);
+        w.zoomToFit();
+      })
+    ;
+
+    invalidation.then(() => {
+      g.target(null).render();
+    });
+  </script>
+  <script id="19" type="text/markdown">
+    ---
+
+    ## Appendix
+
+    _Instanciate the Graphviz Wasm Module._
+  </script>
+  <script id="20" type="module" pinned="">
+    import { Graphviz } from "npm:@hpcc-js/wasm-graphviz";
+    import { Graphviz as GV } from "npm:@hpcc-js/graph"
+
+    const gv = await Graphviz.load();
+
+    display(`GraphViz Version: ${gv.version()}`);
+  </script>
+</notebook>
