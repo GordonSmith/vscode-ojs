@@ -95,12 +95,12 @@
     "uuid": "14.0.3",
     "vitest": "5.0.5",
     "@xmldom/xmldom": "0.9.12",
-    "fast-uri": "4.2.2",
+    "fast-uri": "4.2.3",
     "qs": "6.16.1"
   },
   "overrides": {
     "@xmldom/xmldom": "0.9.12",
-    "fast-uri": "4.2.2",
+    "fast-uri": "4.2.3",
     "qs": "6.16.1"
   },
   "author": {
