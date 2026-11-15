@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.66](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.65...observable-js-v0.4.66) (2026-11-15)
+
+
+### Bug Fixes
+
+* bump versions (security) ([f86bd6e](https://github.com/GordonSmith/vscode-ojs/commit/f86bd6eaf65ed7e894e62696294b5db890ff7ecb))
+* honour vscode dark/light mode ([eba71fb](https://github.com/GordonSmith/vscode-ojs/commit/eba71fbce642695747f5fb23f39404e4f86d66c5)), closes [#154](https://github.com/GordonSmith/vscode-ojs/issues/154)
+
 ## [0.4.65](https://github.com/GordonSmith/vscode-ojs/compare/observable-js-v0.4.64...observable-js-v0.4.65) (2026-11-01)
 
 
