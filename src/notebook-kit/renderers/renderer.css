@@ -1,3 +1,11 @@
 :root {
     --max-width: unset;
 }
+
+body.vscode-light {
+    color-scheme: light;
+}
+
+body.vscode-dark {
+    color-scheme: dark;
+}
